@@ -1,38 +1,352 @@
+.img {
+  max-width: 100%;
+  height: auto;
+}
+
+.spot-img {
+  width: 200rem; 
+  height: auto; 
+}
+
 .App {
-  text-align: center;
-}
-
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
   min-height: 100vh;
+  width: 85vw;
+  max-width: 1900px;
+  margin: 0rem auto;
+}
+
+nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 90px;
+}
+
+li {
+  font-size: 22px;
+  padding: 5px 20px;
+}
+
+.imagen-home-banner {
+  position: absolute;
+  top: 50%;
+  right: -15%;
+  transform: translate(-50%, -50%);
+  z-index: -2;
+}
+
+.spot-img {
+  max-width: 58vw;
+  height: auto;
+  position: relative; /* Asegura que el z-index funcione correctamente */
+  z-index: 1; /* Asigna un valor menor para que quede detrás de la imagen palette */
+}
+
+.palette-img {
+  max-width: 52vw;
+  position: absolute;
+  top: 18rem;
+  left: 3rem;
+  z-index: 2;
+  transform: rotate(-5deg);
+}
+
+.home-text-section {
+  flex: 1;
   display: flex;
   flex-direction: column;
+  height: 68vh;
+  font-family: "Nunito", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 800;
+  font-style: normal;
+}
+
+.primary-heading {
+  font-size: clamp(2rem, 4vw, 4rem);
+  margin-top: 10rem;
+  margin-left: 2rem;
+  color: #0D001B;
+  max-width: 600px;
+}
+
+.about-container {
+  margin-top: 20rem;
+  background-color: #e5d0ff;
+  padding: 50px 0;
+  text-align: center;
+  border-radius: 5px 50px 5px 50px;
+  width: calc(100% - 40px); 
+  margin-left: 20px; 
+  margin-right: 20px; 
+}
+
+.about-content{
+  margin-left: -5rem;
+  max-width: 50rem;
+}
+
+.about-text {
+  font-family: "Nunito", sans-serif;
+  font-size: 2.5rem;
+  color: #333;
+}
+
+.art-img{
+  max-width: 35rem;
+  border-radius: 25px;
+}
+
+.about-description {
+  font-size: 1.2rem;
+  color: black;
+  margin-top: 20px;
+}
+
+.support-container{
   align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+  margin-top: 8.5rem;
 }
 
-.App-link {
-  color: #61dafb;
+.support-text{
+  font-size: 2rem;
+  font-family: "Nunito", sans-serif;
+  margin-bottom: 1rem;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.support-p{  
+  max-width: 68%;
+  position: relative;
+  top: 18px; /* Ajusta el valor según sea necesario */
+  margin: 0 auto;
+}
+
+.support-btn{
+  background-color: #8D33FF !important;
+  border-color: white !important;
+  border-radius: 50px !important; 
+  padding: 5px 20px !important; 
+  min-width: 130px !important; 
+  height: 2.7rem !important;
+  margin-top: 1.5rem;
+  margin-left: 10px;
+}
+
+.accordion-item {
+  font-family: "Nunito", sans-serif;
+  border-color: #d1acff !important;
+  width: 88rem;
+}
+
+.accordion-body li{
+  font-size: 1rem;
+}
+
+ol{
+  list-style: circle;
+}
+
+.accordion-button:focus {
+  border-color: #b576ff !important;
+  box-shadow: 0 0 0 0.2rem #d1acff !important;
+  background-color: #e5d0ff !important;
+}
+
+.accordion-button:not(.collapsed) {
+  background-color: #e5d0ff !important;
+}
+
+.accordion-button:hover {
+  background-color: #e5d0ff !important;
+}
+.primary-text {
+  margin-top: 1rem;
+  margin-left: 2rem;
+  max-width: 500px;
+  opacity: 1; /* Asegura que el texto sea visible */
+  transition: opacity 0.5s ease-in-out; /* Transición suave de opacidad */
+}
+
+.primary-text.fade-out {
+  opacity: 0;
+}
+
+.primary-text.fade-in {
+  opacity: 1;
+}
+
+.login-btn {
+  background-color: #8D33FF !important;
+  border-color: white !important;
+  border-radius: 50px !important; 
+  padding: 5px 30px !important; 
+  min-width: 130px !important; 
+  height: 3.2rem !important;
+  margin-top: 0.2rem;
+  margin-left: 10px;
+}
+
+.signup-btn {
+  background-color: white !important;
+  border-color: #8D33FF !important;
+  border-radius: 50px !important; 
+  padding: 5px 30px !important; 
+  min-width: 130px !important; 
+  height: 3.2rem !important;
+  margin-left: 10px;
+  margin-top: 0.2rem;
+  color: #8D33FF !important;
+}
+
+.register-btn{
+  background-color: #8D33FF !important;
+  border-color: white !important;
+  border-radius: 50px !important; 
+  padding: 5px 20px !important; 
+  min-width: 130px !important; 
+  height: 2.7rem !important;
+  margin-top: 0.2rem;
+  margin-left: 10px;
+}
+
+.email-box{
+  height: 40px;
+  max-width: 25rem;
+  margin-top: 5px;
+  margin-left: 2rem;
+}
+
+.form-control:focus {
+  border-color: #b576ff !important;
+  box-shadow: 0 0 0 0.2rem #d1acff !important;
+}
+
+.email{
+  margin-top: -15px;
+}
+
+.btn:hover {
+  background-color: #5e12b7 !important;
+  border-color: #5e12b7 !important;
+  color: white !important;
+}
+
+.navbar {
+  background-color: none;
+}
+
+.nav-logo {
+  max-width: 30vh;
+}
+
+.footer-logo{
+  max-width: 15rem;
+}
+
+.footer-container {
+  position: absolute;
+  font-family: "Nunito", sans-serif;
+  border-top: 1px solid #d1acff;
+  left: 0;
+  right: 0;
+  width: 99.2vw;
+  margin-top: 10rem;
+}
+
+.footer-login {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+}
+
+.cuadro-img{
+  max-width: 90%;
+  border-radius: 20px;
+  margin-left: 3rem;
+}
+
+.login-container {
+  max-width: 95rem;
+  margin: 10rem auto;
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  background-color: #fff;
+}
+
+.login-form {
+  max-width: 30rem; /* Define el ancho máximo del formulario */
+  margin-left: auto; /* Centra el formulario en el contenedor */
+  margin-right: auto;
+  margin-top: 4.5rem;
+  padding: 0 1rem; /* Agrega un poco de espacio a los lados */
+}
+
+.login-content {
+  display: flex;
+  flex-direction: row;
+}
+
+.logo-login {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  width: 20rem;
+}
+
+.form-floating {
+  margin-bottom: 15px;
+}
+
+.form-check-label {
+  font-weight: normal;
+}
+
+.form-check-input:checked {
+  background-color: #8D33FF !important;
+  border-color: #8D33FF !important;
+}
+
+.form-check-input:focus {
+  border: #8D33FF !important;
+  box-shadow: 0 0 0 0.2rem #d1acff !important;
+}
+
+.iniciar-btn {
+  background-color: #8D33FF !important;
+  border-color: white !important;
+  border-radius: 50px !important; 
+  margin-left: 6.5rem;
+  padding: 5px 23px !important; 
+  max-width: 15rem;
+  height: 2.7rem !important;
+}
+
+.text-body-secondary {
+  color: #6c757d;
+}
+
+.Links {
+  margin-top: 1rem;
+}
+
+.link-contraseña {
+  color: #8D33FF;
+}
+
+.link-cuenta {
+  color: #8D33FF;
+}
+
+.link-contraseña:hover {
+  color: #5e12b7;
+}
+
+.link-cuenta:hover {
+  color: #5e12b7;
+}
+
+.link-no-underline {
+  text-decoration: none;
 }
