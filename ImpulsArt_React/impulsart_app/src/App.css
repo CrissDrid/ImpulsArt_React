@@ -260,7 +260,52 @@ ol{
   width: 100%;
 }
 
-.cuadro-img{
+.register-img{
+  max-width: 95%;
+  margin-top: 6rem;
+  border-radius: 20px;
+  margin-left: 3rem;
+}
+
+.register-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
+
+.register-content {
+  max-width: 95rem;
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  background-color: #fff;
+  margin-top: 5rem !important; /* Empuja el contenido hacia abajo */
+}
+
+.create-btn{
+  background-color: #8D33FF !important;
+  border-color: white !important;
+  border-radius: 50px !important; 
+  margin-left: 12rem;
+  padding: 5px 23px !important; 
+  max-width: 15rem;
+  height: 2.7rem !important;
+}
+
+.footer-register {
+  margin-top: auto; /* Hace que el footer esté al final de la página */
+}
+
+.logo-register{
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  width: 20rem;
+}
+
+.login-img{
   max-width: 90%;
   border-radius: 20px;
   margin-left: 3rem;
@@ -276,11 +321,11 @@ ol{
 }
 
 .login-form {
-  max-width: 30rem; /* Define el ancho máximo del formulario */
-  margin-left: auto; /* Centra el formulario en el contenedor */
+  max-width: 30rem;
+  margin-left: auto;
   margin-right: auto;
   margin-top: 4.5rem;
-  padding: 0 1rem; /* Agrega un poco de espacio a los lados */
+  padding: 0 1rem;
 }
 
 .login-content {
@@ -349,4 +394,53 @@ ol{
 
 .link-no-underline {
   text-decoration: none;
+}
+
+.dropdown-divider {
+  margin-top: -2px !important;
+}
+
+.dropdown-menu {
+  max-width: 15rem;
+  font-size: 0.8rem;
+}
+
+.dropdown-item {
+  padding: 0.25rem 1rem;
+  font-size: 1rem; 
+  margin-top: -5px;
+}
+
+.username {
+  font-family: "Nunito", sans-serif;
+  font-size: 1rem;
+}
+
+.search {
+  margin-top: 2px;
+}
+
+.search-form {
+  border-radius: 50px !important;
+}
+
+.search-btn {
+  border-radius: 50vw !important;
+  width: 50px; /* Ajusta el tamaño del botón según tu diseño */
+  height: 45px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #8D33FF !important;
+  border: #8D33FF solid 0.5px !important;
+}
+
+.person-icon {
+  font-size: 45px;
+  color: #8D33FF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 1rem;
+  margin-top: -6px !important;
 }

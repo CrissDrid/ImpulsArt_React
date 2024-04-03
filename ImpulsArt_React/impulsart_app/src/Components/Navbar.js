@@ -30,7 +30,9 @@ function Navbar() {
               </Link>
             </li>
             <li>
+              <Link to="/register">
               <button className="btn btn-primary login-btn" type="button" >Saca A Tu Artista</button>
+              </Link>
             </li>
           </ul>
         </div>
