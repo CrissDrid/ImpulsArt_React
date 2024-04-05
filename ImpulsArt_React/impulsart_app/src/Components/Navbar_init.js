@@ -68,11 +68,7 @@ function Navbar_init() {
                   <ul className="dropdown-menu show" aria-labelledby="navbarDropdownMenuLink">
                     <li className='username'>{userName}</li>
                     <li><hr className="dropdown-divider"/></li>
-                    <li><a className="dropdown-item" href="#">Perfil</a></li>
                     <li><a className="dropdown-item" href="#">Mis Obras</a></li>
-                    <li><a className="dropdown-item" href="#">Carrito de Compras</a></li>
-                    <li><a className="dropdown-item" href="#">Mis Compras</a></li>
-                    <li><a className="dropdown-item" href="#">Mis Favoritos</a></li>
                     <li><hr className="dropdown-divider"/></li>
                     <li><button className="dropdown-item" onClick={handleLogout}>Cerrar Sesion</button></li>
                   </ul>

@@ -6,7 +6,58 @@ function Album() {
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = currentPage * itemsPerPage;
 
-  const cards = Array.from({ length: 22 }, (_, index) => (
+  const cardsData = [
+    {
+      title: 'Mona Lisa',
+      description: 'Réplica de la Mona Lisa con técnica de acuarelas, reinterpretando la expresión y los detalles para resaltar su belleza enigmática.',
+    },
+    {
+      title: 'La noche estrellada',
+      description: 'Réplica de La noche estrellada con técnica de óleo, intensificando los colores y los remolinos para crear un efecto más dinámico y cautivador.',
+    },
+    {
+        title: 'El nacimiento de Venus',
+        description: 'Réplica de El nacimiento de Venus con técnica de acrílico, resaltando la gracia y la serenidad de la diosa en su concha marina.',
+      },
+      {
+        title: 'Guernica',
+        description: 'Réplica de Guernica con técnica mixta, reinterpretando las figuras y los símbolos para transmitir la brutalidad del bombardeo de Guernica.',
+      },
+      {
+        title: 'La persistencia de la memoria',
+        description: 'Réplica de La persistencia de la memoria con técnica de surrealismo, enfatizando los relojes derretidos y los paisajes oníricos.',
+      },
+      {
+        title: 'El jardín de las delicias',
+        description: 'Réplica de El jardín de las delicias con técnica de acuarelas, resaltando los detalles surrealistas y el simbolismo moral.6',
+      },
+      {
+        title: 'La última cena',
+        description: 'Réplica de La última cena con técnica de óleo, capturando la emoción y la intensidad del momento.',
+      },
+      {
+        title: 'La primavera',
+        description: 'Réplica de La primavera con técnica de acrílico, realzando la belleza y el simbolismo mitológico de la obra.',
+      },
+      {
+        title: 'Los girasoles',
+        description: 'Réplica de Los girasoles con técnica de óleo, destacando la textura y el colorido de las flores.',
+      },
+      {
+        title: 'La creación de Adán',
+        description: 'Réplica de La creación de Adán con técnica de acrílico, resaltando el dramatismo y la belleza del momento.',
+      },
+      {
+        title: 'El grito',
+        description: 'Réplica de El grito con técnica de acrílico, resaltando la angustia y la desesperación de la figura.',
+      },
+      {
+        title: 'Las meninas',
+        description: 'Réplica de Las meninas con técnica de óleo, recreando la complejidad y la profundidad de la obra maestra de Velázquez.',
+      },
+  ];
+
+  const cards = cardsData.map((data, index) => (
     <div className="col" key={index}>
       <div className="card shadow-sm">
         <svg
@@ -15,21 +66,18 @@ function Album() {
           height="225"
           xmlns="http://www.w3.org/2000/svg"
           role="img"
-          aria-label="Placeholder: Thumbnail"
+          aria-label={`Imagen: ${data.title}`}
           preserveAspectRatio="xMidYMid slice"
           focusable="false"
         >
-          <title>Placeholder</title>
+          <title>{data.title}</title>
           <rect width="100%" height="100%" fill="#55595c" />
           <text x="50%" y="50%" fill="#eceeef" dy=".3em">
-            Thumbnail
+            {data.title}
           </text>
         </svg>
         <div className="card-body">
-          <p className="card-text">
-            This is a wider card with supporting text below as a natural lead-in to additional content. This content is a
-            little bit longer.
-          </p>
+          <p className="card-text">{data.description}</p>
           <div className="d-flex justify-content-between align-items-center">
             <div className="btn-group">
               <button type="button" className="btn btn-sm btn-outline-secondary">
