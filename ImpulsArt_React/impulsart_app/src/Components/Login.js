@@ -29,30 +29,30 @@ const Login = () => {
         email: form.email,
         contrasena: form.password,
       });
-
+  
       console.log('Server response:', response.data);
   
       if (response.data.success) {
         console.log('Login successful!');
-        navigate('/home');
-      } else {
-        const errorMessage = response.data.data;
-        if (errorMessage === "Credenciales inválidas") {
-          setError('Contraseña o Correo erroneos');
+        navigate('/home', { state: { userName: response.data.userName } });
         } else {
-          setError('Error al iniciar sesion');
+            const errorMessage = response.data.data;
+            if (errorMessage === "Credenciales inválidas") {
+                setError('Contraseña o Correo erroneos');
+            } else {
+                setError('Error al iniciar sesion');
+            }
         }
-      }
     } catch (error) {
-      if (error.response && error.response.status === 401) {
-        setError('Contraseña o Correo incorrectos');
-        console.error('Email o Contraseña incorrectos', error.message);
-      } else {
-        console.error('Error del servidor:', error.response.data.message);
-        setError('Error del servidor: ' + error.response.data.message);
-      }
+        if (error.response && error.response.status === 401) {
+            setError('Contraseña o Correo incorrectos');
+            console.error('Email o Contraseña incorrectos', error.message);
+        } else {
+            console.error('Error del servidor:', error.response.data.message);
+            setError('Error del servidor: ' + error.response.data.message);
+        }
     }
-  };
+};
   
 
   return (

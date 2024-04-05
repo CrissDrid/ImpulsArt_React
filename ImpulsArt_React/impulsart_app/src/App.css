@@ -444,3 +444,7 @@ ol{
   margin-right: 1rem;
   margin-top: -6px !important;
 }
+
+.album {
+  background-color: white;
+}

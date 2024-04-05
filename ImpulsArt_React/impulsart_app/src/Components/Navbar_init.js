@@ -1,14 +1,31 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Logo from '../Resources/Logo.svg';
 import { BsPersonCircle } from 'react-icons/bs';
 import { BiSearch } from 'react-icons/bi';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 
 function Navbar_init() {
+  const location = useLocation();
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [userName, setUserName] = useState('');
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (location.state && location.state.userName) {
+      setUserName(location.state.userName);
+    }
+  }, [location.state]);
 
   const toggleDropdown = () => {
     setDropdownOpen(!dropdownOpen);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    setUserName('');
+    setDropdownOpen(false);
+    navigate('/login', { replace: true });
   };
 
   return (
@@ -33,12 +50,12 @@ function Navbar_init() {
               <a className="nav-link active" aria-current="page" href="#">Contactanos</a>
             </li>
             <li className="nav-item justify-content-center">
-            <form className="d-flex mx-auto search">
+              <form className="d-flex mx-auto search">
                 <input className="form-control me-2 search-form" type="search" placeholder="Search" aria-label="Search"/>
                 <button className="btn btn-outline-success search-btn" type="submit">
                     <BiSearch />
                 </button>
-            </form>
+              </form>
             </li>
             <li className="nav-item">
               <div className="dropdown">
@@ -49,7 +66,7 @@ function Navbar_init() {
                 </button>
                 {dropdownOpen && (
                   <ul className="dropdown-menu show" aria-labelledby="navbarDropdownMenuLink">
-                    <li className='username'>Cristopher David Diaz Moreno</li>
+                    <li className='username'>{userName}</li>
                     <li><hr className="dropdown-divider"/></li>
                     <li><a className="dropdown-item" href="#">Perfil</a></li>
                     <li><a className="dropdown-item" href="#">Mis Obras</a></li>
@@ -57,7 +74,7 @@ function Navbar_init() {
                     <li><a className="dropdown-item" href="#">Mis Compras</a></li>
                     <li><a className="dropdown-item" href="#">Mis Favoritos</a></li>
                     <li><hr className="dropdown-divider"/></li>
-                    <li><a className="dropdown-item" href="#">Cerrar Sesion</a></li>
+                    <li><button className="dropdown-item" onClick={handleLogout}>Cerrar Sesion</button></li>
                   </ul>
                 )}
               </div>
