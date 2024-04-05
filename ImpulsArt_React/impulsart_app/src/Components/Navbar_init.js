@@ -3,6 +3,7 @@ import Logo from '../Resources/Logo.svg';
 import { BsPersonCircle } from 'react-icons/bs';
 import { BiSearch } from 'react-icons/bi';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 
 function Navbar_init() {
@@ -68,7 +69,9 @@ function Navbar_init() {
                   <ul className="dropdown-menu show" aria-labelledby="navbarDropdownMenuLink">
                     <li className='username'>{userName}</li>
                     <li><hr className="dropdown-divider"/></li>
-                    <li><a className="dropdown-item" href="#">Mis Obras</a></li>
+                    <li>
+                    <Link to='/ListObra' className="dropdown-item">Mis Obras</Link>
+                     </li>
                     <li><hr className="dropdown-divider"/></li>
                     <li><button className="dropdown-item" onClick={handleLogout}>Cerrar Sesion</button></li>
                   </ul>
