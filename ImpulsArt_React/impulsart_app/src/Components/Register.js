@@ -1,10 +1,46 @@
-import React from 'react';
-import { Link } from 'react-router-dom'; 
+import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom'; 
 import Logo from '../Resources/Logo.svg';
 import Art from '../Resources/Img-Art2.svg';
 import Footer from './Footer';
+import axios from 'axios';
 
-function Register() {
+const Register = () => {
+
+  let navigate = useNavigate()
+
+  const [usuario, setUsuario] = useState({
+    nombreUsuario: "",
+    identificacion: "",
+    nombre: "",
+    apellido: "",
+    fechaNacimiento: "",
+    email: "",
+    numCelular: "",
+    direccion: "",
+    contrasena: "",
+    tipoUsuario: "usuario comun"
+  });
+
+  const { nombre, apellido, fechaNacimiento, email, numCelular, direccion, contrasena, nombreUsuario, identificacion} = usuario;
+
+  const onInputChange = (e) => {
+    setUsuario({...usuario, [e.target.name]: e.target.value});
+  };
+
+  const onSubmit = async (e) => {
+    e.preventDefault();
+    try {
+
+      await axios.post("http://localhost:8086/api/usuario/create", usuario);
+      navigate("/login"); 
+
+    } catch (error) {
+      console.error(error);
+      // Manejo de errores aquí
+    }
+  };
+
   return (
     <div className="register-container">
       <div className="register-content row justify-content-center">
@@ -13,54 +49,50 @@ function Register() {
             <div className="register-image">
               <img className="logo-register" src={Logo} alt=""/>
             </div>
-            <form>
+            <form onSubmit={(e) => onSubmit(e)}>
               <div className="form-row">
                 <div className="row">
-                <div className="col-md-6">
-                  <div className="form-floating">
-                    <input type="text" className="form-control" id="floatingName" placeholder="Nombre"/>
-                    <label htmlFor="floatingName">Nombre</label>
+                  <div className="col-md-6">
+                    <div className="form-floating">
+                      <input className="form-control" id="floatingName" placeholder="Nombre" onChange={(e) => onInputChange(e)} value={nombre} type="text" name="nombre" required/>
+                      <label htmlFor="floatingName">Nombre</label>
+                    </div>
                   </div>
-                </div>
-                <div className="col-md-6">
-                  <div className="form-floating">
-                    <input type="text" className="form-control" id="floatingLastName" placeholder="Apellido"/>
-                    <label htmlFor="floatingLastName">Apellido</label>
+                  <div className="col-md-6">
+                    <div className="form-floating">
+                      <input className="form-control" id="floatingLastName" onChange={(e) => onInputChange(e)} value={apellido} type="text" name="apellido" placeholder="Apellido" required/>
+                      <label htmlFor="floatingLastName">Apellido</label>
+                    </div>
                   </div>
-                </div>
                 </div>
               </div>
               <div className="form-floating">
-                <input type="text" className="form-control" id="floatingId" placeholder="Numero de Documento"/>
+                <input className="form-control" id="floatingId" onChange={(e) => onInputChange(e)} value={identificacion} type="number" name="identificacion" placeholder="Numero de Documento" required/>
                 <label htmlFor="floatingId">Numero de Documento</label>
               </div>
               <div className="form-floating">
-                <input type="text" className="form-control" id="floatingUserName" placeholder="User Name"/>
+                <input type="text" className="form-control" id="floatingUserName" onChange={(e) => onInputChange(e)} value={nombreUsuario} name="nombreUsuario" placeholder="User Name" required/>
                 <label htmlFor="floatingUserName">User Name</label>
               </div>
               <div className="form-floating">
-                <input type="email" className="form-control" id="floatingEmail" placeholder="name@example.com"/>
+                <input type="email" className="form-control" id="floatingEmail" onChange={(e) => onInputChange(e)} value={email} name="email" placeholder="name@example.com" required/>
                 <label htmlFor="floatingEmail">Email</label>
               </div>
               <div className="form-floating">
-                <input type="date" className="form-control" id="floatingDOB" placeholder="Fecha de Nacimiento"/>
+                <input type="date" className="form-control" id="floatingDOB" onChange={(e) => onInputChange(e)} value={fechaNacimiento} name="fechaNacimiento" placeholder="Fecha de Nacimiento" required/>
                 <label htmlFor="floatingDOB">Fecha de Nacimiento</label>
               </div>
               <div className="form-floating">
-                <input type="text" className="form-control" id="floatingPhone" placeholder="Numero de Celular"/>
+                <input type="number" className="form-control" id="floatingPhone" onChange={(e) => onInputChange(e)} value={numCelular} name="numCelular" placeholder="Numero de Celular" required/>
                 <label htmlFor="floatingPhone">Numero de Celular</label>
               </div>
               <div className="form-floating">
-                <input type="text" className="form-control" id="floatingAddress" placeholder="Direccion"/>
+                <input type="text" className="form-control" id="floatingAddress" onChange={(e) => onInputChange(e)} value={direccion} name="direccion" placeholder="Direccion" required/>
                 <label htmlFor="floatingAddress">Direccion</label>
               </div>
               <div className="form-floating">
-                <input type="password" className="form-control" id="floatingPassword" placeholder="Password"/>
+                <input type="password" className="form-control" id="floatingPassword" onChange={(e) => onInputChange(e)} value={contrasena} name="contrasena" placeholder="Password" required/>
                 <label htmlFor="floatingPassword">Contraseña</label>
-              </div>
-              <div className="form-floating">
-                <input type="password" className="form-control" id="floatingPasswordConfirmation" placeholder="Password"/>
-                <label htmlFor="floatingPasswordConfirmation">Confirmar Contraseña</label>
               </div>
               <button className="btn btn-primary w-100 py-2 create-btn" type="submit">Crear Cuenta</button>
               <div className="Links">
@@ -78,6 +110,6 @@ function Register() {
       </div>
     </div>
   );
-}
+};
 
 export default Register;
