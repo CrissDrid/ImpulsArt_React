@@ -10,7 +10,7 @@ const Register = () => {
   let navigate = useNavigate()
 
   const [usuario, setUsuario] = useState({
-    nombreUsuario: "",
+    userName: "",
     identificacion: "",
     nombre: "",
     apellido: "",
@@ -22,7 +22,7 @@ const Register = () => {
     tipoUsuario: "usuario comun"
   });
 
-  const { nombre, apellido, fechaNacimiento, email, numCelular, direccion, contrasena, nombreUsuario, identificacion} = usuario;
+  const { nombre, apellido, fechaNacimiento, email, numCelular, direccion, contrasena, userName, identificacion} = usuario;
 
   const onInputChange = (e) => {
     setUsuario({...usuario, [e.target.name]: e.target.value});
@@ -71,7 +71,7 @@ const Register = () => {
                 <label htmlFor="floatingId">Numero de Documento</label>
               </div>
               <div className="form-floating">
-                <input type="text" className="form-control" id="floatingUserName" onChange={(e) => onInputChange(e)} value={nombreUsuario} name="nombreUsuario" placeholder="User Name" required/>
+                <input type="text" className="form-control" id="floatingUserName" onChange={(e) => onInputChange(e)} value={userName} name="userName" placeholder="User Name" required/>
                 <label htmlFor="floatingUserName">User Name</label>
               </div>
               <div className="form-floating">
