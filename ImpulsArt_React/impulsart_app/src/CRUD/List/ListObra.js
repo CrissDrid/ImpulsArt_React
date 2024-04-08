@@ -108,24 +108,28 @@ export const ListObra = () => {
                             <th scope="col">Nombre</th>
                             <th scope="col">Categoria</th>
                             <th scope="col">Cantidad</th>
+                            <th scope="col">Imagen</th>
                             <th scope="col">Acciones</th>
                             {/* Aquí puedes agregar más encabezados si es necesario */}
                         </tr>
                     </thead>
                     <tbody>
-                        {listObra.map((obra, index) => (
-                            <tr key={index}>
-                                <td>{obra.nombreProducto}</td>
-                                <td>{obra.categoria}</td>
-                                <td>{obra.cantidad}</td>
-                                {/* Aquí puedes agregar más columnas si es necesario */}
-                                <td>
-                                    <Link to={`/EditObra/${obra.pkCod_Producto}`} className="btn btn-outline-primary mx-2">Edit</Link>
-                                    <button onClick={() => deleteObra(obra.pkCod_Producto)} className="btn btn-danger mx-2">Delete</button>
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
+    {listObra.map((obra, index) => {
+        return (
+            <tr key={index}>
+                <td>{obra.nombreProducto}</td>
+                <td>{obra.categoria}</td>
+                <td>{obra.cantidad}</td>
+                <td><img src={obra.imagen} alt="" style={{ maxWidth: '100px' }} /></td>
+                {/* Aquí puedes agregar más columnas si es necesario */}
+                <td>
+                    <Link to={`/EditObra/${obra.pkCod_Producto}`} className="btn btn-outline-primary mx-2">Edit</Link>
+                    <button onClick={() => deleteObra(obra.pkCod_Producto)} className="btn btn-danger mx-2">Delete</button>
+                </td>
+            </tr>
+        );
+    })}
+</tbody>
                 </table>
             </div>
         </>
