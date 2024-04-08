@@ -13,6 +13,7 @@ import EditSubasta from '../CRUD/Edit/EditSubasta';
 import ListDespacho from '../CRUD/List/ListDespacho';
 import FormDespacho from '../CRUD/Create/FormDespacho';
 import EditDespacho from '../CRUD/Edit/EditDespacho';
+import ListPQRS from '../CRUD/List/ListPQRS';
 
 function AppRoutes() { // Cambia el nombre de la función a AppRoutes
   return (
@@ -39,6 +40,13 @@ function AppRoutes() { // Cambia el nombre de la función a AppRoutes
 <Route path="/CreateDespacho" element = {<FormDespacho />}/>
 <Route path="/EditDespacho/:pkCod_Despacho" element = {<EditDespacho />}/>
 {/*CRUD DESPACHO*/}
+
+{/*CRUD PQRS*/}
+<Route path="/ListPQRS" element = {<ListPQRS />}/>
+<Route path="/CreatePQRS" element = {<FormDespacho />}/>
+<Route path="/EditPQRS/:pkCod_PQRS" element = {<EditDespacho />}/>
+{/*CRUD PQRS*/}
+
       </Routes>
     </Router>
   );

@@ -57,10 +57,6 @@ const FormObra = () => {
                 <input className="form-control" type="text" name="nombreProducto" value={obra.nombreProducto} onChange={handleInputChange} placeholder="Ingrese el nombre de la obra" required />
               </div>
               <br />
-              <div className="imagen">
-                <input className="form-control" type="file" name="imagen" accept="image/*" onChange={handleFileChange} />
-              </div>
-              <br />
               <div className="nombre">
                 <input className="form-control" type="number" name="costo" value={obra.costo} onChange={handleInputChange} placeholder="Ingrese cuanto costara su producto" required />
               </div>
@@ -88,6 +84,15 @@ const FormObra = () => {
               <div className="direccion">
                 <input className="form-control" type="text" name="descripcion" value={obra.descripcion} onChange={handleInputChange} placeholder="Ingrese una descripcion de su obra" required />
               </div>
+              <br />
+              <div className="imagen">
+                <input className="form-control" type="file" name="imagen" accept="image/*" onChange={handleFileChange} />
+              </div>
+              {obra.imagen && (
+  <div className="preview-image" style={{ border: '1px solid #ccc', padding: '10px', marginTop: '10px' }}>
+    <img src={URL.createObjectURL(obra.imagen)} alt="Previsualización" className="img-fluid" style={{ maxWidth: '100%', maxHeight: '200px' }} />
+  </div>
+)}
               <br />
               <div className="form-check mb-3">
                 <button type="submit" className='btn btn-outline-success'>Crear obra</button>

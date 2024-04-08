@@ -77,9 +77,13 @@ export const EditObra = () => {
               <input className="form-control" onChange = {(e) => onInputChange(e)} value = {cantidad} type={"number"} name="cantidad" placeholder="Ingrese la cantidad de la obra" required />
             </div>
             <br />
-            <div className="fecha_nacimiento">
-              <input className="form-control" onChange = {(e) => onInputChange(e)} value = {categoria} type={"text"} name="categoria" placeholder="Ingresa la categoria de su obra" required />
-            </div>
+            <select className="form-select" onChange = {(e) => onInputChange(e)} name="categoria" value={categoria} required>
+    <option value="">Selecciona la categoría de su obra</option>
+    <option value="Pintura">Pintura</option>
+    <option value="Dibujo">Dibujo</option>
+    <option value="Maqueta">Maqueta</option>
+    <option value="Ceramica">Ceramica</option>
+            </select>
             <br />
             <div className="direccion">
               <input className="form-control" onChange = {(e) => onInputChange(e)} value = {descripcion} type={"text"} name="descripcion" placeholder="Ingrese una descripcion de su obra" required />
