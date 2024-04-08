@@ -77,9 +77,13 @@ const FormObra = () => {
                 <input className="form-control" type="text" name="cantidad" value={obra.cantidad} onChange={handleInputChange} placeholder="Ingrese la cantidad de la obra" required />
               </div>
               <br />
-              <div className="fecha_nacimiento">
-                <input className="form-control" type="text" name="categoria" value={obra.categoria} onChange={handleInputChange} placeholder="Ingresa la categoria de su obra" required />
-              </div>
+              <select className="form-select" name="categoria" value={obra.categoria} onChange={handleInputChange} required>
+    <option value="">Selecciona la categoría de su obra</option>
+    <option value="Pintura">Pintura</option>
+    <option value="Dibujo">Dibujo</option>
+    <option value="Maqueta">Maqueta</option>
+    <option value="Ceramica">Ceramica</option>
+            </select>
               <br />
               <div className="direccion">
                 <input className="form-control" type="text" name="descripcion" value={obra.descripcion} onChange={handleInputChange} placeholder="Ingrese una descripcion de su obra" required />

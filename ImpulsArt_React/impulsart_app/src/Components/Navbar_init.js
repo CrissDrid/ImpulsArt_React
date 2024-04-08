@@ -50,14 +50,6 @@ function Navbar_init() {
             <li className="nav-item">
               <a className="nav-link active" aria-current="page" href="#">Contactanos</a>
             </li>
-            <li className="nav-item justify-content-center">
-              <form className="d-flex mx-auto search">
-                <input className="form-control me-2 search-form" type="search" placeholder="Search" aria-label="Search"/>
-                <button className="btn btn-outline-success search-btn" type="submit">
-                    <BiSearch />
-                </button>
-              </form>
-            </li>
             <li className="nav-item">
               <div className="dropdown">
                 <button className="nav-link active dropdown" onClick={toggleDropdown}>

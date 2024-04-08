@@ -1,105 +1,149 @@
-import React, { useState } from 'react';
+import axios from 'axios';
+import React, { useEffect, useState } from 'react';
+import { BiSearch } from 'react-icons/bi';
 
 function Album() {
+  const [listObra, setListObra] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 9;
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = currentPage * itemsPerPage;
+  const [categoria, setCategoria] = useState('');
+  const [nombreProducto, setNombreProducto] = useState('');
 
-  const cardsData = [
-    {
-      title: 'Mona Lisa',
-      description: 'Réplica de la Mona Lisa con técnica de acuarelas, reinterpretando la expresión y los detalles para resaltar su belleza enigmática.',
-    },
-    {
-      title: 'La noche estrellada',
-      description: 'Réplica de La noche estrellada con técnica de óleo, intensificando los colores y los remolinos para crear un efecto más dinámico y cautivador.',
-    },
-    {
-        title: 'El nacimiento de Venus',
-        description: 'Réplica de El nacimiento de Venus con técnica de acrílico, resaltando la gracia y la serenidad de la diosa en su concha marina.',
-      },
-      {
-        title: 'Guernica',
-        description: 'Réplica de Guernica con técnica mixta, reinterpretando las figuras y los símbolos para transmitir la brutalidad del bombardeo de Guernica.',
-      },
-      {
-        title: 'La persistencia de la memoria',
-        description: 'Réplica de La persistencia de la memoria con técnica de surrealismo, enfatizando los relojes derretidos y los paisajes oníricos.',
-      },
-      {
-        title: 'El jardín de las delicias',
-        description: 'Réplica de El jardín de las delicias con técnica de acuarelas, resaltando los detalles surrealistas y el simbolismo moral.6',
-      },
-      {
-        title: 'La última cena',
-        description: 'Réplica de La última cena con técnica de óleo, capturando la emoción y la intensidad del momento.',
-      },
-      {
-        title: 'La primavera',
-        description: 'Réplica de La primavera con técnica de acrílico, realzando la belleza y el simbolismo mitológico de la obra.',
-      },
-      {
-        title: 'Los girasoles',
-        description: 'Réplica de Los girasoles con técnica de óleo, destacando la textura y el colorido de las flores.',
-      },
-      {
-        title: 'La creación de Adán',
-        description: 'Réplica de La creación de Adán con técnica de acrílico, resaltando el dramatismo y la belleza del momento.',
-      },
-      {
-        title: 'El grito',
-        description: 'Réplica de El grito con técnica de acrílico, resaltando la angustia y la desesperación de la figura.',
-      },
-      {
-        title: 'Las meninas',
-        description: 'Réplica de Las meninas con técnica de óleo, recreando la complejidad y la profundidad de la obra maestra de Velázquez.',
-      },
-  ];
+  useEffect(() => {
+    if (categoria && !nombreProducto) {
+      getObraByCategoria();
+    } else if (nombreProducto && !categoria) {
+      getObraByNombreProducto();
+    } else if (categoria && nombreProducto) {
+      getObraByCategoriaAndNombreProducto();
+    } else {
+      getObra();
+    }
+  }, [categoria, nombreProducto, currentPage]);
 
-  const cards = cardsData.map((data, index) => (
-    <div className="col" key={index}>
-      <div className="card shadow-sm">
-        <svg
-          className="bd-placeholder-img card-img-top"
-          width="100%"
-          height="225"
-          xmlns="http://www.w3.org/2000/svg"
-          role="img"
-          aria-label={`Imagen: ${data.title}`}
-          preserveAspectRatio="xMidYMid slice"
-          focusable="false"
-        >
-          <title>{data.title}</title>
-          <rect width="100%" height="100%" fill="#55595c" />
-          <text x="50%" y="50%" fill="#eceeef" dy=".3em">
-            {data.title}
-          </text>
-        </svg>
-        <div className="card-body">
-          <p className="card-text">{data.description}</p>
-          <div className="d-flex justify-content-between align-items-center">
-            <div className="btn-group">
-              <button type="button" className="btn btn-sm btn-outline-secondary">
-                View
-              </button>
-              <button type="button" className="btn btn-sm btn-outline-secondary">
-                Edit
-              </button>
+  const normalizeData = (data) => {
+    if (Array.isArray(data)) {
+      return data;
+    } else if (data && data.data && Array.isArray(data.data)) {
+      return data.data;
+    } else {
+      return [];
+    }
+  };
+
+  const getObra = () => {
+    axios.get("http://localhost:8086/api/obra/all")
+      .then((response) => {
+        setListObra(normalizeData(response.data));
+      })
+      .catch((e) => {
+        console.log(e);
+      });
+  };
+
+  const getObraByCategoria = () => {
+    axios.get(`http://localhost:8086/api/obra/categoria/${categoria}`)
+      .then((response) => {
+        setListObra(normalizeData(response.data));
+      })
+      .catch((e) => {
+        console.log(e);
+      });
+  };
+
+  const getObraByNombreProducto = () => {
+    axios.get(`http://localhost:8086/api/obra/nombreProducto/${nombreProducto}`)
+      .then((response) => {
+        setListObra(normalizeData(response.data));
+      })
+      .catch((e) => {
+        console.log(e);
+      });
+  };
+
+  const getObraByCategoriaAndNombreProducto = () => {
+    axios.get(`http://localhost:8086/api/obra/categoria/${categoria}/nombreProducto/${nombreProducto}`)
+      .then((response) => {
+        setListObra(normalizeData(response.data));
+      })
+      .catch((e) => {
+        console.log(e);
+      });
+  };
+
+  const handlePaginationClick = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
+
+  const renderCards = () => {
+    return listObra.slice(startIndex, endIndex).map((obra, index) => (
+      <div className="col" key={index}>
+        <div className="card shadow-sm">
+          <img
+            src={obra.imagen}
+            className="bd-placeholder-img card-img-top"
+            width="100%"
+            height="225"
+            alt={`Imagen: ${obra.nombreProducto}`}
+          />
+          <div className="card-body">
+            <h5 className="card-title">{obra.nombreProducto}</h5>
+            <p className="card-text">{obra.descripcion}</p>
+            <p className="card-text">Categoría: {obra.categoria}</p>
+            <div className="d-flex justify-content-between align-items-center">
+              <div className="btn-group">
+                <button type="button" className="btn btn-sm btn-outline-secondary">
+                  View
+                </button>
+                <button type="button" className="btn btn-sm btn-outline-secondary">
+                  Edit
+                </button>
+              </div>
+              <small className="text-body-secondary">9 mins</small>
             </div>
-            <small className="text-body-secondary">9 mins</small>
           </div>
         </div>
       </div>
-    </div>
-  ));
+    ));
+  };
 
-  const currentCards = cards.slice(startIndex, endIndex);
-
+  const totalPages = Math.ceil(listObra.length / itemsPerPage);
   return (
     <div className="album py-5 bg-custom-color">
       <div className="container">
-        <div className="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">{currentCards}</div>
+
+        {/*FORMULARIO PARA BUSCAR POR FILTRO*/}
+        <div className="row">
+          <div className="col-md-6 d-flex">
+          <select
+       value={categoria}
+       onChange={(e) => setCategoria(e.target.value)}
+       className="form-select"
+        >
+   <option value="">Selecciona la categoría de su obra</option>
+    <option value="Pintura">Pintura</option>
+    <option value="Dibujo">Dibujo</option>
+    <option value="Maqueta">Maqueta</option>
+    <option value="Ceramica">Ceramica</option>
+</select>
+<br></br>
+            <input
+                 className="form-control me-2 search-form"
+                 type="search"
+                 placeholder="Buscar por nombre de producto"
+                 aria-label="Buscar"
+                value={nombreProducto}
+                onChange={(e) => setNombreProducto(e.target.value)}
+                />
+          </div>
+        </div>
+         {/*FORMULARIO PARA BUSCAR POR FILTRO*/}
+
+        <br/>
+        <br/>
+        <div className="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">{renderCards()}</div>
       </div>
       <div className="d-flex justify-content-center mt-3">
         <nav aria-label="Page navigation example">
@@ -107,28 +151,26 @@ function Album() {
             <li className={`page-item ${currentPage === 1 && 'disabled'}`}>
               <button
                 className="page-link"
-                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                onClick={() => handlePaginationClick(currentPage - 1)}
                 aria-label="Previous"
               >
                 <span aria-hidden="true">&laquo;</span>
               </button>
             </li>
-            {[...Array(Math.ceil(cards.length / itemsPerPage)).keys()].map((num) => (
+            {[...Array(totalPages).keys()].map((num) => (
               <li
                 key={num}
                 className={`page-item ${currentPage === num + 1 && 'active'}`}
-                onClick={() => setCurrentPage(num + 1)}
+                onClick={() => handlePaginationClick(num + 1)}
                 style={{ margin: '0' }}
               >
                 <button className="page-link">{num + 1}</button>
               </li>
             ))}
-            <li className={`page-item ${currentPage === Math.ceil(cards.length / itemsPerPage) && 'disabled'}`}>
+            <li className={`page-item ${currentPage === totalPages && 'disabled'}`}>
               <button
                 className="page-link custom-page"
-                onClick={() =>
-                  setCurrentPage((prev) => Math.min(prev + 1, Math.ceil(cards.length / itemsPerPage)))
-                }
+                onClick={() => handlePaginationClick(currentPage + 1)}
                 aria-label="Next"
               >
                 <span aria-hidden="true">&raquo;</span>
