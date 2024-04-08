@@ -70,7 +70,9 @@ function Navbar_init() {
                     <li className='username'>{userName}</li>
                     <li><hr className="dropdown-divider"/></li>
                     <li>
-                    <Link to='/ListObra' className="dropdown-item">Mis Obras</Link>
+                    <Link to='/ListObra' className="dropdown-item">CRUD obras</Link>
+                    <Link to='/ListSubasta' className="dropdown-item">CRUD subasta</Link>
+                    <Link to='/ListDespacho' className="dropdown-item">CRUD despacho</Link>
                      </li>
                     <li><hr className="dropdown-divider"/></li>
                     <li><button className="dropdown-item" onClick={handleLogout}>Cerrar Sesion</button></li>

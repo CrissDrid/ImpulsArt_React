@@ -7,6 +7,12 @@ import Home from './Home';
 import ListObra from '../CRUD/List/ListObra';
 import EditObra from '../CRUD/Edit/EditObra';
 import FormObra from '../CRUD/Create/FormObra';
+import ListSubasta from '../CRUD/List/ListSubasta';
+import FormSubasta from '../CRUD/Create/FormSubasta';
+import EditSubasta from '../CRUD/Edit/EditSubasta';
+import ListDespacho from '../CRUD/List/ListDespacho';
+import FormDespacho from '../CRUD/Create/FormDespacho';
+import EditDespacho from '../CRUD/Edit/EditDespacho';
 
 function AppRoutes() { // Cambia el nombre de la función a AppRoutes
   return (
@@ -21,6 +27,18 @@ function AppRoutes() { // Cambia el nombre de la función a AppRoutes
         <Route path="/EditObra/:pkCod_Producto" element = {<EditObra />}/>
         <Route path="/CreateObra" element = {<FormObra />}/>
         {/*CRUD OBRAS*/}
+
+       {/*CRUD SUBASTA*/}
+<Route path='/ListSubasta' element = {<ListSubasta />}/>
+<Route path="/CreateSubasta" element = {<FormSubasta />}/>
+<Route path="/EditSubasta/:pkCodSubasta" element = {<EditSubasta />}/>
+{/*CRUD SUBASTA*/}
+
+{/*CRUD DESPACHO*/}
+<Route path="/ListDespacho" element = {<ListDespacho />}/>
+<Route path="/CreateDespacho" element = {<FormDespacho />}/>
+<Route path="/EditDespacho/:pkCod_Despacho" element = {<EditDespacho />}/>
+{/*CRUD DESPACHO*/}
       </Routes>
     </Router>
   );
