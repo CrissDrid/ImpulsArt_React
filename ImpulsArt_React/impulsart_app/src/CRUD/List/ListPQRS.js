@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import axios from 'axios';
-import { Link } from 'react-bootstrap/lib/Navbar';
+import { Link } from 'react-router-dom';
 
 export const ListPQRS = () => {
   
@@ -32,8 +32,6 @@ export const ListPQRS = () => {
 
     return (
         <>
-            <div>Despachos</div>
-
             <Link to="/CreatePQRS" className='btn btn-primary'>Hacer PQRS</Link>
 
             <div className="container">
@@ -43,7 +41,6 @@ export const ListPQRS = () => {
                             <th scope="col">Estado</th>
                             <th scope="col">Motivo</th>
                             <th scope="col">Fecha PQRS</th>
-                            <th scope="col">Fecha Cierre</th>
                             <th scope="col">Acciones</th>
                             {/* Aquí puedes agregar más encabezados si es necesario */}
                         </tr>
@@ -54,7 +51,6 @@ export const ListPQRS = () => {
                                 <td>{pqrs.estado}</td>
                                 <td>{pqrs.motivo}</td>
                                 <td>{pqrs.fechaPQRS}</td>
-                                <td>{pqrs.fechaCierre}</td>
                                 {/* Aquí puedes agregar más columnas si es necesario */}
                                 <td>
                                     <Link to={`/EditPQRS/${pqrs.pkCod_PQRS}`} className="btn btn-outline-primary mx-2">Edit</Link>

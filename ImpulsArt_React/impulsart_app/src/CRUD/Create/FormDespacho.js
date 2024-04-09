@@ -43,10 +43,13 @@ export const FormDespacho = () => {
 
           <h1>Crear despacho</h1>
           <form onSubmit = {(e) => onSubmit(e)}>
-            <div className="identificacion">
-              <input className="form-control" onChange = {(e) => onInputChange(e)} value = {estado} type={"text"} name="estado" placeholder="Ingrese el estado actual del despacho" required />
-            </div>
-            <br />
+          <select className="form-select" name="estado" onChange = {(e) => onInputChange(e)} value = {estado} required>
+    <option value="">Ingrese el estado actual del despacho</option>
+    <option value="En camino">En camino</option>
+    <option value="Entregado">Entregado</option>
+    <option value="No entregado">No entregado</option>
+    <option value="No se pudo entregar">No se pudo entregar</option>
+            </select>
             <div className="nombre">
               <input className="form-control" onChange = {(e) => onInputChange(e)} value = {comprobante} type={"text"} name="comprobante" placeholder="Ingrese el comprobante" required />
             </div>

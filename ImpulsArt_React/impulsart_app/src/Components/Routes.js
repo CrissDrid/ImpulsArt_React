@@ -14,6 +14,8 @@ import ListDespacho from '../CRUD/List/ListDespacho';
 import FormDespacho from '../CRUD/Create/FormDespacho';
 import EditDespacho from '../CRUD/Edit/EditDespacho';
 import ListPQRS from '../CRUD/List/ListPQRS';
+import FormPQRS from '../CRUD/Create/FormPQRS';
+import EditPQRS from '../CRUD/Edit/EditPQRS';
 
 function AppRoutes() { // Cambia el nombre de la función a AppRoutes
   return (
@@ -43,8 +45,8 @@ function AppRoutes() { // Cambia el nombre de la función a AppRoutes
 
 {/*CRUD PQRS*/}
 <Route path="/ListPQRS" element = {<ListPQRS />}/>
-<Route path="/CreatePQRS" element = {<FormDespacho />}/>
-<Route path="/EditPQRS/:pkCod_PQRS" element = {<EditDespacho />}/>
+<Route path="/CreatePQRS" element = {<FormPQRS />}/>
+<Route path="/EditPQRS/:pkCod_PQRS" element = {<EditPQRS />}/>
 {/*CRUD PQRS*/}
 
       </Routes>
