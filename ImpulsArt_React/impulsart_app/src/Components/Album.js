@@ -2,6 +2,7 @@ import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { BiSearch } from 'react-icons/bi';
 import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
+import { Left } from 'react-bootstrap/lib/Media';
 
 function Album() {
   const [listObra, setListObra] = useState([]);
@@ -124,15 +125,18 @@ function Album() {
     <option value="Maqueta">Maqueta</option>
     <option value="Ceramica">Ceramica</option>
 </select>
+
 <br></br>
-            <input
-                 className="form-control me-2 search-form"
-                 type="search"
-                 placeholder="Buscar por nombre de producto"
-                 aria-label="Buscar"
-                value={nombreProducto}
-                onChange={(e) => setNombreProducto(e.target.value)}
-                />
+<div  style={{ paddingLeft: '10px'}}></div>
+
+<input
+    className="form-control me-2 search-form"
+    type="search"
+    placeholder="Buscar por nombre de producto"
+    aria-label="Buscar"
+    value={nombreProducto}
+    onChange={(e) => setNombreProducto(e.target.value)}
+/>
           </div>
         </div>
          {/*FORMULARIO PARA BUSCAR POR FILTRO*/}

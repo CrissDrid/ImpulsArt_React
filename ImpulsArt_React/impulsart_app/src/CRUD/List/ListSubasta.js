@@ -61,6 +61,7 @@ export const ListSubasta = () => {
             />
 
             <Link to="/CreateSubasta" className='btn btn-primary'>Crear subasta</Link>
+            <Link to="/Home" className='btn btn-danger'>Volver</Link>
 
             <div className="container">
                 <table className="table">

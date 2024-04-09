@@ -35,6 +35,7 @@ export const ListDespacho = () => {
             <div>Despachos</div>
 
             <Link to="/CreateDespacho" className='btn btn-primary'>Hacer despacho</Link>
+            <Link to="/Home" className='btn btn-danger'>Volver</Link>
 
             <div className="container">
                 <table className="table">

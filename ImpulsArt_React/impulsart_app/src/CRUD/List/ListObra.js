@@ -100,6 +100,7 @@ export const ListObra = () => {
                 <br></br>
 
             <Link to="/CreateObra" className='btn btn-primary'>Crear obra</Link>
+            <Link to="/Home" className='btn btn-danger'>Volver</Link>
 
             <div className="container">
                 <table className="table">

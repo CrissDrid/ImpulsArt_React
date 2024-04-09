@@ -33,6 +33,7 @@ export const ListPQRS = () => {
     return (
         <>
             <Link to="/CreatePQRS" className='btn btn-primary'>Hacer PQRS</Link>
+            <Link to="/Home" className='btn btn-danger'>Volver</Link>
 
             <div className="container">
                 <table className="table">
