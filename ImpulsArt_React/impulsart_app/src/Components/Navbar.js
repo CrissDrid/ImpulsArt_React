@@ -22,7 +22,13 @@ function Navbar() {
               <a className="nav-link active" aria-current="page" href="#">Soporte</a>
             </li>
             <li className="nav-item">
-              <a className="nav-link active" aria-current="page" href="#">Contactanos</a>
+
+              <a className="nav-link active" aria-current="page" href="#">Correos</a>
+            </li>
+ <li className="nav-item">
+              <Link to="/ContactUs">
+                <button className="btn btn-primary signup-btn">Correos</button>
+              </Link>
             </li>
             <li className="nav-item">
               <Link to="/login">

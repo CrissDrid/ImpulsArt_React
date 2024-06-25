@@ -17,6 +17,9 @@ function Footer() {
         <li className="nav-item"><a href="#" className="nav-link px-2 text-body-secondary">Nosotros</a></li>
         <li className="nav-item"><a href="#" className="nav-link px-2 text-body-secondary">Soporte</a></li>
         <li className="nav-item"><a href="#" className="nav-link px-2 text-body-secondary">Contactanos</a></li>
+        <Link to='/' className="link-no-underline">
+        <li className="nav-item"><a href="#" className="nav-link px-2 text-body-secondary">Correos</a></li>
+        </Link>
       </ul>
     </footer>
   </div>

@@ -14,6 +14,7 @@ import ListDespacho from '../CRUD/List/ListDespacho';
 import FormDespacho from '../CRUD/Create/FormDespacho';
 import EditDespacho from '../CRUD/Edit/EditDespacho';
 import ListPQRS from '../CRUD/List/ListPQRS';
+import Correos, { ContactUs } from './ContactUs';
 
 function AppRoutes() { // Cambia el nombre de la función a AppRoutes
   return (
@@ -23,6 +24,7 @@ function AppRoutes() { // Cambia el nombre de la función a AppRoutes
         <Route path="/login" element={<Login />} />
         <Route path='/register' element={<Register />}/>
         <Route path='/home' element={<Home/>}/>
+        <Route path='/ContactUs' element={<ContactUs/>}/>
         {/*CRUD OBRAS*/}
         <Route path='/ListObra' element={<ListObra/>}/>
         <Route path="/EditObra/:pkCod_Producto" element = {<EditObra />}/>
