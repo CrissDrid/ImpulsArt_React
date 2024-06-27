@@ -8,7 +8,7 @@ export const ContactUs = () => {
     e.preventDefault();
 
     emailjs
-      .sendForm('service_wjoiqbo', 'template_o5ao9f7', form.current, {
+      .sendForm('service_wjoiqbo', 'template_35zji0z', form.current, {
         publicKey: 'chNrAh1Fwt_TIlPz4',
       })
       .then(
@@ -21,7 +21,10 @@ export const ContactUs = () => {
       );
   };
 return (
+  
     <form ref={form} onSubmit={sendEmail}>
+      <label>By</label>
+      <input type="text" name="from_name" />
       <label>Name</label>
       <input type="text" name="user_name" />
       <label>Email</label>

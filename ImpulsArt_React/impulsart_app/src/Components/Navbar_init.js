@@ -66,7 +66,7 @@ function Navbar_init() {
                     <Link to='/ListSubasta' className="dropdown-item">CRUD subasta</Link>
                     <Link to='/ListDespacho' className="dropdown-item">CRUD despacho</Link>
                     <Link to='/ListPQRS' className="dropdown-item">CRUD PQRS</Link>
-                    <Link to='/Correo' className="dropdown-item">Correos</Link>
+                    <Link to="/ContactUs" className="dropdown-item">Correos</Link>
                      </li>
                     <li><hr className="dropdown-divider"/></li>
                     <li><button className="dropdown-item" onClick={handleLogout}>Cerrar Sesion</button></li>
