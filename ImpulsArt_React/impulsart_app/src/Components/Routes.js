@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import LandingPage from './LandingPage';
 import Login from './Login';
 import Register from './Register';
+import Correo from './Correo';
 import Home from './Home';
 import ListObra from '../CRUD/List/ListObra';
 import EditObra from '../CRUD/Edit/EditObra';
@@ -48,6 +49,8 @@ function AppRoutes() { // Cambia el nombre de la función a AppRoutes
 <Route path="/CreatePQRS" element = {<FormPQRS />}/>
 <Route path="/EditPQRS/:pkCod_PQRS" element = {<EditPQRS />}/>
 {/*CRUD PQRS*/}
+
+<Route path="/Correo" element = {<Correo />}/>
 
       </Routes>
     </Router>
