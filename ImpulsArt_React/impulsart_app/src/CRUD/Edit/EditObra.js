@@ -1,6 +1,9 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom';
+import Logo from '../../Resources/Logo.svg';
+import Art from '../../Resources/Img-Art3.avif';
+import { Link } from 'react-router-dom';
 
 export const EditObra = () => {
 
@@ -45,65 +48,124 @@ export const EditObra = () => {
         loadObra();
       }, [pkCod_Producto]);
 
-  return (
-   
-    <div className="container">
-
-    <div className="row">
-
-      <div className="col-12">
-
-        <div className="formulario-registro">
-
-          <h1>Editar obra</h1>
-          <form onSubmit = {(e) => onSubmit(e)}>
-            <div className="identificacion">
-              <input className="form-control" onChange = {(e) => onInputChange(e)} value = {nombreProducto} type={"text"} name="nombreProducto" placeholder="Ingrese el nombre de la obra" required />
+      return (
+        <div className="register-container">
+          <div className="register-content row justify-content-center">
+            <div className="col-md-6">
+              <div className="register-form">
+              <div className="register-image">
+                <img className="logo-register" src={Logo} alt=""/>
+              </div>
+                <form onSubmit={(e) => onSubmit(e)}>
+                  <div className="form-row">
+                    <div className="row">
+                      <div className="col-md-6">
+                        <div className="form-floating">
+                          <input
+                            className="form-control"
+                            onChange={(e) => onInputChange(e)}
+                            value={nombreProducto}
+                            type="text"
+                            name="nombreProducto"
+                            placeholder="Ingrese el nombre de la obra"
+                            required
+                          />
+                          <label htmlFor="floatingName">Nombre</label>
+                        </div>
+                      </div>
+                      <div className="col-md-6">
+                        <div className="form-floating">
+                          <input
+                            className="form-control"
+                            onChange={(e) => onInputChange(e)}
+                            value={peso}
+                            type="text"
+                            name="peso"
+                            placeholder="Ingrese el peso de su obra"
+                            required
+                          />
+                          <label htmlFor="floatingLastName">Peso</label>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="form-floating">
+                    <input
+                      className="form-control"
+                      onChange={(e) => onInputChange(e)}
+                      value={costo}
+                      type="number"
+                      name="costo"
+                      placeholder="Ingrese cuanto costará su producto"
+                      required
+                    />
+                    <label htmlFor="floatingId">Costo</label>
+                  </div>
+                  <div className="form-floating">
+                    <input
+                      type="text"
+                      className="form-control"
+                      onChange={(e) => onInputChange(e)}
+                      value={tamano}
+                      name="tamano"
+                      placeholder="Ingrese el tamaño de su obra"
+                      required
+                    />
+                    <label htmlFor="floatingUserName">Tamaño</label>
+                  </div>
+                  <div className="form-floating">
+                    <input
+                      type="number"
+                      className="form-control"
+                      onChange={(e) => onInputChange(e)}
+                      value={cantidad}
+                      name="cantidad"
+                      placeholder="Ingrese la cantidad de la obra"
+                      required
+                    />
+                    <label htmlFor="floatingEmail">Cantidad</label>
+                  </div>
+                  <div className="form-floating">
+                    <select
+                      className="form-select"
+                      onChange={(e) => onInputChange(e)}
+                      value={categoria}
+                      name="categoria"
+                      required
+                    >
+                      <option value="">Selecciona la categoría de su obra</option>
+                      <option value="Pintura">Pintura</option>
+                      <option value="Dibujo">Dibujo</option>
+                      <option value="Maqueta">Maqueta</option>
+                      <option value="Ceramica">Cerámica</option>
+                    </select>
+                    <label htmlFor="floatingDOB">Categoría</label>
+                  </div>
+                  <div className="form-floating">
+                    <input
+                      type="text"
+                      className="form-control"
+                      onChange={(e) => onInputChange(e)}
+                      value={descripcion}
+                      name="descripcion"
+                      placeholder="Ingrese una descripción de su obra"
+                      required
+                    />
+                    <label htmlFor="floatingAddress">Descripción</label>
+                  </div>
+                  <button className="btn btn-primary w-50 py-2 create-btn" type="submit">Editar obra</button>
+              <Link to='/ListObra'><button className="btn btn-danger w-100 py-2 cancel-btn">Cancelar</button></Link>
+                </form>
+              </div>
             </div>
-            <br />
-            <div className="nombre">
-              <input className="form-control" onChange = {(e) => onInputChange(e)} value = {costo} type={"number"} name="costo" placeholder="Ingrese cuanto costara su producto" required />
+            <div className='col-md-6'>
+              <img className='register-img' src={Art} alt="Imagen de obra" />
             </div>
-            <br />
-            <div className="apellido">
-              <input className="form-control" onChange = {(e) => onInputChange(e)} value = {peso} type={"text"} name="peso" placeholder="Ingrese el peso de su obra" required />
-            </div>
-            <br />
-            <div className="correo">
-              <input className="form-control" onChange = {(e) => onInputChange(e)} value = {tamano} type={"text"} name="tamano" placeholder="Ingrese el tamaño de su obra" required />
-            </div>
-            <br />
-            <div className="contrasena">
-              <input className="form-control" onChange = {(e) => onInputChange(e)} value = {cantidad} type={"number"} name="cantidad" placeholder="Ingrese la cantidad de la obra" required />
-            </div>
-            <br />
-            <select className="form-select" onChange = {(e) => onInputChange(e)} name="categoria" value={categoria} required>
-    <option value="">Selecciona la categoría de su obra</option>
-    <option value="Pintura">Pintura</option>
-    <option value="Dibujo">Dibujo</option>
-    <option value="Maqueta">Maqueta</option>
-    <option value="Ceramica">Ceramica</option>
-            </select>
-            <br />
-            <div className="direccion">
-              <input className="form-control" onChange = {(e) => onInputChange(e)} value = {descripcion} type={"text"} name="descripcion" placeholder="Ingrese una descripcion de su obra" required />
-            </div>
-            <br />
-            <div className="form-check mb-3">
-              <button type="submit" className='btn btn-outline-success'>Editar obra</button>
-            </div>
-          </form>
-          <div id="mensajeError" className="mensaje-error"></div>
-
+          </div>
+          <div className="footer-register">
+          </div>
         </div>
-
-      </div>
-
-    </div>
-
-  </div>
-
-  )
-}
+      );
+    };
 
 export default EditObra;

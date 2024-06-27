@@ -1,6 +1,9 @@
 import axios from 'axios';
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom';
+import Logo from '../../Resources/Logo.svg';
+import Art from '../../Resources/Img-Art3.avif';
+import { Link } from 'react-router-dom';
 
 export const FormDespacho = () => {
   
@@ -9,13 +12,13 @@ export const FormDespacho = () => {
     const [despacho, setDespacho] = useState ({
 
         estado: "",
-        comprobante: "",
-        fechaEntrega: new Date().toISOString().slice(0, 10),
+        comprobante: "Sin comprobante ahora",
+        fechaEntrega: "",
         fecha_venta: new Date().toISOString().slice(0, 10)
 
     })
 
-    const{ estado, comprobante } = despacho
+    const{ estado, fechaEntrega } = despacho
 
     const onInputChange = (e) => {
        
@@ -31,44 +34,61 @@ export const FormDespacho = () => {
 
     };
 
-  return (
-   
-    <div className="container">
-
-    <div className="row">
-
-      <div className="col-12">
-
-        <div className="formulario-registro">
-
-          <h1>Crear despacho</h1>
-          <form onSubmit = {(e) => onSubmit(e)}>
-          <select className="form-select" name="estado" onChange = {(e) => onInputChange(e)} value = {estado} required>
-    <option value="">Ingrese el estado actual del despacho</option>
-    <option value="En camino">En camino</option>
-    <option value="Entregado">Entregado</option>
-    <option value="No entregado">No entregado</option>
-    <option value="No se pudo entregar">No se pudo entregar</option>
-            </select>
-            <div className="nombre">
-              <input className="form-control" onChange = {(e) => onInputChange(e)} value = {comprobante} type={"text"} name="comprobante" placeholder="Ingrese el comprobante" required />
-            </div>
-            <br />
-            <div className="form-check mb-3">
-              <button type="submit" className='btn btn-outline-success'>Crear despacho</button>
-            </div>
-          </form>
-          <div id="mensajeError" className="mensaje-error"></div>
-
-        </div>
-
+    return (
+      <div className="register-container">
+          <div className="register-content row justify-content-center">
+              <div className='col-md-6'>
+                  <div className="register-form">
+                      <div className="register-image">
+                          <img className="logo-register" src={Logo} alt=""/>
+                      </div>
+                      <form onSubmit={onSubmit}>
+                          <div className="form-row">
+                              <div className="form-floating">
+                                  <select
+                                      className="form-select"
+                                      id="floatingEstado"
+                                      name="estado"
+                                      onChange={onInputChange}
+                                      value={estado}
+                                      required
+                                  >
+                                      <option value="">Ingrese el estado actual del despacho</option>
+                                      <option value="En camino">En camino</option>
+                                      <option value="Entregado">Entregado</option>
+                                      <option value="No entregado">No entregado</option>
+                                      <option value="No se pudo entregar">No se pudo entregar</option>
+                                  </select>
+                                  <label htmlFor="floatingEstado">Estado del Despacho</label>
+                              </div>
+                              <br />
+                              <div className="form-floating">
+                                  <input
+                                      className="form-control"
+                                      id="floatingFechaEntrega"
+                                      onChange={onInputChange}
+                                      value={fechaEntrega}
+                                      type="date"
+                                      name="fechaEntrega"
+                                      placeholder="Ingrese el comprobante"
+                                      required
+                                  />
+                                  <label htmlFor="floatingFechaEntrega">Fecha de Entrega</label>
+                              </div>
+                              <br />
+                              <button className="btn btn-primary w-100 py-2 create-btn" type="submit">Crear</button>
+                              <Link to='/ListDespacho'><button className="btn btn-danger w-100 py-2 cancel-btn">Cancelar</button></Link>
+                          </div>
+                      </form>
+                      <div id="mensajeError" className="mensaje-error"></div>
+                  </div>
+              </div>
+              <div className='col-md-6'>
+                  <img className='register-img' src={Art} alt="" />
+              </div>
+          </div>
       </div>
-
-    </div>
-
-  </div>
-
-  )
-}
+  );
+};
 
 export default FormDespacho;

@@ -1,6 +1,9 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom';
+import Logo from '../../Resources/Logo.svg';
+import { Link } from 'react-router-dom';
+import Art from '../../Resources/Img-Art3.avif';
 
 export const EditSubasta = () => {
   
@@ -41,42 +44,58 @@ export const EditSubasta = () => {
       loadSubasta();
     }, [pkCodSubasta]);
 
-  return (
-   
-    <div className="container">
-
-    <div className="row">
-
-      <div className="col-12">
-
-        <div className="formulario-registro">
-
-          <h1>Editar subasta</h1>
-          <form onSubmit = {(e) => onSubmit(e)}>
-            <div className="identificacion">
-              <input className="form-control" onChange = {(e) => onInputChange(e)} value = {precioInicial} type={"number"} name="precioInicial" placeholder="Ingrese la oferta minima que se debe ingresar" required />
-            </div>
-            <br />
-            <div className="nombre">
-              <input className="form-control" onChange = {(e) => onInputChange(e)} value = {fechaFinalizacion} type={"date"} name="fechaFinalizacion" placeholder="Ingrese cuando terminara su subasta" required />
-            </div>
-            <br />
-            <div className="form-check mb-3">
-              <br />
-              <button type="submit" className='btn btn-outline-success'>Editar subasta</button>
-            </div>
-          </form>
-          <div id="mensajeError" className="mensaje-error"></div>
-
-        </div>
-
+    return (
+      <div className="register-container">
+          <div className="register-content row justify-content-center">
+              <div className='col-md-6'>
+                  <div className="register-form">
+                      <div className="register-image">
+                          <img className="logo-register" src={Logo} alt=""/>
+                      </div>
+                      <form onSubmit={onSubmit}>
+                          <div className="form-row">
+                              <div className="form-floating">
+                                  <input
+                                      className="form-control"
+                                      id="floatingPrecioInicial"
+                                      onChange={onInputChange}
+                                      value={precioInicial}
+                                      type="number"
+                                      name="precioInicial"
+                                      placeholder="Ingrese la oferta mínima que se debe ingresar"
+                                      required
+                                  />
+                                  <label htmlFor="floatingPrecioInicial">Precio Inicial</label>
+                              </div>
+                              <br />
+                              <div className="form-floating">
+                                  <input
+                                      className="form-control"
+                                      id="floatingFechaFinalizacion"
+                                      onChange={onInputChange}
+                                      value={fechaFinalizacion}
+                                      type="date"
+                                      name="fechaFinalizacion"
+                                      placeholder="Ingrese cuando terminará su subasta"
+                                      required
+                                  />
+                                  <label htmlFor="floatingFechaFinalizacion">Fecha de Finalización</label>
+                              </div>
+                              <br />
+                              <br />
+                              <button className="btn btn-primary w-100 py-2 create-btn" type="submit">Editar subasta</button>
+                              <Link to='/ListSubasta'><button className="btn btn-danger w-100 py-2 cancel-btn">Cancelar</button></Link>
+                          </div>
+                      </form>
+                      <div id="mensajeError" className="mensaje-error"></div>
+                  </div>
+              </div>
+              <div className='col-md-6'>
+                  <img className='register-img' src={Art} alt="" />
+              </div>
+          </div>
       </div>
-
-    </div>
-
-  </div>
-
-  )
-}
+  );
+};
 
 export default EditSubasta;

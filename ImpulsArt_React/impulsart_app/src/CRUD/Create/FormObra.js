@@ -1,6 +1,9 @@
 import axios from 'axios';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import Logo from '../../Resources/Logo.svg';
+import Art from '../../Resources/Img-Art3.avif';
+import { Link } from 'react-router-dom';
 
 const FormObra = () => {
   const navigate = useNavigate();
@@ -47,60 +50,80 @@ const FormObra = () => {
   };
 
   return (
-    <div className="container">
-      <div className="row">
-        <div className="col-12">
-          <div className="formulario-registro">
-            <h1>Crear obra</h1>
+    <div className="register-container">
+      <div className="register-content row justify-content-center">
+        <div className='col-md-6'>
+          <div className="register-form">
+            <div className="register-image">
+              <img className="logo-register" src={Logo} alt="Logo" />
+            </div>
             <form onSubmit={handleSubmit}>
-              <div className="identificacion">
-                <input className="form-control" type="text" name="nombreProducto" value={obra.nombreProducto} onChange={handleInputChange} placeholder="Ingrese el nombre de la obra" required />
+              <div className="form-row">
+                <div className="row">
+                  <div className="col-md-6">
+                    <div className="form-floating">
+                      <input className="form-control" id="floatingNombreProducto" placeholder="Nombre de la obra" name="nombreProducto" value={obra.nombreProducto} onChange={handleInputChange} type="text" required />
+                      <label htmlFor="floatingNombreProducto">Nombre de la obra</label>
+                    </div>
+                  </div>
+                  <div className="col-md-6">
+                    <div className="form-floating">
+                      <input className="form-control" id="floatingCosto" placeholder="Costo" name="costo" value={obra.costo} onChange={handleInputChange} type="number" required />
+                      <label htmlFor="floatingCosto">Costo</label>
+                    </div>
+                  </div>
+                </div>
               </div>
-              <br />
-              <div className="nombre">
-                <input className="form-control" type="number" name="costo" value={obra.costo} onChange={handleInputChange} placeholder="Ingrese cuanto costara su producto" required />
+              <div className="form-floating">
+                <input className="form-control" id="floatingPeso" placeholder="Peso" name="peso" value={obra.peso} onChange={handleInputChange} type="text" required />
+                <label htmlFor="floatingPeso">Peso</label>
               </div>
-              <br />
-              <div className="apellido">
-                <input className="form-control" type="text" name="peso" value={obra.peso} onChange={handleInputChange} placeholder="Ingrese el peso de su obra" required />
+              <div className="form-floating">
+                <input className="form-control" id="floatingTamano" placeholder="Tamaño" name="tamano" value={obra.tamano} onChange={handleInputChange} type="text" required />
+                <label htmlFor="floatingTamano">Tamaño</label>
               </div>
-              <br />
-              <div className="correo">
-                <input className="form-control" type="text" name="tamano" value={obra.tamano} onChange={handleInputChange} placeholder="Ingrese el tamaño de su obra" required />
+              <div className="form-floating">
+                <input className="form-control" id="floatingCantidad" placeholder="Cantidad" name="cantidad" value={obra.cantidad} onChange={handleInputChange} type="text" required />
+                <label htmlFor="floatingCantidad">Cantidad</label>
               </div>
-              <br />
-              <div className="contrasena">
-                <input className="form-control" type="text" name="cantidad" value={obra.cantidad} onChange={handleInputChange} placeholder="Ingrese la cantidad de la obra" required />
+              <div className="form-floating">
+                <select className="form-select" id="floatingCategoria" name="categoria" value={obra.categoria} onChange={handleInputChange} required>
+                  <option value="">Selecciona la categoría de su obra</option>
+                  <option value="Pintura">Pintura</option>
+                  <option value="Dibujo">Dibujo</option>
+                  <option value="Maqueta">Maqueta</option>
+                  <option value="Ceramica">Ceramica</option>
+                </select>
+                <label htmlFor="floatingCategoria">Categoría</label>
               </div>
-              <br />
-              <select className="form-select" name="categoria" value={obra.categoria} onChange={handleInputChange} required>
-    <option value="">Selecciona la categoría de su obra</option>
-    <option value="Pintura">Pintura</option>
-    <option value="Dibujo">Dibujo</option>
-    <option value="Maqueta">Maqueta</option>
-    <option value="Ceramica">Ceramica</option>
-            </select>
-              <br />
-              <div className="direccion">
-                <input className="form-control" type="text" name="descripcion" value={obra.descripcion} onChange={handleInputChange} placeholder="Ingrese una descripcion de su obra" required />
+              <div className="form-floating">
+                <input className="form-control" id="floatingDescripcion" placeholder="Descripción" name="descripcion" value={obra.descripcion} onChange={handleInputChange} type="text" required />
+                <label htmlFor="floatingDescripcion">Descripción</label>
               </div>
-              <br />
-              <div className="imagen">
-                <input className="form-control" type="file" name="imagen" accept="image/*" onChange={handleFileChange} />
+              <div className="form-group">
+                <div className="image-upload" onClick={() => document.getElementById('fileInput').click()}>
+                  {obra.imagen ? (
+                    <img src={URL.createObjectURL(obra.imagen)} alt="Previsualización" className="img-fluid preview-image" />
+                  ) : (
+                    <div className="image-placeholder">
+                      <span className="cross-icon">+</span>
+                      <p>Subir Imagen</p>
+                    </div>
+                  )}
+                  <input id="fileInput" type="file" name="imagen" accept="image/*" onChange={handleFileChange} style={{ display: 'none' }} />
+                </div>
               </div>
-              {obra.imagen && (
-  <div className="preview-image" style={{ border: '1px solid #ccc', padding: '10px', marginTop: '10px' }}>
-    <img src={URL.createObjectURL(obra.imagen)} alt="Previsualización" className="img-fluid" style={{ maxWidth: '100%', maxHeight: '200px' }} />
-  </div>
-)}
-              <br />
-              <div className="form-check mb-3">
-                <button type="submit" className='btn btn-outline-success'>Crear obra</button>
-              </div>
+              <br></br>
+              <button className="btn btn-primary w-100 py-2 create-btn" type="submit">Crear obra</button>
+              <Link to='/ListObra'><button className="btn btn-danger w-100 py-2 cancel-btn">Cancelar</button></Link>
             </form>
-            <div id="mensajeError" className="mensaje-error"></div>
           </div>
         </div>
+        <div className='col-md-6'>
+          <img className='register-img' src={Art} alt="" />
+        </div>
+      </div>
+      <div className="footer-register">
       </div>
     </div>
   );

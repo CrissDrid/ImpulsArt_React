@@ -294,6 +294,16 @@ ol{
   height: 2.7rem !important;
 }
 
+.cancel-btn{
+  background-color: #db2214 !important;
+  border-color: white !important;
+  border-radius: 50px !important; 
+  margin-left: 12rem;
+  padding: 5px 23px !important; 
+  max-width: 15rem;
+  height: 2.7rem !important;
+}
+
 .footer-register {
   margin-top: auto; /* Hace que el footer esté al final de la página */
 }
@@ -447,4 +457,59 @@ ol{
 
 .album {
   background-color: white;
+}
+
+.image-upload {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 2px dashed #800080; /* Borde morado */
+  border-radius: 5px;
+  padding: 20px;
+  cursor: pointer;
+  position: relative;
+  text-align: center;
+  transition: all 0.3s ease-in-out; /* Animación suave */
+}
+
+.image-upload:hover {
+  background-color: #f0e6f8; /* Fondo ligeramente morado al pasar el mouse */
+}
+
+.image-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.cross-icon {
+  font-size: 50px;
+  color: #800080; /* Color morado */
+  transition: transform 0.3s ease-in-out; /* Animación de transformación */
+}
+
+.image-upload:hover .cross-icon {
+  transform: scale(1.2); /* Aumenta el tamaño al pasar el mouse */
+}
+
+.image-upload p {
+  color: #800080; /* Color morado */
+  margin: 0;
+  transition: color 0.3s ease-in-out; /* Animación de cambio de color */
+}
+
+.image-upload:hover p {
+  color: #4b0082; /* Color morado oscuro al pasar el mouse */
+}
+
+.preview-image {
+  max-width: 100%;
+  max-height: 200px;
+  object-fit: cover;
+  border-radius: 5px;
+}
+
+table.table thead.table-head {
+  background-color: #8D33FF;
+  color: white;
 }

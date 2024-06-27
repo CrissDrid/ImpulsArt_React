@@ -1,6 +1,9 @@
 import axios from 'axios';
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom';
+import Logo from '../../Resources/Logo.svg';
+import Art from '../../Resources/Img-Art3.avif';
+import { Link } from 'react-router-dom';
 
 export const FormPQRS = () => {
   
@@ -33,49 +36,74 @@ export const FormPQRS = () => {
 
     };
 
-  return (
-   
-    <div className="container">
-
-    <div className="row">
-
-      <div className="col-12">
-
-        <div className="formulario-registro">
-
-          <h1>Crear usuario</h1>
-          <form onSubmit = {(e) => onSubmit(e)}>
-            <div className="identificacion">
-              <input className="form-control" onChange = {(e) => onInputChange(e)} value = {descripcion} type={"text"} name="descripcion" placeholder="Ingrese sus observacion" required />
+    return (
+      <div className="register-container">
+          <div className="register-content row justify-content-center">
+              <div className='col-md-6'>
+                  <div className="register-form">
+                  <div className="register-image">
+              <img className="logo-register" src={Logo} alt=""/>
             </div>
-            <br />
-            <select className="form-select" name="motivo" onChange = {(e) => onInputChange(e)} value = {motivo} required>
-    <option value="">Ingrese el motivo de su PQRS</option>
-    <option value="Producto en mal estado">Producto en mal estado</option>
-    <option value="Estafa">Estafa</option>
-    <option value="Tiempos de entrega">Tiempos de entrega</option>
-            </select>
-            <br />
-            <div className="apellido">
-              <input className="form-control" onChange = {(e) => onInputChange(e)} value = {FkCod_TipoPQRS} type={"number"} name="FkCod_TipoPQRS" placeholder="Ingresa el tipo de PQRS" required />
-            </div>
-            <br />
-            <div className="form-check mb-3">
-              <br />
-              <button type="submit" className='btn btn-outline-success'>Crear subasta</button>
-            </div>
-          </form>
-          <div id="mensajeError" className="mensaje-error"></div>
-
-        </div>
-
+                      <form onSubmit={onSubmit}>
+                          <div className="form-floating">
+                              <input
+                                  className="form-control"
+                                  id="floatingDescripcion"
+                                  onChange={onInputChange}
+                                  value={descripcion}
+                                  type="text"
+                                  name="descripcion"
+                                  placeholder="Ingrese sus observaciones"
+                                  required
+                              />
+                              <label htmlFor="floatingDescripcion">Descripción</label>
+                          </div>
+                          <br />
+                          <div className="form-floating">
+                              <select
+                                  className="form-control"
+                                  id="floatingMotivo"
+                                  onChange={onInputChange}
+                                  value={motivo}
+                                  name="motivo"
+                                  required
+                              >
+                                  <option value="">Seleccione el motivo de su queja</option>
+                                  <option value="Producto en mal estado">Producto en mal estado</option>
+                                  <option value="Estafa">Estafa</option>
+                                  <option value="Tiempos de entrega">Tiempos de entrega</option>
+                              </select>
+                              <label htmlFor="floatingMotivo">Motivo</label>
+                          </div>
+                          <br />
+                          <div className="form-floating">
+                              <input
+                                  className="form-control"
+                                  id="floatingTipoPQRS"
+                                  onChange={onInputChange}
+                                  value={FkCod_TipoPQRS}
+                                  type="number"
+                                  name="FkCod_TipoPQRS"
+                                  placeholder="Ingrese el tipo de queja"
+                                  required
+                              />
+                              <label htmlFor="floatingTipoPQRS">Tipo de queja</label>
+                          </div>
+                          <br />
+                          <button className="btn btn-primary w-100 py-2 create-btn" type="submit">Crear</button>
+                          <Link to='/ListPQRS'><button className="btn btn-danger w-100 py-2 cancel-btn">Cancelar</button></Link>
+                      </form>
+                  </div>
+              </div>
+              <div className='col-md-6'>
+                  <img className='register-img' src={Art} alt="" />
+              </div>
+          </div>
+          <div className="footer-register">
+              {/* Agrega el componente de Footer si es necesario */}
+          </div>
       </div>
-
-    </div>
-
-  </div>
-
-  )
-}
+  );
+};
 
 export default FormPQRS;
