@@ -81,6 +81,30 @@ li {
   margin-right: 20px; 
 }
 
+.container-banner {
+  position: relative;
+  padding: 0;
+}
+
+.profile-banner {
+  background-color: #8A2BE2;
+  height: 20rem;
+  border-radius: 3rem;
+}
+
+.profile-icon {
+  position: absolute;
+  bottom: -6rem;
+  left: 4rem;
+  width: 15rem;
+  height: 15rem;
+  background-color: #9370DB;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 .about-content{
   margin-left: -5rem;
   max-width: 50rem;
