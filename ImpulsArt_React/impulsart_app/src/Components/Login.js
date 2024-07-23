@@ -6,6 +6,7 @@ import Art from '../Resources/Img-Art.svg';
 import Footer from './Footer';
 
 const baseurl = "http://localhost:8086/api/usuario/login";
+const validarEmpleadoUrl = "http://localhost:8086/api/usuario/validarEmpleado";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -33,8 +34,16 @@ const Login = () => {
       console.log('Server response:', response.data);
   
       if (response.data.success) {
+       
         console.log('Login successful!');
-        navigate('/home', { state: { userName: response.data.userName } });
+        const { userName, identificacion } = response.data;
+
+        // Validar si el usuario es un empleado
+        const validarResponse = await axios.get(`${validarEmpleadoUrl}/${identificacion}`);
+        const esEmpleado = validarResponse.data.success;
+
+        navigate('/home', { state: { userName, identificacion, esEmpleado } });
+
         } else {
             const errorMessage = response.data.data;
             if (errorMessage === "Credenciales inválidas") {
