@@ -1,7 +1,6 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { BiSearch } from 'react-icons/bi';
-import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
 import { Left } from 'react-bootstrap/lib/Media';
 
 function Album() {
@@ -95,9 +94,6 @@ function Album() {
             <p className="card-text">{obra.descripcion}</p>
             <p className="card-text">Categoría: {obra.categoria}</p>
             <div className="d-flex justify-content-between align-items-center">
-            <PayPalScriptProvider options={{ clientId: "AeOLFnpCQnLCoCBBNtFamFgKBdZCRvPtlJFErQCvm_TqfpQ-MXEtEhzjxppmGLG-BpiP0_IqDoN64z9g" }}>
-            <PayPalButtons style={{ layout: "horizontal" }} />
-            </PayPalScriptProvider>
               <small className="text-body-secondary">9 mins</small>
             </div>
           </div>
