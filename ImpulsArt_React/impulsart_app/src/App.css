@@ -86,25 +86,6 @@ li {
   padding: 0;
 }
 
-.profile-banner {
-  background-color: #8A2BE2;
-  height: 20rem;
-  border-radius: 3rem;
-}
-
-.profile-icon {
-  position: absolute;
-  bottom: -6rem;
-  left: 4rem;
-  width: 15rem;
-  height: 15rem;
-  background-color: #9370DB;
-  border-radius: 50%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
 .about-content{
   margin-left: -5rem;
   max-width: 50rem;
@@ -243,6 +224,16 @@ ol{
 .form-control:focus {
   border-color: #b576ff !important;
   box-shadow: 0 0 0 0.2rem #d1acff !important;
+}
+
+.form-control:hover{
+  border-color: #8D33FF !important;
+}
+
+.form-contraseña .p-inputtext{
+  width: 715px;
+  padding: 18px;
+  border-radius: 5px !important;
 }
 
 .email{
@@ -487,7 +478,7 @@ ol{
   display: flex;
   justify-content: center;
   align-items: center;
-  border: 2px dashed #800080; /* Borde morado */
+  border: 2px dashed #8D33FF; /* Borde morado */
   border-radius: 5px;
   padding: 20px;
   cursor: pointer;

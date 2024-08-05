@@ -17,8 +17,11 @@ import EditDespacho from '../CRUD/Edit/EditDespacho';
 import ListPQRS from '../CRUD/List/ListPQRS';
 import FormPQRS from '../CRUD/Create/FormPQRS';
 import EditPQRS from '../CRUD/Edit/EditPQRS';
-import Correos, { ContactUs } from './ContactUs';
 import Profile from './Profile';
+import UserData from './UserData';
+import ChangePWD from './ChangePWD';
+import Galery from './Galery';
+import Correos, { ContactUs } from './ContactUs';
 
 function AppRoutes() { // Cambia el nombre de la función a AppRoutes
   return (
@@ -29,7 +32,10 @@ function AppRoutes() { // Cambia el nombre de la función a AppRoutes
         <Route path='/register' element={<Register />}/>
         <Route path='/home' element={<Home/>}/>
         <Route path='/ContactUs' element={<ContactUs/>}/>
-        <Route path='/Profile' element={<Profile/>}/>
+        <Route path='/profile' element={<Profile/>}/>
+        <Route path='/userdata' element={<UserData/>}/>
+        <Route path='/changePWD' element={<ChangePWD/>}/>
+        <Route path='/galery' element={<Galery/>}/>
         {/*CRUD OBRAS*/}
         <Route path='/ListObra' element={<ListObra/>}/>
         <Route path="/EditObra/:pkCod_Producto" element = {<EditObra />}/>

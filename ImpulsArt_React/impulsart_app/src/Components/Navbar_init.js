@@ -1,29 +1,27 @@
 import React, { useState, useEffect } from 'react';
 import Logo from '../Resources/Logo.svg';
 import { BsPersonCircle } from 'react-icons/bs';
-import { useLocation, useNavigate } from 'react-router-dom';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 function Navbar_init() {
-  const location = useLocation();
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [userName, setUserName] = useState(localStorage.getItem('userName') || '');
+  const [userData, setUserData] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (location.state && location.state.userName) {
-      setUserName(location.state.userName);
-      localStorage.setItem('userName', location.state.userName); 
+    const user = JSON.parse(localStorage.getItem('user'));
+    if (user) {
+      setUserData(user);
     }
-  }, [location.state]);
+  }, []);
 
   const toggleDropdown = () => {
     setDropdownOpen(!dropdownOpen);
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('userName'); 
-    setUserName('');
+    localStorage.removeItem('user');
+    setUserData(null);
     setDropdownOpen(false);
     navigate('/login', { replace: true });
   };
@@ -58,7 +56,7 @@ function Navbar_init() {
                 </button>
                 {dropdownOpen && (
                   <ul className="dropdown-menu show" aria-labelledby="navbarDropdownMenuLink">
-                    <li className='username'>{userName}</li>
+                    <li className='username'>{userData ? userData.userName : 'Invitado'}</li>
                     <li><hr className="dropdown-divider" /></li>
                     <li>
                       <Link to='/Profile' className='dropdown-item'>Mi perfil</Link>
