@@ -75,16 +75,6 @@ const Register = () => {
         return;
     }
 
-    try {
-      const response = await axios.get(`http://localhost:8086/api/usuario/list/${identificacion}`);
-      if (response.data.status === 'success') {
-        toast.current.show({ severity: 'error', summary: 'Error', detail: 'El usuario con ese número de identificación ya está registrado', life: 3000 });
-        return;
-      }
-    } catch (error) {
-      console.error('Error al verificar el número de identificación:', error);
-    }
-
     if (!isOnlyLetters(nombre)) {
         toast.current.show({ severity: 'warn', summary: 'Advertencia', detail: 'El nombre solo debe contener letras', life: 3000 });
         return;
@@ -123,6 +113,16 @@ const Register = () => {
     if (!isStrongPassword(contrasena)) {
         toast.current.show({ severity: 'warn', summary: 'Advertencia', detail: getWeakPasswordMessage(contrasena), life: 3000 });
         return;
+    }
+
+    try {
+      const response = await axios.get(`http://localhost:8086/api/usuario/list/${identificacion}`);
+      if (response.data.status === 'success') {
+        toast.current.show({ severity: 'error', summary: 'Error', detail: 'El usuario con ese número de identificación ya está registrado', life: 3000 });
+        return;
+      }
+    } catch (error) {
+      console.error('Error al verificar el número de identificación:', error);
     }
 
     try {

@@ -17,7 +17,6 @@ import EditDespacho from '../CRUD/Edit/EditDespacho';
 import ListPQRS from '../CRUD/List/ListPQRS';
 import FormPQRS from '../CRUD/Create/FormPQRS';
 import EditPQRS from '../CRUD/Edit/EditPQRS';
-import Profile from './Profile';
 import UserData from './UserData';
 import ChangePWD from './ChangePWD';
 import Galery from './Galery';
@@ -39,6 +38,10 @@ function AppRoutes() { // Cambia el nombre de la función a AppRoutes
         <Route path='/register' element={<Register />}/>
         <Route path='/home' element={<Home/>}/>
         <Route path='/ContactUs' element={<ContactUs/>}/>
+        <Route path='/profile' element={<Profile/>}/>
+        <Route path='/userdata' element={<UserData/>}/>
+        <Route path='/changePWD' element={<ChangePWD/>}/>
+        <Route path='/galery' element={<Galery/>}/>
         
         {/*CRUD USUARIOS*/}
         <Route path='/ListUsuario' element={<ProtectedRoute element={ListUsuario} roles={['administrador']} />} />
@@ -49,7 +52,7 @@ function AppRoutes() { // Cambia el nombre de la función a AppRoutes
         {/*CRUD OBRAS*/}
         <Route path='/ListObra' element={<ProtectedRoute element={ListObra} roles={['administrador']} />} />
         <Route path="/EditObra/:pkCod_Producto" element={<ProtectedRoute element={EditObra} roles={['administrador']} />} />
-        <Route path="/CreateObra" element={<ProtectedRoute element={FormObra} roles={['administrador']} />} />
+        <Route path="/CreateObra" element={<ProtectedRoute element={FormObra} roles={['administrador', 'usuario comun']} />} />
         {/*CRUD OBRAS*/}
 
         {/*CRUD SUBASTA*/}

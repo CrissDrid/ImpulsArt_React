@@ -12,6 +12,7 @@ function Navbar_init() {
     tipoUsuario: 'usuario común',
   });
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     if (location.state) {
@@ -28,7 +29,7 @@ function Navbar_init() {
       setRoles(newRoles);
       localStorage.setItem('userRoles', JSON.stringify(newRoles));
     }
-  }, []);
+  }, [location.state]);
 
   const toggleDropdown = () => {
     setDropdownOpen(!dropdownOpen);
@@ -81,7 +82,7 @@ function Navbar_init() {
                 </button>
                 {dropdownOpen && (
                   <ul className="dropdown-menu show" aria-labelledby="navbarDropdownMenuLink">
-                    <li className='username'>{userData ? userData.userName : 'Invitado'}</li>
+                    <li className='username'>{userName}</li>
                     <li><hr className="dropdown-divider" /></li>
                     {roles.esAsesor && (
                       <li><Link to='/AsesorDashboard' className="dropdown-item">Dashboard Asesor</Link></li>
@@ -99,6 +100,7 @@ function Navbar_init() {
                       </>
                     )}
                     <li><Link to="/ContactUs" className="dropdown-item">Correos</Link></li>
+                    <Link to='/Profile' className='dropdown-item'>Mi perfil</Link>
                     <li><hr className="dropdown-divider" /></li>
                     <li><button className="dropdown-item" onClick={handleLogout}>Cerrar Sesión</button></li>
                   </ul>
@@ -113,4 +115,5 @@ function Navbar_init() {
 }
 
 export default Navbar_init;
+
 

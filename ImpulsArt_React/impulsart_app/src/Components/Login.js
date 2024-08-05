@@ -15,88 +15,76 @@ const Login = () => {
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
-    setError(null);
-    setForm({
-      ...form,
-      [e.target.name]: e.target.value,
-    });
     setError(null); // Limpiar el error cuando el usuario escribe
   };
 
   const iniciarSesion = async () => {
-  try {
-    const response = await axios.post(baseurl, { email: form.email, contrasena: form.password });
-    console.log('Server response:', response.data);
-
-    if (response.data.success) {
-      console.log('Login successful!');
-      localStorage.setItem('user', JSON.stringify(response.data.data));
-      navigate('/home');
-    } else {
-      const errorMessage = response.data.message;
-      if (errorMessage === "Credenciales inválidas") {
-        const users = await axios.get(`http://localhost:8086/api/usuario/list/${form.email}`);
-        if (users.data.length > 0) {
-          const user = users.data.find((user) => user.email === form.email && user.contrasena === form.password);
-          if (user) {
-            localStorage.setItem('user', JSON.stringify(user));
-            navigate('/home');
-          } else {
-            setError('Correo o contraseña incorrectos');
-          }
-        } else {
-          setError('Correo o contraseña incorrectos');
-        }
-      } else {
-        setError('Error al iniciar sesión');
-      }
-    }
-  } catch (error) {
-    if (error.response && error.response.status === 401) {
-      setError('Correo o contraseña incorrectos');
-      console.error('Email o Contraseña incorrectos', error.message);
-    } else {
-      console.error('Error del servidor:', error.response?.data?.message || error.message);
-      setError('Error del servidor: ' + (error.response?.data?.message || error.message));
-    }
-  }
-};
     try {
-      const response = await axios.post(baseurl, {
-        email: form.email,
-        contrasena: form.password,
-      });
-  
+      const response = await axios.post(baseurl, { email: form.email, contrasena: form.password });
+      console.log('Server response:', response.data);
+
       if (response.data.success) {
-        const { userName, identificacion } = response.data;
+        console.log('Login successful!');
+        const { userName, identificacion } = response.data.data;
+
+        // Obtener y validar roles del usuario
         const validarResponse = await axios.get(`${validarRolesUrl}/${identificacion}`);
         const rolesData = validarResponse.data;
-  
+
         // Consolidar roles en un solo objeto
         const roles = {
           esAsesor: rolesData.esAsesor || false,
           esDomiciliario: rolesData.esDomiciliario || false,
           tipoUsuario: rolesData.tipoUsuario || 'usuario común',
         };
-  
+
         // Guardar roles y nombre de usuario en localStorage
         localStorage.setItem('userRoles', JSON.stringify(roles));
         localStorage.setItem('userName', userName);
-  
-        navigate('/home', { state: { userName, identificacion, roles } });
+        localStorage.setItem('user', JSON.stringify(response.data.data));
+        
+        navigate('/home');
       } else {
-        const errorMessage = response.data.data;
+        const errorMessage = response.data.message;
         if (errorMessage === "Credenciales inválidas") {
-          setError('Contraseña o Correo erroneos');
+          const users = await axios.get(`http://localhost:8086/api/usuario/list/${form.email}`);
+          if (users.data.length > 0) {
+            const user = users.data.find((user) => user.email === form.email && user.contrasena === form.password);
+            if (user) {
+              // Obtener y validar roles del usuario
+              const validarResponse = await axios.get(`${validarRolesUrl}/${user.identificacion}`);
+              const rolesData = validarResponse.data;
+
+              // Consolidar roles en un solo objeto
+              const roles = {
+                esAsesor: rolesData.esAsesor || false,
+                esDomiciliario: rolesData.esDomiciliario || false,
+                tipoUsuario: rolesData.tipoUsuario || 'usuario común',
+              };
+
+              // Guardar roles y nombre de usuario en localStorage
+              localStorage.setItem('userRoles', JSON.stringify(roles));
+              localStorage.setItem('userName', user.userName);
+              localStorage.setItem('user', JSON.stringify(user));
+              
+              navigate('/home');
+            } else {
+              setError('Correo o contraseña incorrectos');
+            }
+          } else {
+            setError('Correo o contraseña incorrectos');
+          }
         } else {
           setError('Error al iniciar sesión');
         }
       }
     } catch (error) {
       if (error.response && error.response.status === 401) {
-        setError('Contraseña o Correo incorrectos');
+        setError('Correo o contraseña incorrectos');
+        console.error('Email o Contraseña incorrectos', error.message);
       } else {
-        setError('Error del servidor: ' + error.response.data.message);
+        console.error('Error del servidor:', error.response?.data?.message || error.message);
+        setError('Error del servidor: ' + (error.response?.data?.message || error.message));
       }
     }
   };
@@ -126,17 +114,6 @@ const Login = () => {
               <div className="Links">
                 <p><Link className='link-contraseña link-no-underline'>¿Olvidaste tu contraseña?</Link></p>
                 <p>¿Todavía no tienes una cuenta?<Link className='link-no-underline link-cuenta' to="/register"> Crear cuenta nueva</Link></p>
-                <p>
-                  <Link to="#" className='link-contraseña link-no-underline'>
-                    ¿Olvidaste tu contraseña?
-                  </Link>
-                </p>
-                <p>
-                  ¿Todavía no tienes una cuenta?
-                  <Link className='link-no-underline link-cuenta' to="/register">
-                    Crear cuenta nueva
-                  </Link>
-                </p>
               </div>
             </form>
           </div>
@@ -148,3 +125,4 @@ const Login = () => {
 };
 
 export default Login;
+
