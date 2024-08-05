@@ -63,6 +63,16 @@ function Navbar_init() {
                 {dropdownOpen && (
                   <ul className="dropdown-menu show" aria-labelledby="navbarDropdownMenuLink">
                     <li className='username'>{userName}</li>
+                    <li><hr className="dropdown-divider"/></li>
+                    <li>
+                    <Link to='/ListObra' className="dropdown-item">CRUD obras</Link>
+                    <Link to='/ListSubasta' className="dropdown-item">CRUD subasta</Link>
+                    <Link to='/ListDespacho' className="dropdown-item">CRUD despacho</Link>
+                    <Link to='/ListPQRS' className="dropdown-item">CRUD PQRS</Link>
+                    <Link to="/ContactUs" className="dropdown-item">Correos</Link>
+                    <Link to="ListUsuario" className="dropdown-item">Usuarios</Link>
+                     </li>
+                    <li><hr className="dropdown-divider"/></li>
                     <li><hr className="dropdown-divider" /></li>
                     {esEmpleado && (
                       <>
