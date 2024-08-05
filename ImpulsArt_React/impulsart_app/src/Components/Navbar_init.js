@@ -52,14 +52,14 @@ function Navbar_init() {
   return (
     <nav className="navbar navbar-expand-lg">
       <div className="container-fluid">
-        <img className='nav-logo' src={Logo} alt="" />
+          <Link to='/Home'><img className='nav-logo' src={Logo} alt="" /></Link>
         <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarTogglerDemo02" aria-controls="navbarTogglerDemo02" aria-expanded="false" aria-label="Toggle navigation">
           <span className="navbar-toggler-icon"></span>
         </button>
         <div className="collapse navbar-collapse" id="navbarTogglerDemo02">
           <ul className="navbar-nav mb-2 mb-lg-0 ms-auto">
             <li className="nav-item">
-              <a className="nav-link active" aria-current="page" href="#">Inicio</a>
+              <Link to="/Home" style={{ textDecoration: 'none' }}><a className="nav-link active" aria-current="page" href="#" >Inicio</a></Link>
             </li>
             <li className="nav-item">
               <a className="nav-link active" aria-current="page" href="#">Categorias</a>
@@ -84,13 +84,14 @@ function Navbar_init() {
                   <ul className="dropdown-menu show" aria-labelledby="navbarDropdownMenuLink">
                     <li className='username'>{userName}</li>
                     <li><hr className="dropdown-divider" /></li>
+                    <li><Link to='/Profile' className='dropdown-item'>Mi perfil</Link></li>
                     {roles.esAsesor && (
                       <li><Link to='/AsesorDashboard' className="dropdown-item">Dashboard Asesor</Link></li>
                     )}
                     {roles.esDomiciliario && (
                       <li><Link to='/DomiciliarioDashboard' className="dropdown-item">Dashboard Domiciliario</Link></li>
                     )}
-                    {roles.tipoUsuario === 'administrador' && (
+                    {roles.tipoUsuario === 'Administrador' && (
                       <>
                         <li><Link to='/ListObra' className="dropdown-item">CRUD obras</Link></li>
                         <li><Link to='/ListSubasta' className="dropdown-item">CRUD subasta</Link></li>
@@ -100,7 +101,6 @@ function Navbar_init() {
                       </>
                     )}
                     <li><Link to="/ContactUs" className="dropdown-item">Correos</Link></li>
-                    <Link to='/Profile' className='dropdown-item'>Mi perfil</Link>
                     <li><hr className="dropdown-divider" /></li>
                     <li><button className="dropdown-item" onClick={handleLogout}>Cerrar Sesión</button></li>
                   </ul>

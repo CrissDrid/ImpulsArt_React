@@ -508,13 +508,13 @@ ol{
 }
 
 .image-upload p {
-  color: #800080; /* Color morado */
+  color: #8D33FF; /* Color morado */
   margin: 0;
   transition: color 0.3s ease-in-out; /* Animación de cambio de color */
 }
 
 .image-upload:hover p {
-  color: #4b0082; /* Color morado oscuro al pasar el mouse */
+  color: #5e12b7; /* Color morado oscuro al pasar el mouse */
 }
 
 .preview-image {

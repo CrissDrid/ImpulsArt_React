@@ -1,14 +1,23 @@
 import axios from 'axios';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Logo from '../../Resources/Logo.svg';
 import Art from '../../Resources/Img-Art3.avif';
-import { Link } from 'react-router-dom';
 import Navbar_init from '../../Components/Navbar_init';
 import Footer from '../../Components/Footer';
 
 const FormObra = () => {
   const navigate = useNavigate();
+  const [roles, setRoles] = useState(JSON.parse(localStorage.getItem('userRoles')) || {
+    tipoUsuario: 'usuario común',
+  });
+
+  useEffect(() => {
+    const storedRoles = JSON.parse(localStorage.getItem('userRoles'));
+    if (storedRoles) {
+      setRoles(storedRoles);
+    }
+  }, []);
 
   const [obra, setObra] = useState({
     nombreProducto: "",
@@ -48,6 +57,14 @@ const FormObra = () => {
       navigate("/ListObra");
     } catch (error) {
       console.error('Error al enviar el formulario:', error);
+    }
+  };
+
+  const handleCancel = () => {
+    if (roles.tipoUsuario === 'Administrador') {
+      navigate('/ListObra');
+    } else {
+      navigate('/Profile');
     }
   };
 
@@ -91,8 +108,8 @@ const FormObra = () => {
                 <label htmlFor="floatingCantidad">Cantidad</label>
               </div>
               <div className="form-floating">
-              <input className="form-control" id="floatingCantidad" placeholder="ID categoria" name="categoria" value={obra.categoria} onChange={handleInputChange} type="number" required />
-              <label htmlFor="floatingCantidad">Categoria</label>
+              <input className="form-control" id="floatingCategoria" placeholder="ID categoria" name="categoria" value={obra.categoria} onChange={handleInputChange} type="number" required />
+              <label htmlFor="floatingCategoria">Categoria</label>
               </div>
               <div className="form-floating">
                 <input className="form-control" id="floatingDescripcion" placeholder="Descripción" name="descripcion" value={obra.descripcion} onChange={handleInputChange} type="text" required />
@@ -104,8 +121,8 @@ const FormObra = () => {
                     <img src={URL.createObjectURL(obra.imagen)} alt="Previsualización" className="img-fluid preview-image" />
                   ) : (
                     <div className="image-placeholder">
-                      <span className="cross-icon">+</span>
-                      <p>Subir Imagen</p>
+                      <i className="cross-icon bi bi-plus"></i>
+                      <p className='text-subirObra'>Subir Imagen</p>
                     </div>
                   )}
                   <input id="fileInput" type="file" name="imagen" accept="image/*" onChange={handleFileChange} style={{ display: 'none' }} />
@@ -113,7 +130,7 @@ const FormObra = () => {
               </div>
               <br></br>
               <button className="btn btn-primary w-100 py-2 create-btn" type="submit">Crear obra</button>
-              <Link to='/ListObra'><button className="btn btn-danger w-100 py-2 cancel-btn">Cancelar</button></Link>
+              <button className="btn btn-danger w-100 py-2 cancel-btn" type="button" onClick={handleCancel}>Cancelar</button>
             </form>
           </div>
         </div>
@@ -130,3 +147,4 @@ const FormObra = () => {
 };
 
 export default FormObra;
+
