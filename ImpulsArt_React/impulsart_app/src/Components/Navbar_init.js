@@ -4,7 +4,6 @@ import Logo from '../Resources/Logo.svg';
 import { BsPersonCircle } from 'react-icons/bs';
 
 function Navbar_init() {
-  const location = useLocation();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [userName, setUserName] = useState(localStorage.getItem('userName') || '');
   const [roles, setRoles] = useState(JSON.parse(localStorage.getItem('userRoles')) || {
@@ -29,7 +28,7 @@ function Navbar_init() {
       setRoles(newRoles);
       localStorage.setItem('userRoles', JSON.stringify(newRoles));
     }
-  }, [location.state]);
+  }, []);
 
   const toggleDropdown = () => {
     setDropdownOpen(!dropdownOpen);
@@ -82,7 +81,7 @@ function Navbar_init() {
                 </button>
                 {dropdownOpen && (
                   <ul className="dropdown-menu show" aria-labelledby="navbarDropdownMenuLink">
-                    <li className='username'>{userName}</li>
+                    <li className='username'>{userData ? userData.userName : 'Invitado'}</li>
                     <li><hr className="dropdown-divider" /></li>
                     {roles.esAsesor && (
                       <li><Link to='/AsesorDashboard' className="dropdown-item">Dashboard Asesor</Link></li>
@@ -114,3 +113,4 @@ function Navbar_init() {
 }
 
 export default Navbar_init;
+

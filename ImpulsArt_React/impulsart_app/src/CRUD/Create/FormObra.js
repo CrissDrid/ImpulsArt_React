@@ -4,6 +4,8 @@ import { useNavigate } from 'react-router-dom';
 import Logo from '../../Resources/Logo.svg';
 import Art from '../../Resources/Img-Art3.avif';
 import { Link } from 'react-router-dom';
+import Navbar_init from '../../Components/Navbar_init';
+import Footer from '../../Components/Footer';
 
 const FormObra = () => {
   const navigate = useNavigate();
@@ -50,6 +52,8 @@ const FormObra = () => {
   };
 
   return (
+    <>
+      <Navbar_init />
     <div className="register-container">
       <div className="register-content row justify-content-center">
         <div className='col-md-6'>
@@ -120,6 +124,8 @@ const FormObra = () => {
       <div className="footer-register">
       </div>
     </div>
+    <Footer/>
+    </>
   );
 };
 

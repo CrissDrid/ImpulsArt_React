@@ -1,0 +1,33 @@
+.subir-obra {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 1.3rem;
+    border: 2px dashed #8D33FF;
+    border-radius: 8px;
+    padding: 20px;
+    cursor: pointer;
+    position: relative;
+    text-align: center;
+    transition: all 0.3s ease-in-out; 
+    max-width: 9rem; 
+}
+
+.text-subirObra{
+    font-family: "Nunito", sans-serif;
+    color: #8D33FF;
+}
+
+.subir-obra:hover{
+    background-color: #f0e6f8;
+}
+
+i.cross-icon {
+    font-size: 4rem;
+    color: #8D33FF !important;
+    transition: transform 0.3s ease-in-out;
+}
+
+.subir-obra:hover .cross-icon {
+    transform: scale(1.2); 
+}

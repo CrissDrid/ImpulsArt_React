@@ -1,0 +1,139 @@
+    .profile-banner {
+    background-color: #8D33FF;
+    height: 20rem;
+    border-radius: 3rem;
+    }
+
+    .profile-icon {
+    position: absolute;
+    bottom: -8rem;
+    left: 4rem;
+    width: 15rem;
+    height: 15rem;
+    background-color: #9370DB;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    }
+
+    .userName{
+    font-family: "Nunito", sans-serif;
+    margin-left: 10rem;
+    margin-top: 2rem;
+    }
+
+    .profile-content {
+    display: flex;
+    margin-top: 5rem;
+    }
+
+    .user-nav {
+    font-size: 1.6rem;
+    width: 20%;
+    max-height: 23rem;
+    margin-left: 2rem;
+    margin-right: 4rem;
+    padding: 20px;
+    background-color: #ebebeb67;
+    border-radius: 1rem;
+    }
+
+    .user-nav ul {
+    list-style-type: none; 
+    padding: 0;
+    margin: 0;
+    margin-top: 1rem;
+    }
+
+    .user-nav li {
+    display: flex;
+    align-items: center; 
+    margin-bottom: 10px;
+    transition: background-color 0.3s ease; 
+    border-radius: 1rem;
+    }
+
+    .user-nav i {
+    margin-right: 10px; 
+    color: #8D33FF; 
+    }
+
+    .user-nav a {
+        display: block;
+        padding: 1px;
+        text-decoration: none;
+        color: #000;
+        transition: background-color 0.3s ease;
+        border-radius: 1rem;
+    }
+
+    .user-nav li:hover,
+    .user-nav li:focus,
+    .user-nav li.active {
+        background-color: #8b33ff1e;
+        border-radius: 1rem;
+    }
+
+    .user-nav a:hover,
+    .user-nav a:focus,
+    .user-nav a:active{
+        color: #8D33FF;
+    }
+
+    .user-data {
+    width: 55%;
+    align-items: center;
+    margin-left: 5rem;
+    }
+
+
+    .user-data form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    }
+
+    .form-group {
+    margin-bottom: 15px;
+    }
+
+    .form-group label {
+    display: block;
+    margin-bottom: 5px;
+    }
+
+    .form-group input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    }
+
+    .guardar-btn{
+    background-color: #8D33FF !important;
+    border-color: white !important;
+    border-radius: 50px !important; 
+    margin-left: auto;
+    padding: 5px 23px !important; 
+    max-width: 10rem;
+    height: 2.7rem !important;
+    }
+
+    .btn-disabled {
+    cursor: not-allowed !important; 
+    opacity: 0.6; 
+    }
+
+    .read-only-field {
+    background-color: #f8f9fa !important; 
+    cursor: not-allowed; 
+    border-color: #dee2e6 !important; 
+    }
+
+    .read-only-field:focus {
+    outline: none !important; 
+    box-shadow: none !important; 
+    border-color: #dee2e6 !important; 
+    }
+    
