@@ -136,13 +136,13 @@ export const ListObra = () => {
         
                 doc.autoTable({
                     startY: 60,  // Ajustar el startY para dejar espacio para el título
-                    head: [['Nombre', 'Categoría', 'Cantidad']],
-                    body: listObra.map(obra => [obra.nombreProducto, obra.categoria, obra.cantidad]),
+                    head: [['Nombre', 'Costo', 'Cantidad']],
+                    body: listObra.map(obra => [obra.nombreProducto, obra.costo, obra.cantidad]),
                     theme: 'grid',               // Tema de la tabla
                     ...styles                    // Aplicar estilos definidos
                 });
         
-                doc.save("reporte_servicio_al_cliente.pdf");
+                doc.save("reporte_obra.pdf");
             };
         };
 
@@ -161,18 +161,6 @@ export const ListObra = () => {
         {/*FORMULARIO PARA BUSCAR POR FILTRO*/}
         <div className="row justify-content-center">
           <div className="col-md-6 d-flex">
-          <select
-       value={categoria}
-       onChange={(e) => setCategoria(e.target.value)}
-       className="form-select"
-        >
-   <option value="">Selecciona la categoría de su obra</option>
-    <option value="Pintura">Pintura</option>
-    <option value="Dibujo">Dibujo</option>
-    <option value="Maqueta">Maqueta</option>
-    <option value="Ceramica">Ceramica</option>
-</select>
-
 <br></br>
 <div  style={{ paddingLeft: '10px'}}></div>
 
@@ -203,7 +191,7 @@ export const ListObra = () => {
                     <thead className="table-head">
                         <tr>
                             <th scope="col">Nombre</th>
-                            <th scope="col">Categoria</th>
+                            <th scope="col">Costo</th>
                             <th scope="col">Cantidad</th>
                             <th scope="col">Imagen</th>
                             <th scope="col">Acciones</th>
@@ -215,7 +203,7 @@ export const ListObra = () => {
         return (
             <tr key={index}>
                 <td>{obra.nombreProducto}</td>
-                <td>{obra.categoria}</td>
+                <td>{obra.costo}</td>
                 <td>{obra.cantidad}</td>
                 <td><img src={obra.imagen} alt="" style={{ maxWidth: '100px' }} /></td>
                 {/* Aquí puedes agregar más columnas si es necesario */}

@@ -1,13 +1,17 @@
 import React, { useState, useEffect } from 'react';
+import { useLocation, useNavigate, Link } from 'react-router-dom';
 import Logo from '../Resources/Logo.svg';
 import { BsPersonCircle } from 'react-icons/bs';
-import { useLocation, useNavigate, Link } from 'react-router-dom';
 
 function Navbar_init() {
   const location = useLocation();
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [userName, setUserName] = useState('');
-  const [esEmpleado, setEsEmpleado] = useState(false);
+  const [userName, setUserName] = useState(localStorage.getItem('userName') || '');
+  const [roles, setRoles] = useState(JSON.parse(localStorage.getItem('userRoles')) || {
+    esAsesor: false,
+    esDomiciliario: false,
+    tipoUsuario: 'usuario común',
+  });
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -15,9 +19,15 @@ function Navbar_init() {
       if (location.state.userName) {
         setUserName(location.state.userName);
       }
-      if (location.state.esEmpleado !== undefined) {
-        setEsEmpleado(location.state.esEmpleado);
-      }
+
+      const newRoles = {
+        esAsesor: location.state.roles?.esAsesor || false,
+        esDomiciliario: location.state.roles?.esDomiciliario || false,
+        tipoUsuario: location.state.roles?.tipoUsuario || 'usuario común',
+      };
+
+      setRoles(newRoles);
+      localStorage.setItem('userRoles', JSON.stringify(newRoles));
     }
   }, [location.state]);
 
@@ -27,7 +37,14 @@ function Navbar_init() {
 
   const handleLogout = () => {
     localStorage.removeItem('token');
+    localStorage.removeItem('userName');
+    localStorage.removeItem('userRoles');
     setUserName('');
+    setRoles({
+      esAsesor: false,
+      esDomiciliario: false,
+      tipoUsuario: 'usuario común',
+    });
     setDropdownOpen(false);
     navigate('/login', { replace: true });
   };
@@ -54,6 +71,9 @@ function Navbar_init() {
               <a className="nav-link active" aria-current="page" href="#">Contactanos</a>
             </li>
             <li className="nav-item">
+              <Link to='/SeccionSubasta' className="nav-link active" aria-current="page">Seccion Subasta</Link>
+            </li>
+            <li className="nav-item">
               <div className="dropdown">
                 <button className="nav-link active dropdown" onClick={toggleDropdown}>
                   <div className='person-icon'>
@@ -63,28 +83,25 @@ function Navbar_init() {
                 {dropdownOpen && (
                   <ul className="dropdown-menu show" aria-labelledby="navbarDropdownMenuLink">
                     <li className='username'>{userName}</li>
-                    <li><hr className="dropdown-divider"/></li>
-                    <li>
-                    <Link to='/ListObra' className="dropdown-item">CRUD obras</Link>
-                    <Link to='/ListSubasta' className="dropdown-item">CRUD subasta</Link>
-                    <Link to='/ListDespacho' className="dropdown-item">CRUD despacho</Link>
-                    <Link to='/ListPQRS' className="dropdown-item">CRUD PQRS</Link>
-                    <Link to="/ContactUs" className="dropdown-item">Correos</Link>
-                    <Link to="ListUsuario" className="dropdown-item">Usuarios</Link>
-                     </li>
-                    <li><hr className="dropdown-divider"/></li>
                     <li><hr className="dropdown-divider" /></li>
-                    {esEmpleado && (
+                    {roles.esAsesor && (
+                      <li><Link to='/AsesorDashboard' className="dropdown-item">Dashboard Asesor</Link></li>
+                    )}
+                    {roles.esDomiciliario && (
+                      <li><Link to='/DomiciliarioDashboard' className="dropdown-item">Dashboard Domiciliario</Link></li>
+                    )}
+                    {roles.tipoUsuario === 'administrador' && (
                       <>
                         <li><Link to='/ListObra' className="dropdown-item">CRUD obras</Link></li>
                         <li><Link to='/ListSubasta' className="dropdown-item">CRUD subasta</Link></li>
                         <li><Link to='/ListDespacho' className="dropdown-item">CRUD despacho</Link></li>
                         <li><Link to='/ListPQRS' className="dropdown-item">CRUD PQRS</Link></li>
+                        <li><Link to='/ListUsuario' className="dropdown-item">CRUD Usuarios</Link></li>
                       </>
                     )}
                     <li><Link to="/ContactUs" className="dropdown-item">Correos</Link></li>
                     <li><hr className="dropdown-divider" /></li>
-                    <li><button className="dropdown-item" onClick={handleLogout}>Cerrar Sesion</button></li>
+                    <li><button className="dropdown-item" onClick={handleLogout}>Cerrar Sesión</button></li>
                   </ul>
                 )}
               </div>

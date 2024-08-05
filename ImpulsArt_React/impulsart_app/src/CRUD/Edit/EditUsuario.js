@@ -1,11 +1,13 @@
 import axios from 'axios';
-import React, { useState } from 'react'
-import { useNavigate } from 'react-router-dom';
+import React, { useEffect, useState } from 'react'
+import { useNavigate, useParams } from 'react-router-dom';
 import Logo from '../../Resources/Logo.svg';
-import Art from '../../Resources/Img-Art3.avif';
 import { Link } from 'react-router-dom';
+import Art from '../../Resources/Img-Art3.avif';
 
-export const FormUsuario = () => {
+export const EditUsuario = () => {
+
+    const {identificacion} = useParams()
 
     let navigate = useNavigate()
 
@@ -22,24 +24,28 @@ export const FormUsuario = () => {
       tipoUsuario: "usuario comun"
     });
   
-    const { nombre, apellido, fechaNacimiento, email, numCelular, direccion, contrasena, userName, identificacion} = usuario;
+    const { nombre, apellido, fechaNacimiento, email, numCelular, direccion, userName } = usuario;
   
     const onInputChange = (e) => {
       setUsuario({...usuario, [e.target.name]: e.target.value});
     };
   
     const onSubmit = async (e) => {
-      e.preventDefault();
-      try {
-  
-        await axios.post("http://localhost:8086/api/usuario/create", usuario);
-        navigate("/ListUsuario"); 
-  
-      } catch (error) {
-        console.error(error);
-        // Manejo de errores aquí
-      }
+
+        e.preventDefault();
+        axios.put(`http://localhost:8086/api/usuario/update/${identificacion}`, usuario)
+        navigate("/ListUsuario");
+
     };
+
+    useEffect(() => {
+      
+      const loadUsuario = async () => {
+        const result = await axios.get(`http://localhost:8086/api/usuario/list/${identificacion}`);
+        setUsuario(result.data.data);
+      };
+      loadUsuario();
+    }, [identificacion]);
   
     return (
       <div className="register-container">
@@ -67,10 +73,6 @@ export const FormUsuario = () => {
                   </div>
                 </div>
                 <div className="form-floating">
-                  <input className="form-control" id="floatingId" onChange={(e) => onInputChange(e)} value={identificacion} type="number" name="identificacion" placeholder="Numero de Documento" required/>
-                  <label htmlFor="floatingId">Numero de Documento</label>
-                </div>
-                <div className="form-floating">
                   <input type="text" className="form-control" id="floatingUserName" onChange={(e) => onInputChange(e)} value={userName} name="userName" placeholder="User Name" required/>
                   <label htmlFor="floatingUserName">User Name</label>
                 </div>
@@ -90,11 +92,7 @@ export const FormUsuario = () => {
                   <input type="text" className="form-control" id="floatingAddress" onChange={(e) => onInputChange(e)} value={direccion} name="direccion" placeholder="Direccion" required/>
                   <label htmlFor="floatingAddress">Direccion</label>
                 </div>
-                <div className="form-floating">
-                  <input type="password" className="form-control" id="floatingPassword" onChange={(e) => onInputChange(e)} value={contrasena} name="contrasena" placeholder="Password" required/>
-                  <label htmlFor="floatingPassword">Contraseña</label>
-                </div>
-                <button className="btn btn-primary w-100 py-2 create-btn" type="submit">Crear usuario</button>
+                <button className="btn btn-primary w-100 py-2 create-btn" type="submit">Editar usuario</button>
                 <Link to='/ListSubasta'><button className="btn btn-danger w-100 py-2 cancel-btn">Cancelar</button></Link>
               </form>
             </div>
@@ -110,4 +108,4 @@ export const FormUsuario = () => {
   };
 
 
-export default FormUsuario;
+export default EditUsuario;

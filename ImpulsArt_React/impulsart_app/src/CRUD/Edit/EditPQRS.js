@@ -9,7 +9,7 @@ export const EditPQRS = () => {
 
     let navigate = useNavigate()
 
-    const {pkCod_PQRS} = useParams()
+    const {pkCod_Reclamo} = useParams()
 
     const [PQRS, setPQRS] = useState ({
 
@@ -29,7 +29,7 @@ export const EditPQRS = () => {
     const onSubmit = async (e) => {
 
         e.preventDefault();
-        axios.put(`http://localhost:8086/api/pqrs/update/${pkCod_PQRS}`,PQRS)
+        axios.put(`http://localhost:8086/api/reclamo/update/${pkCod_Reclamo}`,PQRS)
         navigate("/ListPQRS"); 
 
     };
@@ -37,11 +37,11 @@ export const EditPQRS = () => {
     useEffect(() => {
       
         const loadPQRS = async () => {
-          const result = await axios.get(`http://localhost:8086/api/pqrs/list/${pkCod_PQRS}`);
+          const result = await axios.get(`http://localhost:8086/api/reclamo/list/${pkCod_Reclamo}`);
           setPQRS(result.data.data);
         };
         loadPQRS();
-      }, [pkCod_PQRS]);
+      }, [pkCod_Reclamo]);
 
       return (
         <div className="register-container">

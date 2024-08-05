@@ -19,6 +19,10 @@ import FormPQRS from '../CRUD/Create/FormPQRS';
 import EditPQRS from '../CRUD/Edit/EditPQRS';
 import Correos, { ContactUs } from './ContactUs';
 import ListUsuario from '../CRUD/List/ListUsuario';
+import CreateUsuario from '../CRUD/Create/FormUsuario';
+import EditUsuario from '../CRUD/Edit/EditUsuario';
+import NoAccess from './no_access';
+import ProtectedRoute from './ProtectedRoute'; // Importar ProtectedRoute
 import Profile from './Profile';
 
 function AppRoutes() { // Cambia el nombre de la función a AppRoutes
@@ -26,37 +30,43 @@ function AppRoutes() { // Cambia el nombre de la función a AppRoutes
     <Router>
       <Routes>
         <Route path="/" element={<LandingPage />} />
+        <Route path="/no-access" element={<NoAccess />} />
         <Route path="/login" element={<Login />} />
         <Route path='/register' element={<Register />}/>
         <Route path='/home' element={<Home/>}/>
         <Route path='/ContactUs' element={<ContactUs/>}/>
         
-        <Route path='/ListUsuario' element={<ListUsuario/>}/>
+        {/*CRUD USUARIOS*/}
+        <Route path='/ListUsuario' element={<ProtectedRoute element={ListUsuario} roles={['administrador']} />} />
+        <Route path="/EditUsuario/:identificacion" element={<ProtectedRoute element={EditUsuario} roles={['administrador']} />} />
+        <Route path="/CreateUsuario" element={<ProtectedRoute element={CreateUsuario} roles={['administrador']} />} />
+        {/*CRUD USUARIOS*/}
         
-        <Route path='/Profile' element={<Profile/>}/>
         {/*CRUD OBRAS*/}
-        <Route path='/ListObra' element={<ListObra/>}/>
-        <Route path="/EditObra/:pkCod_Producto" element = {<EditObra />}/>
-        <Route path="/CreateObra" element = {<FormObra />}/>
+        <Route path='/ListObra' element={<ProtectedRoute element={ListObra} roles={['administrador']} />} />
+        <Route path="/EditObra/:pkCod_Producto" element={<ProtectedRoute element={EditObra} roles={['administrador']} />} />
+        <Route path="/CreateObra" element={<ProtectedRoute element={FormObra} roles={['administrador']} />} />
         {/*CRUD OBRAS*/}
 
-       {/*CRUD SUBASTA*/}
-<Route path='/ListSubasta' element = {<ListSubasta />}/>
-<Route path="/CreateSubasta" element = {<FormSubasta />}/>
-<Route path="/EditSubasta/:pkCodSubasta" element = {<EditSubasta />}/>
-{/*CRUD SUBASTA*/}
+        {/*CRUD SUBASTA*/}
+        <Route path='/ListSubasta' element={<ProtectedRoute element={ListSubasta} roles={['administrador']} />} />
+        <Route path="/CreateSubasta" element={<ProtectedRoute element={FormSubasta} roles={['administrador']} />} />
+        <Route path="/EditSubasta/:pkCodSubasta" element={<ProtectedRoute element={EditSubasta} roles={['administrador']} />} />
+        {/*CRUD SUBASTA*/}
 
-{/*CRUD DESPACHO*/}
-<Route path="/ListDespacho" element = {<ListDespacho />}/>
-<Route path="/CreateDespacho" element = {<FormDespacho />}/>
-<Route path="/EditDespacho/:pkCod_Despacho" element = {<EditDespacho />}/>
-{/*CRUD DESPACHO*/}
+        {/*CRUD DESPACHO*/}
+        <Route path="/ListDespacho" element={<ProtectedRoute element={ListDespacho} roles={['administrador']} />} />
+        <Route path="/CreateDespacho" element={<ProtectedRoute element={FormDespacho} roles={['administrador']} />} />
+        <Route path="/EditDespacho/:pkCod_Despacho" element={<ProtectedRoute element={EditDespacho} roles={['administrador']} />} />
+        {/*CRUD DESPACHO*/}
 
-{/*CRUD PQRS*/}
-<Route path="/ListPQRS" element = {<ListPQRS />}/>
-<Route path="/CreatePQRS" element = {<FormPQRS />}/>
-<Route path="/EditPQRS/:pkCod_PQRS" element = {<EditPQRS />}/>
-{/*CRUD PQRS*/}
+        {/*CRUD PQRS*/}
+        <Route path="/ListPQRS" element={<ProtectedRoute element={ListPQRS} roles={['administrador']} />} />
+        <Route path="/CreatePQRS" element={<ProtectedRoute element={FormPQRS} roles={['administrador']} />} />
+        <Route path="/EditPQRS/:pkCod_Reclamo" element={<ProtectedRoute element={EditPQRS} roles={['administrador']} />} />
+        {/*CRUD PQRS*/}
+
+
 
 <Route path="/Correo" element = {<Correo />}/>
 

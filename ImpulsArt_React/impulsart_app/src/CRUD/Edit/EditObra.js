@@ -126,21 +126,9 @@ export const EditObra = () => {
                     <label htmlFor="floatingEmail">Cantidad</label>
                   </div>
                   <div className="form-floating">
-                    <select
-                      className="form-select"
-                      onChange={(e) => onInputChange(e)}
-                      value={categoria}
-                      name="categoria"
-                      required
-                    >
-                      <option value="">Selecciona la categoría de su obra</option>
-                      <option value="Pintura">Pintura</option>
-                      <option value="Dibujo">Dibujo</option>
-                      <option value="Maqueta">Maqueta</option>
-                      <option value="Ceramica">Cerámica</option>
-                    </select>
-                    <label htmlFor="floatingDOB">Categoría</label>
-                  </div>
+              <input className="form-control" id="floatingCantidad" placeholder="ID categoria" name="categoria" value={categoria} onChange={(e) => onInputChange(e)} type="number" required />
+              <label htmlFor="floatingCantidad">Categoria</label>
+              </div>
                   <div className="form-floating">
                     <input
                       type="text"

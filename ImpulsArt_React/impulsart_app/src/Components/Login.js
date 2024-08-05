@@ -6,7 +6,7 @@ import Art from '../Resources/Img-Art.svg';
 import Footer from './Footer';
 
 const baseurl = "http://localhost:8086/api/usuario/login";
-const validarEmpleadoUrl = "http://localhost:8086/api/usuario/validarEmpleado";
+const validarRolesUrl = "http://localhost:8086/api/usuario/validarRoles";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -21,7 +21,7 @@ const Login = () => {
       ...form,
       [e.target.name]: e.target.value,
     });
-    setError(null);
+    setError(null); // Limpiar el error cuando el usuario escribe
   };
 
   const iniciarSesion = async () => {
@@ -31,38 +31,39 @@ const Login = () => {
         contrasena: form.password,
       });
   
-      console.log('Server response:', response.data);
-  
       if (response.data.success) {
-       
-        console.log('Login successful!');
         const { userName, identificacion } = response.data;
-
-        // Validar si el usuario es un empleado
-        const validarResponse = await axios.get(`${validarEmpleadoUrl}/${identificacion}`);
-        const esEmpleado = validarResponse.data.success;
-
-        navigate('/home', { state: { userName, identificacion, esEmpleado } });
-
-        } else {
-            const errorMessage = response.data.data;
-            if (errorMessage === "Credenciales inválidas") {
-                setError('Contraseña o Correo erroneos');
-            } else {
-                setError('Error al iniciar sesion');
-            }
-        }
-    } catch (error) {
-        if (error.response && error.response.status === 401) {
-            setError('Contraseña o Correo incorrectos');
-            console.error('Email o Contraseña incorrectos', error.message);
-        } else {
-            console.error('Error del servidor:', error.response.data.message);
-            setError('Error del servidor: ' + error.response.data.message);
-        }
-    }
-};
+        const validarResponse = await axios.get(`${validarRolesUrl}/${identificacion}`);
+        const rolesData = validarResponse.data;
   
+        // Consolidar roles en un solo objeto
+        const roles = {
+          esAsesor: rolesData.esAsesor || false,
+          esDomiciliario: rolesData.esDomiciliario || false,
+          tipoUsuario: rolesData.tipoUsuario || 'usuario común',
+        };
+  
+        // Guardar roles y nombre de usuario en localStorage
+        localStorage.setItem('userRoles', JSON.stringify(roles));
+        localStorage.setItem('userName', userName);
+  
+        navigate('/home', { state: { userName, identificacion, roles } });
+      } else {
+        const errorMessage = response.data.data;
+        if (errorMessage === "Credenciales inválidas") {
+          setError('Contraseña o Correo erroneos');
+        } else {
+          setError('Error al iniciar sesión');
+        }
+      }
+    } catch (error) {
+      if (error.response && error.response.status === 401) {
+        setError('Contraseña o Correo incorrectos');
+      } else {
+        setError('Error del servidor: ' + error.response.data.message);
+      }
+    }
+  };
 
   return (
     <div className="login-container">
@@ -121,7 +122,7 @@ const Login = () => {
               </button>
               <div className="Links">
                 <p>
-                  <Link className='link-contraseña link-no-underline'>
+                  <Link to="#" className='link-contraseña link-no-underline'>
                     ¿Olvidaste tu contraseña?
                   </Link>
                 </p>

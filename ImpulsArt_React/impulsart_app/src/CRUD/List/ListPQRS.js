@@ -18,7 +18,7 @@ export const ListPQRS = () => {
 
       //GET ALL USERS
       const getPQRS = () => {
-        axios.get("http://localhost:8086/api/pqrs/all")
+        axios.get("http://localhost:8086/api/reclamo/all")
             .then((response) => {
                 setListPQRS(response.data.data);
             })
@@ -29,8 +29,8 @@ export const ListPQRS = () => {
     //GET ALL USERS
 
     //DELETE USERS
-    const deletePQRS = async (pkCod_PQRS) => {
-        await axios.delete(`http://localhost:8086/api/pqrs/delete/${pkCod_PQRS}`)
+    const deletePQRS = async (pkCod_Reclamo) => {
+        await axios.delete(`http://localhost:8086/api/reclamo/delete/${pkCod_Reclamo}`)
         getPQRS();
     }
     //DELETE USERS
@@ -134,8 +134,8 @@ export const ListPQRS = () => {
                                 <td>{pqrs.fechaPQRS}</td>
                                 {/* Aquí puedes agregar más columnas si es necesario */}
                                 <td>
-                                    <Link to={`/EditPQRS/${pqrs.pkCod_PQRS}`} className="btn btn-outline-primary mx-2">Edit</Link>
-                                    <button onClick={() => deletePQRS(pqrs.pkCod_PQRS)} className="btn btn-danger mx-2">Delete</button>
+                                    <Link to={`/EditPQRS/${pqrs.pkCod_Reclamo}`} className="btn btn-outline-primary mx-2">Edit</Link>
+                                    <button onClick={() => deletePQRS(pqrs.pkCod_Reclamo)} className="btn btn-danger mx-2">Delete</button>
                                 </td>
                             </tr>
                         ))}

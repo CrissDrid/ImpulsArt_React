@@ -16,11 +16,11 @@ export const FormPQRS = () => {
         respuesta: "No hay respuesta aun",
         estado: "Pendiente",
         fechaPQRS: new Date().toISOString().slice(0, 10),
-        FkCod_TipoPQRS: ""
+        fkCod_TipoReclamo: ""
   
       });
 
-    const{ descripcion, motivo, FkCod_TipoPQRS } = PQRS
+    const{ descripcion, motivo, fkCod_TipoReclamo } = PQRS
 
     const onInputChange = (e) => {
        
@@ -31,7 +31,7 @@ export const FormPQRS = () => {
     const onSubmit = async (e) => {
 
         e.preventDefault();
-        axios.post("http://localhost:8086/api/pqrs/create",PQRS)
+        axios.post("http://localhost:8086/api/reclamo/create",PQRS)
         navigate("/ListPQRS"); 
 
     };
@@ -81,9 +81,9 @@ export const FormPQRS = () => {
                                   className="form-control"
                                   id="floatingTipoPQRS"
                                   onChange={onInputChange}
-                                  value={FkCod_TipoPQRS}
+                                  value={fkCod_TipoReclamo}
                                   type="number"
-                                  name="FkCod_TipoPQRS"
+                                  name="fkCod_TipoReclamo"
                                   placeholder="Ingrese el tipo de queja"
                                   required
                               />

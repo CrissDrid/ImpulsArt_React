@@ -87,14 +87,8 @@ const FormObra = () => {
                 <label htmlFor="floatingCantidad">Cantidad</label>
               </div>
               <div className="form-floating">
-                <select className="form-select" id="floatingCategoria" name="categoria" value={obra.categoria} onChange={handleInputChange} required>
-                  <option value="">Selecciona la categoría de su obra</option>
-                  <option value="Pintura">Pintura</option>
-                  <option value="Dibujo">Dibujo</option>
-                  <option value="Maqueta">Maqueta</option>
-                  <option value="Ceramica">Ceramica</option>
-                </select>
-                <label htmlFor="floatingCategoria">Categoría</label>
+              <input className="form-control" id="floatingCantidad" placeholder="ID categoria" name="categoria" value={obra.categoria} onChange={handleInputChange} type="number" required />
+              <label htmlFor="floatingCantidad">Categoria</label>
               </div>
               <div className="form-floating">
                 <input className="form-control" id="floatingDescripcion" placeholder="Descripción" name="descripcion" value={obra.descripcion} onChange={handleInputChange} type="text" required />
