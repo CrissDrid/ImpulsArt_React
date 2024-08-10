@@ -92,7 +92,6 @@ function Album() {
           <div className="card-body">
             <h5 className="card-title">{obra.nombreProducto}</h5>
             <p className="card-text">{obra.descripcion}</p>
-            <p className="card-text">Categoría: {obra.categoria}</p>
             <div className="d-flex justify-content-between align-items-center">
               <small className="text-body-secondary">9 mins</small>
             </div>
