@@ -303,7 +303,6 @@ ol{
   background-color: #8D33FF !important;
   border-color: white !important;
   border-radius: 50px !important; 
-  margin-left: 12rem;
   padding: 5px 23px !important; 
   max-width: 15rem;
   height: 2.7rem !important;
@@ -313,10 +312,14 @@ ol{
   background-color: #db2214 !important;
   border-color: white !important;
   border-radius: 50px !important; 
-  margin-left: 12rem;
   padding: 5px 23px !important; 
   max-width: 15rem;
   height: 2.7rem !important;
+}
+
+.cancel-btn:hover{
+  background-color: #aa0b00 !important;
+  border-color: #aa0b00 !important;
 }
 
 .footer-register {
