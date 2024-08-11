@@ -1,9 +1,6 @@
-.btn-group {
-    display: flex;
-    justify-content: center; 
-    align-items: center; 
+.btn-create{
+    margin-right: 8px;
 }
-
 input[type="number"]::-webkit-outer-spin-button,
 input[type="number"]::-webkit-inner-spin-button {
     -webkit-appearance: none;
@@ -11,7 +8,6 @@ input[type="number"]::-webkit-inner-spin-button {
 }
 .group-tamano{
     margin-top: -0.5rem;
-    margin-bottom: 0.8rem;
 }
 .tamano-separator {
     margin-left: -5px;
@@ -23,7 +19,7 @@ input[type="number"]::-webkit-inner-spin-button {
     width: calc(100% + 5px) !important; 
     height: 2rem !important;
 }
-.form-categoria{
+.form-cantidad{
     margin-top: 1rem;
 }
 
@@ -34,6 +30,16 @@ input[type="number"]::-webkit-inner-spin-button {
     margin-top: 0.25rem;
 }
 
+.image-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.createObra-img {
+    width: 85%;
+    margin-top: 5rem;
+    border-radius: 20px;
+}
 
 
 

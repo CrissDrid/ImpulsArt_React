@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import Logo from '../../Resources/Logo.svg';
@@ -6,23 +6,25 @@ import Art from '../../Resources/Img-Art3.avif';
 import Navbar_init from '../../Components/Navbar_init';
 import Footer from '../../Components/Footer';
 import { InputTextarea } from "primereact/inputtextarea";
+import { Toast } from 'primereact/toast';
+import Swal from 'sweetalert2';
 import '../../Styles/CreateObra.css';
 
 const FormObra = () => {
   const navigate = useNavigate();
+  const toast = useRef(null); // Definición de la referencia para el Toast
   const [roles, setRoles] = useState(JSON.parse(localStorage.getItem('userRoles')) || { tipoUsuario: 'usuario común' });
   const [obra, setObra] = useState({
     nombreProducto: "",
     costo: "",
     peso: "",
-    alto: "",
-    ancho: "",
+    tamano: "", 
     cantidad: "",
-    categoria: "",
+    categoriaId: "",  // Cambiado a "categoria"
     descripcion: "",
     imagen: null
   });
-  const [categorias, setCategorias] = useState([]); // Definir el estado para categorías
+  const [categorias, setCategorias] = useState([]); 
   const [isDescriptionOverLimit, setIsDescriptionOverLimit] = useState(false);
 
   useEffect(() => {
@@ -30,52 +32,146 @@ const FormObra = () => {
     if (storedRoles) {
       setRoles(storedRoles);
     }
-    loadCategorias(); // Corregir el llamado a loadCategorias
-  }, []);
+    const loadCategorias = async () => {
+      try {
+        const result = await axios.get('http://localhost:8086/api/categoria/all');
+        setCategorias(result.data.data);  // Supongo que las categorías están en result.data.data
+      } catch (error) {
+        console.error('Error al cargar las categorías:', error);
+      }
+    };
 
-  const loadCategorias = async () => {
-    try {
-      const result = await axios.get('http://localhost:8086/api/categoria/all');
-      setCategorias(result.data.data);  // Supongo que las categorías están en result.data.data
-    } catch (error) {
-      console.error('Error al cargar las categorías:', error);
-    }
-  };
+    loadCategorias();  // Cargar las categorías cuando se monta el componente
+  }, []);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    if (name === 'alto' || name === 'ancho') {
-      setObra({ ...obra, [name]: value.replace(/[^\d]/g, '') + "cm" });
-    } else {
-      setObra({ ...obra, [name]: value });
-    }
-  };
 
-  const handleFileChange = (e) => {
-    setObra({ ...obra, imagen: e.target.files[0] });
+    if (name === 'alto' || name === 'ancho') {
+      const rawValue = value.replace(/[^\d]/g, '');
+      const updatedValue = rawValue ? `${rawValue}cm` : ''; // Solo agrega "cm" si hay un número
+      setObra(prevObra => {
+        const updatedObra = { ...prevObra, [name]: updatedValue };
+        if (updatedObra.alto && updatedObra.ancho) {
+          updatedObra.tamano = `${updatedObra.alto} x ${updatedObra.ancho}`;
+        } else {
+          updatedObra.tamano = updatedObra.alto || updatedObra.ancho ? `${updatedObra.alto} x ${updatedObra.ancho}` : '';
+        }
+        return updatedObra;
+      });
+    } else {
+      setObra(prevObra => ({ ...prevObra, [name]: value }));
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const obraData = { ...obra, costo: obra.costo.replace(/[^\d]/g, '') };
-    const formData = new FormData();
-    for (const key in obraData) {
-      formData.append(key, obraData[key]);
+  
+    // Verificar si algún campo está vacío
+    if (!obra.nombreProducto || !obra.costo || !obra.peso || !obra.tamano || !obra.cantidad || !obra.categoriaId || !obra.descripcion || !obra.imagen) {
+      toast.current.show({ severity: 'warn', summary: 'Advertencia', detail: 'Todos los campos deben estar completos' });
+      return;
     }
-    try {
-      const response = await axios.post("http://localhost:8086/api/obra/create", formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      });
-      console.log(response.data);
-      navigate("/ListObra");
-    } catch (error) {
-      console.error('Error al enviar el formulario:', error);
+  
+    if (obra.nombreProducto.length > 50) {
+      toast.current.show({ severity: 'warn', summary: 'Advertencia', detail: 'El nombre de la obra debe contener un máximo de 50 caracteres' });
+      return;
     }
-  };
+    
+    if (obra.costo === "$0") {
+      toast.current.show({ severity: 'warn', summary: 'Advertencia', detail: 'El costo no puede ser 0' });
+      return;
+    }
+  
+    if (obra.peso === "0Kg") {
+      toast.current.show({ severity: 'warn', summary: 'Advertencia', detail: 'El peso no puede ser 0Kg' });
+      return;
+    }
+  
+    if (obra.alto === "0cm" || obra.ancho === "0cm") {
+      toast.current.show({ severity: 'warn', summary: 'Advertencia', detail: 'El tamaño no puede ser 0cm' });
+      return;
+    }
+  
+    if (obra.cantidad === "0") {
+      toast.current.show({ severity: 'warn', summary: 'Advertencia', detail: 'La cantidad no puede ser 0' });
+      return;
+    }
+  
+    // Mostrar SweetAlert2 para confirmación
+    Swal.fire({
+      title: "¿Estás seguro?",
+      text: "No podrás revertir esto!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#8D33FF",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Sí, crear obra!",
+      cancelButtonText: "Cancelar"
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        // Si se confirma, envía los datos del formulario
+        try {
+          const formData = new FormData();
+          for (const key in obra) {
+            formData.append(key, obra[key]);
+          }
+  
+          const response = await axios.post("http://localhost:8086/api/obra/create", formData, {
+            headers: { 'Content-Type': 'multipart/form-data' }
+          });
+          console.log('Respuesta del servidor:', response.data);
+  
+          Swal.fire(
+            'Felicidades!',
+            'Has subido una nuvea obra con exito.',
+            'success'
+          ).then(() => {
+            // Redirigir según el rol del usuario
+            if (roles.tipoUsuario === 'Administrador') {
+              navigate("/ListObra");
+            } else {
+              navigate("/Profile");
+            }
+          });
+        } catch (error) {
+          console.error('Error al enviar el formulario:', error.response ? error.response.data : error.message);
+          Swal.fire(
+            'Error!',
+            'Hubo un problema al crear la obra.',
+            'error'
+          );
+        }
+      }
+    });
+  };  
 
   const handleCancel = () => {
-    navigate(roles.tipoUsuario === 'Administrador' ? '/ListObra' : '/Profile');
+    // Verificar si algún campo del formulario tiene datos
+    const hasData = Object.values(obra).some(value => value !== "" && value !== null);
+  
+    if (hasData) {
+      Swal.fire({
+        title: '¿Estás seguro?',
+        text: 'Se perderán los datos no guardados!',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#8D33FF',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Sí, cancelar',
+        cancelButtonText: 'Cancelar'
+      }).then(result => {
+        if (result.isConfirmed) {
+          // Redirigir según el rol del usuario
+          navigate(roles.tipoUsuario === 'Administrador' ? '/ListObra' : '/Profile');
+        }
+      });
+    } else {
+      // Si no hay datos, redirigir directamente
+      navigate(roles.tipoUsuario === 'Administrador' ? '/ListObra' : '/Profile');
+    }
   };
+  
 
   const formatCurrency = (value) => {
     const number = value.replace(/[^\d]/g, '');
@@ -101,6 +197,10 @@ const FormObra = () => {
     setIsDescriptionOverLimit(value.length > 155);
   };
 
+  const handleFileChange = (e) => {
+    setObra({ ...obra, imagen: e.target.files[0] });
+  };
+
   return (
     <>
       <Navbar_init />
@@ -113,20 +213,20 @@ const FormObra = () => {
               </div>
               <form onSubmit={handleSubmit}>
                 <div className="form-floating">
-                  <input className="form-control" id="floatingNombreProducto" placeholder="Nombre de la obra" name="nombreProducto" value={obra.nombreProducto} onChange={handleInputChange} type="text" required />
+                  <input className="form-control" id="floatingNombreProducto" placeholder="Nombre de la obra" name="nombreProducto" value={obra.nombreProducto} onChange={handleInputChange} type="text"/>
                   <label htmlFor="floatingNombreProducto">Nombre de la obra</label>
                 </div>
                 <div className="form-row">
                   <div className="row">
                     <div className="col-md-6">
                       <div className="form-floating">
-                        <input className="form-control" id="floatingCosto" placeholder="Costo" name="costo" value={obra.costo} onChange={handleCostoChange} type="text" required />
+                        <input className="form-control" id="floatingCosto" placeholder="Costo" name="costo" value={obra.costo} onChange={handleCostoChange} type="text"/>
                         <label htmlFor="floatingCosto">Costo</label>
                       </div>
                     </div>
                     <div className="col-md-6">
                       <div className="form-floating">
-                        <input className="form-control" id="floatingPeso" placeholder="Peso" name="peso" value={obra.peso} onChange={handlePesoChange} type="text" required />
+                        <input className="form-control" id="floatingPeso" placeholder="Peso" name="peso" value={obra.peso} onChange={handlePesoChange} type="text"/>
                         <label htmlFor="floatingPeso">Peso</label>
                       </div>
                     </div>
@@ -140,7 +240,7 @@ const FormObra = () => {
                         <div className="row tamano-group">
                           <div className="col-md-5">
                             <div className="form-floating">
-                              <input className="form-control form-tamano" id="floatingAlto" placeholder="Alto" name="alto" value={obra.alto} onChange={handleInputChange} type="text" required />
+                              <input className="form-control form-tamano" id="floatingAlto" placeholder="Alto" name="alto" value={obra.alto} onChange={handleInputChange} type="text"/>
                               <label htmlFor="floatingAlto">Alto</label>
                             </div>
                           </div>
@@ -149,7 +249,7 @@ const FormObra = () => {
                           </div>
                           <div className="col-md-5">
                             <div className="form-floating">
-                              <input className="form-control form-tamano" id="floatingAncho" placeholder="Ancho" name="ancho" value={obra.ancho} onChange={handleInputChange} type="text" required />
+                              <input className="form-control form-tamano" id="floatingAncho" placeholder="Ancho" name="ancho" value={obra.ancho} onChange={handleInputChange} type="text"/>
                               <label htmlFor="floatingAncho">Ancho</label>
                             </div>
                           </div>
@@ -157,27 +257,31 @@ const FormObra = () => {
                       </div>
                     </div>
                     <div className="col-md-6">
-                    <div className="form-floating form-categoria">
-  <select
-    className="form-control"
-    id="floatingCategoriaId"
-    name="categoria"
-    value={obra.categoria}
-    onChange={handleInputChange}
-    required
-  >
-    <option value="" disabled>Seleccione una categoría</option> {/* Opción predeterminada */}
-    {categorias.map(categoria => (
-      <option key={categoria.pkCod_Categoria} value={categoria.pkCod_Categoria}>
-        {categoria.nombreCategoria}
-      </option>
-    ))}
-  </select>
-  <label htmlFor="floatingCategoria">Categoría</label>
-</div>
+                      <div className="form-floating form-cantidad">
+                        <input className="form-control" id="floatingCantidad" placeholder="Nombre de la obra" name="cantidad" value={obra.cantidad} onChange={handleInputChange} type="number"/>
+                        <label htmlFor="floatingCantidad">Cantidad</label>
+                      </div>
                     </div>
                   </div>
                 </div>
+                <div className="form-floating">
+                    <select
+                      className="form-control"
+                      id="floatingCategoriaId"
+                      name="categoriaId"  // Cambiado a "categoria"
+                      value={obra.categoriaId}
+                      onChange={handleInputChange}
+                                        >
+                        <option value="">Seleccione una categoría</option>
+                        {categorias.map(categoria => (
+                            <option key={categoria.pkCod_Categoria} value={categoria.pkCod_Categoria}>
+                                {categoria.nombreCategoria}
+                            </option>
+                        ))}
+                    </select>
+
+                        <label htmlFor="floatingCategoriaId">Categoría</label>
+                    </div>
                 <div className={`form-floating ${isDescriptionOverLimit ? 'input-error' : ''}`}>
                   <InputTextarea 
                     className="form-control" 
@@ -206,19 +310,20 @@ const FormObra = () => {
                     <input id="fileInput" type="file" name="imagen" accept="image/*" onChange={handleFileChange} style={{ display: 'none' }} />
                   </div>
                 </div>
-                <div className="btn-group justify-content-center">
-                    <button className="btn btn-primary py-2 create-btn" type="submit">Crear obra</button>
-                    <button className="btn btn-danger py-2 cancel-btn" type="button" onClick={handleCancel}>Cancelar</button>
-                  </div>
+                <div className="btn-group d-flex justify-content-center" >
+                    <button className="btn btn-create btn-primary py-2 create-btn" type="submit">Crear Obra</button>
+                    <button className="btn btn-cancel btn-secondary py-2 cancel-btn" type="button" onClick={handleCancel}>Cancelar</button>
+                </div>
               </form>
             </div>
           </div>
-          <div className='col-md-6'>
-            <img className="imgArt" src={Art} alt="Arte" />
+          <div className="col-md-6 image-wrapper">
+            <img className="createObra-img" src={Art} alt="Art" />
           </div>
         </div>
       </div>
       <Footer />
+      <Toast ref={toast} /> 
     </>
   );
 };
