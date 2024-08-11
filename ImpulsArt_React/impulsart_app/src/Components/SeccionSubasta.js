@@ -1,6 +1,8 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import Navbar_init from './Navbar_init';
+import Footer from './Footer';
 
 function SeccionSubasta() {
   const [listSubasta, setListSubasta] = useState([]);
@@ -63,6 +65,8 @@ function SeccionSubasta() {
 
   const totalPages = Math.ceil(listSubasta.length / itemsPerPage);
   return (
+    <>
+    <Navbar_init/>
     <div className="album py-5 bg-custom-color">
       <div className="container">
         <div className="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
@@ -104,6 +108,8 @@ function SeccionSubasta() {
         </div>
       </div>
     </div>
+    <Footer/>
+    </>
   );
 }
 

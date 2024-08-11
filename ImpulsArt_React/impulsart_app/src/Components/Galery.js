@@ -1,27 +1,44 @@
-import React from 'react'
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import '../Styles/Galery.css'
+import Swal from 'sweetalert2';
+import '../Styles/Galery.css';
 
 function Galery() {
   const navigate = useNavigate();
 
   const handleSubirObraClick = () => {
-    navigate('/CreateObra');
+    Swal.fire({
+      title: '¿Qué te gustaría hacer?',
+      text: "¿Deseas subir una nueva obra a tu galería o prefieres iniciar una subasta?",
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'Subir Obra',
+      cancelButtonText: 'Iniciar Subasta',
+      confirmButtonColor: "#8D33FF",
+      cancelButtonColor: "#8D33FF",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        navigate('/CreateObra');
+      } else if (result.dismiss === Swal.DismissReason.cancel) {
+        navigate('/CreateSubasta');
+      }
+    });
+    
   };
 
   return (
     <div className="user-data">
-        <h2>Mi Galería</h2>
-        <div className="form-group">
-            <div className="subir-obra" onClick={handleSubirObraClick}>
-                <div className="image-placeholder">
-                    <i className="cross-icon bi bi-plus"></i>
-                    <p className='text-subirObra'>Nueva Obra</p>
-                </div>
-            </div>
+      <h2>Mi Galería</h2>
+      <div className="form-group">
+        <div className="subir-obra" onClick={handleSubirObraClick}>
+          <div className="image-placeholder">
+            <i className="cross-icon bi bi-plus"></i>
+            <p className='text-subirObra'>Nueva Obra</p>
+          </div>
         </div>
+      </div>
     </div>
-  )
+  );
 }
 
 export default Galery;

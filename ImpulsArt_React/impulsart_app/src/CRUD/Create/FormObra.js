@@ -128,10 +128,10 @@ const FormObra = () => {
             'success'
           ).then(() => {
             // Redirigir según el rol del usuario
-            if (roles.tipoUsuario === 'Administrador') {
-              navigate("/ListObra");
+            if (result.isConfirmed) {
+              navigate(-1);
             } else {
-              navigate("/Profile");
+              navigate(-1);
             }
           });
         } catch (error) {
@@ -162,13 +162,11 @@ const FormObra = () => {
         cancelButtonText: 'Cancelar'
       }).then(result => {
         if (result.isConfirmed) {
-          // Redirigir según el rol del usuario
-          navigate(roles.tipoUsuario === 'Administrador' ? '/ListObra' : '/Profile');
+          navigate(-1);
         }
       });
     } else {
-      // Si no hay datos, redirigir directamente
-      navigate(roles.tipoUsuario === 'Administrador' ? '/ListObra' : '/Profile');
+      navigate(-1);
     }
   };
   

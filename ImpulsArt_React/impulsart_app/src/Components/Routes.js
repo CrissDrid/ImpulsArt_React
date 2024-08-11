@@ -61,7 +61,7 @@ function AppRoutes() { // Cambia el nombre de la función a AppRoutes
 
         {/*CRUD SUBASTA*/}
         <Route path='/ListSubasta' element={<ProtectedRoute element={ListSubasta} roles={['administrador', 'Administrador']} />} />
-        <Route path="/CreateSubasta" element={<ProtectedRoute element={FormSubasta} roles={['administrador', 'Administrador']} />} />
+        <Route path="/CreateSubasta" element={<ProtectedRoute element={FormSubasta} roles={['administrador', 'Administrador', 'usuario comun', 'Usuario']} />} />
         <Route path="/EditSubasta/:pkCodSubasta" element={<ProtectedRoute element={EditSubasta} roles={['administrador', 'Administrador']} />} />
         {/*CRUD SUBASTA*/}
 

@@ -1,0 +1,23 @@
+.createSubasta-img{
+    width: 90%;
+    margin-top: 5rem;
+    border-radius: 20px;
+}
+
+.form-subasta-container {
+    max-width: 500px; /* Ajusta el ancho máximo según sea necesario */
+    margin: 0 auto; /* Centra el formulario horizontalmente */
+    padding: 1rem; /* Agrega un poco de espacio alrededor del formulario */
+  }
+
+.subasta-content{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 75rem;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    background-color: #fff;
+    margin-top: 5rem !important; /* Empuja el contenido hacia abajo */
+}
