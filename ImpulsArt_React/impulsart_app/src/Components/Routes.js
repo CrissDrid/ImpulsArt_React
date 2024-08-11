@@ -27,6 +27,8 @@ import EditUsuario from '../CRUD/Edit/EditUsuario';
 import NoAccess from './no_access';
 import ProtectedRoute from './ProtectedRoute'; // Importar ProtectedRoute
 import Profile from './Profile';
+import SeccionSubasta from './SeccionSubasta';
+import DetallesSubasta from './DetallesSubasta';
 
 function AppRoutes() { // Cambia el nombre de la función a AppRoutes
   return (
@@ -42,6 +44,8 @@ function AppRoutes() { // Cambia el nombre de la función a AppRoutes
         <Route path='/userdata' element={<UserData/>}/>
         <Route path='/changePWD' element={<ChangePWD/>}/>
         <Route path='/galery' element={<Galery/>}/>
+        <Route path='/SeccionSubasta' element={<SeccionSubasta />}/>
+        <Route path='/DetallesSubasta/:pkCodSubasta' element={<DetallesSubasta />}/>
         
         {/*CRUD USUARIOS*/}
         <Route path='/ListUsuario' element={<ProtectedRoute element={ListUsuario} roles={['administrador', 'Administrador']} />} />

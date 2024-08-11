@@ -1,5 +1,5 @@
 import axios from 'axios';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Logo from '../../Resources/Logo.svg';
 import Art from '../../Resources/Img-Art3.avif';
@@ -24,6 +24,21 @@ export const FormSubasta = () => {
         fechaFinalizacion: "",
         imagen: null
     });
+
+    const [categorias, setCategorias] = useState([]);  // Estado para almacenar las categorías
+
+    useEffect(() => {
+        const loadCategorias = async () => {
+            try {
+                const result = await axios.get('http://localhost:8086/api/categoria/all');
+                setCategorias(result.data.data);  // Supongo que las categorías están en `result.data.data`
+            } catch (error) {
+                console.error('Error al cargar las categorías:', error);
+            }
+        };
+
+        loadCategorias();  // Cargar las categorías cuando se monta el componente
+    }, []);
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -89,7 +104,21 @@ export const FormSubasta = () => {
                                     <label htmlFor="floatingTamano">Tamaño</label>
                                 </div>
                                 <div className="form-floating">
-                                    <input className="form-control" id="floatingCategoriaId" placeholder="ID Categoría" name="categoriaId" value={subasta.categoriaId} onChange={handleInputChange} type="number" required />
+                                    <select
+                                        className="form-control"
+                                        id="floatingCategoriaId"
+                                        name="categoriaId"
+                                        value={subasta.categoriaId}
+                                        onChange={handleInputChange}
+                                        required
+                                    >
+                                        <option value="">Seleccione una categoría</option>
+                                        {categorias.map(categoria => (
+                                            <option key={categoria.pkCod_Categoria} value={categoria.pkCod_Categoria}>
+                                                {categoria.nombreCategoria}
+                                            </option>
+                                        ))}
+                                    </select>
                                     <label htmlFor="floatingCategoriaId">Categoría</label>
                                 </div>
                                 <div className="form-floating">
