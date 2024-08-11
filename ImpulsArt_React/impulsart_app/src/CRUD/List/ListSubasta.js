@@ -25,7 +25,7 @@ export const ListSubasta = () => {
 
     //GET ALL SUBASTAS
     const getSubasta = () => {
-        axios.get("http://localhost:8086/api/subasta/all")
+        axios.get("http://localhost:8086/api/subasta/subastaYobras")
             .then((response) => {
                 setListSubasta(response.data.data);
             })
@@ -117,52 +117,61 @@ export const ListSubasta = () => {
             };
         };
 
-    return (
-        <>
-            <Navbar_init />
-   
-
-            <div className="d-flex align-items-center mb-3 justify-content-center">
-               <img src={Paleta} alt="Logo" style={{ maxWidth: '50px' }} />
-                <h2 style={{ color: '#8D33FF', marginRight: '10px' }}>Subasta</h2>
+        return (
+            <>
+                <Navbar_init />
+    
+                <div className="d-flex align-items-center mb-3 justify-content-center">
+                    <img src={Paleta} alt="Logo" style={{ maxWidth: '50px' }} />
+                    <h2 style={{ color: '#8D33FF', marginRight: '10px' }}>Subasta</h2>
                 </div>
-
+    
                 <br></br>
-
-            <div className="container">
-
-            <Link to="/CreateSubasta" className='btn btn-primary'>Crear subasta</Link>
-            <Link to="/Home" className='btn btn-danger'>Volver</Link>
-
-                <table className="table">
-                    <thead>
-                        <tr>
-                            <th scope="col">Estado</th>
-                            <th scope="col">Oferta mínima</th>
-                            <th scope="col">Fecha inicio</th>
-                            <th scope="col">Fecha finalización</th>
-                            <th scope="col">Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {listSubasta.map((subasta, index) => (
-                            <tr key={index}>
-                                <td>{subasta.estadoSubasta}</td>
-                                <td>{subasta.precioInicial}</td>
-                                <td>{subasta.fechaInicio}</td>
-                                <td>{subasta.fechaFinalizacion}</td>
-                                <td>
-                                    <Link to={`/EditSubasta/${subasta.pkCodSubasta}`} className="btn btn-outline-primary mx-2">Edit</Link>
-                                    <button onClick={() => deleteSubasta(subasta.pkCodSubasta)} className="btn btn-danger mx-2">Delete</button>
-                                </td>
+    
+                <div className="container">
+                    <Link to="/CreateSubasta" className='btn btn-primary'>Crear subasta</Link>
+                    <Link to="/Home" className='btn btn-danger'>Volver</Link>
+    
+                    <table className="table">
+                        <thead>
+                            <tr>
+                                <th scope="col">Estado</th>
+                                <th scope="col">Oferta mínima</th>
+                                <th scope="col">Fecha inicio</th>
+                                <th scope="col">Fecha finalización</th>
+                                <th scope="col">Nombre Producto</th>
+                                <th scope="col">Peso</th>
+                                <th scope="col">Tamaño</th>
+                                <th scope="col">Descripción</th>
+                                <th scope="col">Categoria</th>
+                                <th scope="col">Acciones</th>
                             </tr>
-                        ))}
-                    </tbody>
-                </table>
-                <button onClick={generatePDF} className='btn btn-success'>Generar PDF</button>
-            </div>
-        </>
-    );
-};
+                        </thead>
+                        <tbody>
+                            {listSubasta.map((subasta, index) => (
+                                <tr key={index}>
+                                    <td>{subasta.estadoSubasta}</td>
+                                    <td>{subasta.precioInicial}</td>
+                                    <td>{subasta.fechaInicio}</td>
+                                    <td>{subasta.fechaFinalizacion}</td>
+                                    <td>{subasta.obras.nombreProducto}</td>
+                                    <td>{subasta.obras.peso}</td>
+                                    <td>{subasta.obras.tamano}</td>
+                                    <td>{subasta.obras.descripcion}</td>
+                                    <td>{subasta.obras.categoria.nombreCategoria}</td>
+                                    <td>
+                                        <Link to={`/EditSubasta/${subasta.pkCodSubasta}`} className="btn btn-outline-primary mx-2">Edit</Link>
+                                        <button onClick={() => deleteSubasta(subasta.pkCodSubasta)} className="btn btn-danger mx-2">Delete</button>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                    <button onClick={generatePDF} className='btn btn-success'>Generar PDF</button>
+                </div>
+            </>
+        );
+    };
+    
 
 export default ListSubasta;
