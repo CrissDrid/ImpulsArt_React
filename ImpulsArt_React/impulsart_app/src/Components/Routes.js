@@ -55,14 +55,14 @@ function AppRoutes() { // Cambia el nombre de la función a AppRoutes
         
         {/*CRUD OBRAS*/}
         <Route path='/ListObra' element={<ProtectedRoute element={ListObra} roles={['administrador', 'Administrador']} />} />
-        <Route path="/EditObra/:pkCod_Producto" element={<ProtectedRoute element={EditObra} roles={['administrador', 'Administrador']} />} />
+        <Route path="/EditObra/:pkCod_Producto" element={<ProtectedRoute element={EditObra} roles={['administrador', 'Administrador', 'usuario comun', 'Usuario']} />} />
         <Route path="/CreateObra" element={<ProtectedRoute element={FormObra} roles={['administrador', 'usuario comun', 'Usuario', 'Administrador']} />} />
         {/*CRUD OBRAS*/}
 
         {/*CRUD SUBASTA*/}
         <Route path='/ListSubasta' element={<ProtectedRoute element={ListSubasta} roles={['administrador', 'Administrador']} />} />
         <Route path="/CreateSubasta" element={<ProtectedRoute element={FormSubasta} roles={['administrador', 'Administrador', 'usuario comun', 'Usuario']} />} />
-        <Route path="/EditSubasta/:pkCodSubasta" element={<ProtectedRoute element={EditSubasta} roles={['administrador', 'Administrador']} />} />
+        <Route path="/EditSubasta/:pkCodSubasta" element={<ProtectedRoute element={EditSubasta} roles={['administrador', 'Administrador', 'usuario comun', 'Usuario']} />} />
         {/*CRUD SUBASTA*/}
 
         {/*CRUD DESPACHO*/}

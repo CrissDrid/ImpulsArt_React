@@ -1,6 +1,6 @@
-import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import Swal from 'sweetalert2';
 import '../Styles/Galery.css';
 
@@ -8,11 +8,7 @@ function Galery() {
   const [listObra, setListObra] = useState([]);
   const [listSubasta, setListSubasta] = useState([]);
   const [user, setUser] = useState(JSON.parse(localStorage.getItem('user')));
-  const [currentPage, setCurrentPage] = useState(1);
   const [showSubasta, setShowSubasta] = useState(false);
-  const itemsPerPage = 6;
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = currentPage * itemsPerPage;
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -21,7 +17,7 @@ function Galery() {
     } else {
       getObra();
     }
-  }, [currentPage, showSubasta]);
+  }, [showSubasta]);
 
   const getObra = () => {
     axios.get(`http://localhost:8086/api/obra/historialObras/${user.identificacion}`)
@@ -29,7 +25,7 @@ function Galery() {
         setListObra(response.data.data);
       })
       .catch((e) => {
-        console.log(e);
+        console.error('Error en getObra:', e.response ? e.response.data : e.message);
       });
   };
 
@@ -39,52 +35,78 @@ function Galery() {
         setListSubasta(response.data.data);
       })
       .catch((e) => {
-        console.log(e);
+        console.error('Error en getSubasta:', e.response ? e.response.data : e.message);
       });
   };
 
+  const handleCardClick = (pkCod_Producto) => {
+    Swal.fire({
+      title: '¿Qué deseas hacer?',
+      text: "Puedes editar o eliminar esta obra.",
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'Editar',
+      cancelButtonText: 'Eliminar',
+      confirmButtonColor: "#8D33FF",
+      cancelButtonColor: "#FF5733",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        navigate(`/EditObra/${pkCod_Producto}`); // Redirige al formulario de edición
+      } else if (result.dismiss === Swal.DismissReason.cancel) {
+        Swal.fire({
+          title: '¿Estás seguro?',
+          text: "Esta acción eliminará permanentemente la obra.",
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonText: 'Eliminar',
+          cancelButtonText: 'Cancelar',
+          confirmButtonColor: "#FF5733",
+          cancelButtonColor: "#8D33FF",
+        }).then((deleteResult) => {
+          if (deleteResult.isConfirmed) {
+            axios.delete(`http://localhost:8086/api/obra/delete/${pkCod_Producto}`)
+              .then(() => {
+                Swal.fire('Eliminado', 'La obra ha sido eliminada.', 'success');
+                getObra();
+              })
+              .catch((e) => {
+                console.error('Error en eliminar obra:', e.response ? e.response.data : e.message);
+                Swal.fire('Error', 'No se pudo eliminar la obra.', 'error');
+              });
+          }
+        });
+      }
+    });
+  };
+
   const renderObraCards = () => {
-    return listObra.slice(startIndex, endIndex).map((obra, index) => (
-      <div className="col" key={index}>
-        <div className="card shadow-sm">
-          <img
-            src={obra.imagen}
-            className="bd-placeholder-img card-img-top"
-            width="100%"
-            height="225"
-            alt={`Imagen: ${obra.nombreProducto}`}
-          />
-          <div className="card-body">
-            <h5 className="card-title">{obra.nombreProducto}</h5>
-            <p className="card-text">{obra.descripcion}</p>
-          </div>
+    return listObra.map((obra) => (
+      <div className="obra-card" key={obra.id} onClick={() => handleCardClick(obra.id)}>
+        <img
+          src={obra.imagen}
+          alt={`Imagen: ${obra.nombreProducto}`}
+        />
+        <div className="obra-info">
+          <h5>{obra.nombreProducto}</h5>
+          <p>{obra.descripcion}</p>
         </div>
       </div>
     ));
   };
-  
+
   const renderSubastaCards = () => {
-    return listSubasta.slice(startIndex, endIndex).map((subasta, index) => (
-      <div className="col" key={index}>
-        <div className="card shadow-sm">
-          <img
-            src={subasta.obras.imagen} // Asegúrate de que `subasta.obras.imagen` es la propiedad correcta
-            className="bd-placeholder-img card-img-top"
-            width="100%"
-            height="225"
-            alt={`Imagen: ${subasta.obras.nombreProducto}`} // Ajusta el acceso a `nombreProducto` según tu estructura
-          />
-          <div className="card-body">
-            <h5 className="card-title">{subasta.obras.nombreProducto}</h5>
-            <p className="card-text">Categoría: {subasta.obras.categoria.nombreCategoria}</p>
-          </div>
+    return listSubasta.map((subasta) => (
+      <div className="obra-card" key={subasta.obras.id} onClick={() => handleCardClick(subasta.obras.id)}>
+        <img
+          src={subasta.obras.imagen}
+          alt={`Imagen: ${subasta.obras.nombreProducto}`}
+        />
+        <div className="obra-info">
+          <h5>{subasta.obras.nombreProducto}</h5>
+          <p>Categoría: {subasta.obras.categoria.nombreCategoria}</p>
         </div>
       </div>
     ));
-  };
-  
-  const renderCards = () => {
-    return showSubasta ? renderSubastaCards() : renderObraCards();
   };
 
   const handleSubirObraClick = () => {
@@ -106,71 +128,22 @@ function Galery() {
     });
   };
 
-  const totalPages = Math.ceil((showSubasta ? listSubasta.length : listObra.length) / itemsPerPage);
-
   return (
-    <div>
-      <div className="row">
-        <h2>Mi Galería</h2>
-        <div className="col-md-6 d-flex">
-          <button onClick={() => setShowSubasta(!showSubasta)}>
-            {showSubasta ? 'Ver obras en venta' : 'Ver obras en subasta'}
-          </button>
-        </div>
-      </div>  
+    <div className="user-data">
+      <h2>Mi Galería</h2>
+      <button className='galery-container' onClick={() => setShowSubasta(!showSubasta)}>
+        {showSubasta ? 'Ver obras en venta' : 'Ver obras en subasta'}
+      </button>
 
-      <div className="flex-container">
-        <div className="user-data">
-          <div className="form-group">
-            <div className="subir-obra" onClick={handleSubirObraClick}>
-              <div className="image-placeholder">
-                <i className="cross-icon bi bi-plus"></i>
-                <p className="text-subirObra">Nueva Obra</p>
-              </div>
-            </div>
+      <div className="obras-grid">
+        <div className="subir-obra" onClick={handleSubirObraClick}>
+          <div className="image-placeholder">
+            <i className="cross-icon bi bi-plus"></i>
+            <p className="text-subirObra">Nueva Obra</p>
           </div>
         </div>
-      </div>
 
-      <div className="galery-container">
-        <div className="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
-          {renderCards()}
-        </div>
-      </div>
-
-      <div className="d-flex justify-content-center mt-3">
-        <nav aria-label="Page navigation example">
-          <ul className="pagination" style={{ margin: '0' }}>
-            <li className={`page-item ${currentPage === 1 && 'disabled'}`}>
-              <button
-                className="page-link"
-                onClick={() => setCurrentPage(currentPage - 1)}
-                aria-label="Previous"
-              >
-                <span aria-hidden="true">&laquo;</span>
-              </button>
-            </li>
-            {[...Array(totalPages).keys()].map((num) => (
-              <li
-                key={num}
-                className={`page-item ${currentPage === num + 1 && 'active'}`}
-                onClick={() => setCurrentPage(num + 1)}
-                style={{ margin: '0' }}
-              >
-                <button className="page-link">{num + 1}</button>
-              </li>
-            ))}
-            <li className={`page-item ${currentPage === totalPages && 'disabled'}`}>
-              <button
-                className="page-link custom-page"
-                onClick={() => setCurrentPage(currentPage + 1)}
-                aria-label="Next"
-              >
-                <span aria-hidden="true">&raquo;</span>
-              </button>
-            </li>
-          </ul>
-        </nav>
+        {showSubasta ? renderSubastaCards() : renderObraCards()}
       </div>
     </div>
   );
