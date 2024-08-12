@@ -1,3 +1,12 @@
+.flex-container {
+    display: flex;
+    gap: 1rem; /* Espacio entre los divs */
+}
+
+.user-data {
+    flex: 1; /* Permite que los divs ocupen el mismo espacio disponible */
+}
+
 .subir-obra {
     display: flex;
     justify-content: center;
@@ -30,4 +39,38 @@ i.cross-icon {
 
 .subir-obra:hover .cross-icon {
     transform: scale(1.2); 
+}
+
+/*estilos detalles obra*/
+
+.galery-container .card {
+    width: 9rem;
+    border-radius: 8px; 
+    transition: all 0.3s ease-in-out;
+}
+
+.galery-container .card img {
+    border-radius: 8px 8px 0 0;
+    height: 100px; 
+    object-fit: cover; 
+}
+
+.galery-container .card-body {
+    padding: 0.5rem; 
+    text-align: center;
+}
+
+.galery-container .card-title {
+    font-size: 1rem; 
+    color: #8D33FF;
+}
+
+.galery-container .card-text {
+    font-size: 0.8rem; 
+    color: #333;
+}
+
+.galery-container .card:hover {
+    transform: scale(1.05); 
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 
 }

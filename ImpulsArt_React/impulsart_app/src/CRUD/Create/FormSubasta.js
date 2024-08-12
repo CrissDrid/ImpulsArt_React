@@ -15,9 +15,10 @@ const formatCurrency = (value) => {
 };
 
 export const FormSubasta = () => {
+
     let navigate = useNavigate();
     const toast = useRef(null);
-
+    const [user, setUser] = useState(JSON.parse(localStorage.getItem('user')));
     const [subasta, setSubasta] = useState({
         nombreProducto: "",
         peso: "",
@@ -30,6 +31,7 @@ export const FormSubasta = () => {
         precioInicial: "",
         fechaInicio: new Date().toISOString().slice(0, 10),
         fechaFinalizacion: "",
+        usuarioIds: user.identificacion,
         imagen: null
     });
 
@@ -167,6 +169,7 @@ export const FormSubasta = () => {
                 formData.append('precioInicial', subasta.precioInicial.replace(/[^0-9]/g, ''));
                 formData.append('fechaInicio', subasta.fechaInicio);
                 formData.append('fechaFinalizacion', subasta.fechaFinalizacion);
+                formData.append('usuarioIds', subasta.usuarioIds);
                 if (subasta.imagen) {
                     formData.append('imagen', subasta.imagen);
                 }

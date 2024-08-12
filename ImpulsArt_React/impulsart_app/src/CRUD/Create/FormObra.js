@@ -14,6 +14,7 @@ const FormObra = () => {
   const navigate = useNavigate();
   const toast = useRef(null); // Definición de la referencia para el Toast
   const [roles, setRoles] = useState(JSON.parse(localStorage.getItem('userRoles')) || { tipoUsuario: 'usuario común' });
+  const [user, setUser] = useState(JSON.parse(localStorage.getItem('user')));
   const [obra, setObra] = useState({
     nombreProducto: "",
     costo: "",
@@ -22,12 +23,14 @@ const FormObra = () => {
     cantidad: "",
     categoriaId: "",  // Cambiado a "categoria"
     descripcion: "",
+    usuarioIds: user.identificacion,
     imagen: null
   });
   const [categorias, setCategorias] = useState([]); 
   const [isDescriptionOverLimit, setIsDescriptionOverLimit] = useState(false);
 
   useEffect(() => {
+    
     const storedRoles = JSON.parse(localStorage.getItem('userRoles'));
     if (storedRoles) {
       setRoles(storedRoles);
