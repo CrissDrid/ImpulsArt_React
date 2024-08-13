@@ -39,7 +39,7 @@ function Galery() {
       });
   };
 
-  const handleCardClick = (pkCod_Producto) => {
+  const handleCardClick = (pkCod_Producto, pkCod_Subasta) => {
     Swal.fire({
       title: '¿Qué deseas hacer?',
       text: "Puedes editar o eliminar esta obra.",
@@ -51,7 +51,11 @@ function Galery() {
       cancelButtonColor: "#FF5733",
     }).then((result) => {
       if (result.isConfirmed) {
-        navigate(`/EditObra/${pkCod_Producto}`); // Redirige al formulario de edición
+        if (showSubasta) {
+          navigate(`/EditSubasta/${pkCod_Subasta}`); // Redirige al formulario de edición de subasta
+        } else {
+          navigate(`/EditObra/${pkCod_Producto}`); // Redirige al formulario de edición de obra
+        }
       } else if (result.dismiss === Swal.DismissReason.cancel) {
         Swal.fire({
           title: '¿Estás seguro?',
@@ -64,10 +68,17 @@ function Galery() {
           cancelButtonColor: "#8D33FF",
         }).then((deleteResult) => {
           if (deleteResult.isConfirmed) {
-            axios.delete(`http://localhost:8086/api/obra/delete/${pkCod_Producto}`)
+            const deleteUrl = showSubasta
+              ? `http://localhost:8086/api/subasta/delete/${pkCod_Producto}`
+              : `http://localhost:8086/api/obra/delete/${pkCod_Producto}`;
+            axios.delete(deleteUrl)
               .then(() => {
                 Swal.fire('Eliminado', 'La obra ha sido eliminada.', 'success');
-                getObra();
+                if (showSubasta) {
+                  getSubasta();
+                } else {
+                  getObra();
+                }
               })
               .catch((e) => {
                 console.error('Error en eliminar obra:', e.response ? e.response.data : e.message);
@@ -81,7 +92,7 @@ function Galery() {
 
   const renderObraCards = () => {
     return listObra.map((obra) => (
-      <div className="obra-card" key={obra.id} onClick={() => handleCardClick(obra.id)}>
+      <div className="obra-card" key={obra.pkCod_Producto} onClick={() => handleCardClick(obra.pkCod_Producto)}>
         <img
           src={obra.imagen}
           alt={`Imagen: ${obra.nombreProducto}`}
@@ -96,7 +107,7 @@ function Galery() {
 
   const renderSubastaCards = () => {
     return listSubasta.map((subasta) => (
-      <div className="obra-card" key={subasta.obras.id} onClick={() => handleCardClick(subasta.obras.id)}>
+      <div className="obra-card" key={subasta.obras.id} onClick={() => handleCardClick(subasta.obras.id, subasta.pkCodSubasta)}>
         <img
           src={subasta.obras.imagen}
           alt={`Imagen: ${subasta.obras.nombreProducto}`}

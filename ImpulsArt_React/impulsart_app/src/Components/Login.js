@@ -89,6 +89,12 @@ const Login = () => {
     }
   };
 
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      iniciarSesion();
+    }
+  };
+
   return (
     <div className="login-container">
       <div className="login-content row">
@@ -96,7 +102,7 @@ const Login = () => {
         <div className='col-md-6'>
           <div className="login-form">
             <div className="login-image"><img className="logo-login" src={Logo} alt="" /></div>
-            <form>
+            <form onKeyPress={handleKeyPress}>
               <div className="form-floating">
                 <input type="email" className="form-control" id="floatingInput" placeholder="name@example.com" name='email' value={form.email} onChange={handleChange} />
                 <label htmlFor="floatingInput">Email</label>
