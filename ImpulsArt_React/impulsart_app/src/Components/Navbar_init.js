@@ -47,6 +47,7 @@ function Navbar_init() {
     });
     setDropdownOpen(false);
     navigate('/login', { replace: true });
+    
   };
 
   return (
@@ -68,7 +69,7 @@ function Navbar_init() {
               <a className="nav-link active" aria-current="page" href="#">Soporte</a>
             </li>
             <li className="nav-item">
-              <a className="nav-link active" aria-current="page" href="#">Contactanos</a>
+              <Link to='/ContactUs'className='nav-link active' aria-current="page">Contactanos</Link>
             </li>
             <li className="nav-item">
               <Link to='/SeccionSubasta' className="nav-link active" aria-current="page">Seccion Subasta</Link>

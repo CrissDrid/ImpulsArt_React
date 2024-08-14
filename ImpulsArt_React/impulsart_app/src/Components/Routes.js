@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import LandingPage from './LandingPage';
 import Login from './Login';
 import Register from './Register';
-import Correo from './Correo';
+import ContactUs from './ContactUs';
 import Home from './Home';
 import ListObra from '../CRUD/List/ListObra';
 import EditObra from '../CRUD/Edit/EditObra';
@@ -20,7 +20,6 @@ import EditPQRS from '../CRUD/Edit/EditPQRS';
 import UserData from './UserData';
 import ChangePWD from './ChangePWD';
 import Galery from './Galery';
-import Correos, { ContactUs } from './ContactUs';
 import ListUsuario from '../CRUD/List/ListUsuario';
 import CreateUsuario from '../CRUD/Create/FormUsuario';
 import EditUsuario from '../CRUD/Edit/EditUsuario';
@@ -76,10 +75,6 @@ function AppRoutes() { // Cambia el nombre de la función a AppRoutes
         <Route path="/CreatePQRS" element={<ProtectedRoute element={FormPQRS} roles={['administrador', 'Administrador']} />} />
         <Route path="/EditPQRS/:pkCod_Reclamo" element={<ProtectedRoute element={EditPQRS} roles={['administrador', 'Administrador']} />} />
         {/*CRUD PQRS*/}
-
-
-
-<Route path="/Correo" element = {<Correo />}/>
 
       </Routes>
     </Router>
