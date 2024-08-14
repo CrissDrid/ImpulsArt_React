@@ -164,6 +164,8 @@ export const FormSubasta = () => {
                 formData.append('peso', subasta.peso);
                 formData.append('costo', subasta.costo);
                 formData.append('tamano', subasta.tamano);
+                formData.append('alto', subasta.alto);
+                formData.append('ancho', subasta.ancho);
                 formData.append('categoriaId', subasta.categoriaId);
                 formData.append('cantidad', subasta.cantidad);
                 formData.append('descripcion', subasta.descripcion);

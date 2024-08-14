@@ -22,8 +22,7 @@
     position: relative;
     text-align: center;
     transition: all 0.3s ease-in-out;
-    max-width: 12rem; /* Ajustado para ser más grande */
-    height: 14.7rem; /* Ajustado para ser más grande */
+    width: 11.2rem; /* Ajustado para ser más grande */
   }
   
   .text-subirObra {
