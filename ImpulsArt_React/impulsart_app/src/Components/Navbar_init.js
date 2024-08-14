@@ -3,6 +3,8 @@ import { useLocation, useNavigate, Link } from 'react-router-dom';
 import Logo from '../Resources/Logo.svg';
 import { BsPersonCircle } from 'react-icons/bs';
 
+
+
 function Navbar_init() {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [userName, setUserName] = useState(localStorage.getItem('userName') || '');
@@ -99,8 +101,10 @@ function Navbar_init() {
                         <li><Link to='/ListDespacho' className="dropdown-item">CRUD despacho</Link></li>
                         <li><Link to='/ListPQRS' className="dropdown-item">CRUD PQRS</Link></li>
                         <li><Link to='/ListUsuario' className="dropdown-item">CRUD Usuarios</Link></li>
+                       
                       </>
-                    )}
+                    )} 
+                    <li><Link to='/Simulacion' className="dropdown-item">Simulacion</Link></li>
                     <li><Link to="/ContactUs" className="dropdown-item">Correos</Link></li>
                     <li><hr className="dropdown-divider" /></li>
                     <li><button className="dropdown-item" onClick={handleLogout}>Cerrar Sesión</button></li>

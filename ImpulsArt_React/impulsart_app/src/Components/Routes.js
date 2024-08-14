@@ -28,6 +28,7 @@ import ProtectedRoute from './ProtectedRoute'; // Importar ProtectedRoute
 import Profile from './Profile';
 import SeccionSubasta from './SeccionSubasta';
 import DetallesSubasta from './DetallesSubasta';
+import Simulacion from './Simulacion';
 
 function AppRoutes() { // Cambia el nombre de la función a AppRoutes
   return (
@@ -75,7 +76,8 @@ function AppRoutes() { // Cambia el nombre de la función a AppRoutes
         <Route path="/CreatePQRS" element={<ProtectedRoute element={FormPQRS} roles={['administrador', 'Administrador']} />} />
         <Route path="/EditPQRS/:pkCod_Reclamo" element={<ProtectedRoute element={EditPQRS} roles={['administrador', 'Administrador']} />} />
         {/*CRUD PQRS*/}
-
+         
+        <Route path='/Simulacion' element={<ProtectedRoute element={Simulacion} roles={['administrador', 'Administrador']}/>}/>
       </Routes>
     </Router>
   );
