@@ -24,6 +24,8 @@ export const FormSubasta = () => {
         peso: "",
         costo: "",
         tamano: "",
+        alto: "",
+        ancho: "",
         categoriaId: "",
         cantidad: 1,
         descripcion: "",

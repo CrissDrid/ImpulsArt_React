@@ -19,7 +19,9 @@ const FormObra = () => {
     nombreProducto: "",
     costo: "",
     peso: "",
-    tamano: "", 
+    tamano: "",
+    alto: "",
+    ancho: "", 
     cantidad: "",
     categoriaId: "",  // Cambiado a "categoria"
     descripcion: "",
@@ -259,7 +261,7 @@ const FormObra = () => {
                     </div>
                     <div className="col-md-6">
                       <div className="form-floating form-cantidad">
-                        <input className="form-control" id="floatingCantidad" placeholder="Nombre de la obra" name="cantidad" value={obra.cantidad} onChange={handleInputChange} type="number"/>
+                        <input className="form-control" id="floatingCantidad" placeholder="Nombre de la obra" name="cantidad" value={obra.cantidad} onChange={(e) => {const value = e.target.value; if (value === '' || (Number(value) >= 0)) {setObra(prevObra => ({ ...prevObra, cantidad: value })); }}} min="0"  type="number"/>
                         <label htmlFor="floatingCantidad">Cantidad</label>
                       </div>
                     </div>
