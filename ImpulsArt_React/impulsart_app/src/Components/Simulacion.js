@@ -4,7 +4,7 @@ import 'jspdf-autotable';
 import Navbar_init from './Navbar_init';
 
 
-export const ListObra = () => {
+export const Simulacion = () => {
     const [listUsuario, setListUsuario] = useState([]);
 
     const [listObra, setListObra] = useState([]);
@@ -178,4 +178,4 @@ export const ListObra = () => {
     );
 };
 
-export default ListObra;
+export default Simulacion;
