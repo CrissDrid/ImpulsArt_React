@@ -1,7 +1,8 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
-import { BiSearch } from 'react-icons/bi';
-import { Left } from 'react-bootstrap/lib/Media';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import 'bootstrap/dist/js/bootstrap.bundle.min.js'; // Asegúrate de importar el bundle que incluye Popper.js
+import 'bootstrap-icons/font/bootstrap-icons.css';
 
 function Album() {
   const [listObra, setListObra] = useState([]);
@@ -95,6 +96,18 @@ function Album() {
             <div className="d-flex justify-content-between align-items-center">
               <small className="text-body-secondary">9 mins</small>
             </div>
+            <div className="dropdown">{/* boton*/}
+      <button className="btn btn-light btn-sm dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+        <i className="bi bi-three-dots-vertical"></i>
+      </button>
+      <ul className="dropdown-menu" aria-labelledby="dropdownMenuButton">
+        <li>
+          <a className="dropdown-item" href="#">
+            <i className="bi bi-exclamation-triangle-fill"></i> Reportar
+          </a>
+        </li>
+      </ul>
+    </div>
           </div>
         </div>
       </div>
@@ -105,7 +118,7 @@ function Album() {
   return (
     <div className="album py-5 bg-custom-color">
       <div className="container">
-
+      
         {/*FORMULARIO PARA BUSCAR POR FILTRO*/}
         <div className="row">
           <div className="col-md-6 d-flex">
@@ -135,7 +148,7 @@ function Album() {
           </div>
         </div>
          {/*FORMULARIO PARA BUSCAR POR FILTRO*/}
-
+         
         <br/>
         <br/>
         <div className="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">{renderCards()}</div>

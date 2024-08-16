@@ -4,6 +4,7 @@ import axios from 'axios';
 import Swal from 'sweetalert2';
 import '../Styles/Galery.css';
 
+
 function Galery() {
   const [listObra, setListObra] = useState([]);
   const [listSubasta, setListSubasta] = useState([]);
