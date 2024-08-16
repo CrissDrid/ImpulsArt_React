@@ -130,18 +130,24 @@ export const FormSubasta = () => {
             return;
         }
         
-        // Validar fecha de finalización
         const today = new Date();
-        const selectedDate = new Date(subasta.fechaFinalizacion);
-        
+        today.setHours(0, 0, 0, 0);
+
+        const selectedDate = new Date(subasta.fechaFinalizacion + 'T00:00:00');
+
+        // Para depuración
+        console.log('Today:', today);
+        console.log('Selected Date:', selectedDate);
+
         if (selectedDate <= today) {
             toast.current.show({ severity: 'warn', summary: 'Advertencia', detail: 'La fecha de finalización debe ser después de la fecha actual' });
             return;
         }
-        
+
         const maxDate = new Date();
         maxDate.setDate(today.getDate() + 7);
-        
+        maxDate.setHours(0, 0, 0, 0);
+
         if (selectedDate > maxDate) {
             toast.current.show({ severity: 'warn', summary: 'Advertencia', detail: 'La fecha de finalización no puede ser mayor a 1 semana desde hoy' });
             return;
@@ -165,7 +171,7 @@ export const FormSubasta = () => {
                 formData.append('costo', subasta.costo);
                 formData.append('tamano', subasta.tamano);
                 formData.append('alto', subasta.alto);
-                formData.append('ancho', subasta.ancho);
+                formData.append('ancho',subasta.ancho);
                 formData.append('categoriaId', subasta.categoriaId);
                 formData.append('cantidad', subasta.cantidad);
                 formData.append('descripcion', subasta.descripcion);
@@ -176,11 +182,6 @@ export const FormSubasta = () => {
                 formData.append('usuarioIds', subasta.usuarioIds);
                 if (subasta.imagen) {
                     formData.append('imagen', subasta.imagen);
-                }
-                
-                // Depuración: Imprime el contenido del FormData
-                for (const [key, value] of formData.entries()) {
-                    console.log(`${key}: ${value}`);
                 }
                 
                 try {
@@ -310,10 +311,19 @@ export const FormSubasta = () => {
                       </div>
                     </div>
                     <div className="col-md-6">
-                      <div className="form-floating">
-                        <input className="form-control" id="floatingFechaFinalizacion" placeholder="Fecha de Finalización" name="fechaFinalizacion" value={subasta.fechaFinalizacion} onChange={handleInputChange} type="date" />
-                        <label htmlFor="floatingFechaFinalizacion">Fecha de Finalización</label>
-                      </div>
+                    <div className="form-floating">
+                      <input 
+                        className="form-control" 
+                        id="floatingFechaFinalizacion" 
+                        placeholder="Fecha de Finalización" 
+                        name="fechaFinalizacion" 
+                        value={subasta.fechaFinalizacion} 
+                        onChange={handleInputChange} 
+                        type="date" 
+                        min={new Date().toISOString().split('T')[0]} 
+                      />
+                      <label htmlFor="floatingFechaFinalizacion">Fecha de Finalización</label>
+                    </div>
                     </div>
                   </div>
                 </div>

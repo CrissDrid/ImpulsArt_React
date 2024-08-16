@@ -72,16 +72,35 @@ function DetallesSubasta() {
     loadSubasta();
   }, [pkCodSubasta]);
 
+  const formatDate = (dateString) => {
+    const [year, month, day] = dateString.split('-');
+    const date = new Date(year, month - 1, day);
+    return date.toLocaleDateString('es-CO', { 
+      timeZone: 'America/Bogota',
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit'
+    });
+  };
+
+  const formatTime = (timeString) => {
+    const [hours, minutes] = timeString.split(':');
+    return `${hours}:${minutes}`;
+  };
+  
+
   const handleSubmitOferta = async () => {
     try {
       // Leer datos del usuario desde localStorage
-      const user = JSON.parse(localStorage.getItem('user'));
 
-      // Construir el objeto de la oferta
+      const user = JSON.parse(localStorage.getItem('user'));
+      const now = new Date();
+      const colombiaTime = new Date(now.toLocaleString('en-US', { timeZone: 'America/Bogota' }));
+
       const ofertaData = {
         monto: nuevoMonto,
-        fechaOferta: new Date().toISOString().split('T')[0], // Fecha actual
-        horaOferta: new Date().toISOString().split('T')[1].split('.')[0], // Hora actual
+        fechaOferta: colombiaTime.toISOString().split('T')[0],
+        horaOferta: colombiaTime.toTimeString().split(' ')[0],
         fk_Identificacion: user.identificacion,
         fk_subasta: pkCodSubasta
       };
@@ -148,8 +167,8 @@ function DetallesSubasta() {
                 <tr key={oferta.pkCod_oferta}>
                   <td>{`${oferta.usuarios.nombre} ${oferta.usuarios.apellido}`}</td>
                   <td>${oferta.monto}</td>
-                  <td>{new Date(oferta.fechaOferta).toLocaleDateString()}</td>
-                  <td>{oferta.horaOferta}</td>
+                  <td>{formatDate(oferta.fechaOferta)}</td>
+                  <td>{formatTime(oferta.horaOferta)}</td>
                 </tr>
               ))}
             </tbody>
