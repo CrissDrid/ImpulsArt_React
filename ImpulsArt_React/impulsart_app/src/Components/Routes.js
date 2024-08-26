@@ -29,6 +29,8 @@ import Profile from './Profile';
 import SeccionSubasta from './SeccionSubasta';
 import DetallesSubasta from './DetallesSubasta';
 import Simulacion from './Simulacion';
+import Dashboard from './Dashboard';
+import Help from './Help';
 
 function AppRoutes() { // Cambia el nombre de la función a AppRoutes
   return (
@@ -46,7 +48,9 @@ function AppRoutes() { // Cambia el nombre de la función a AppRoutes
         <Route path='/galery' element={<Galery/>}/>
         <Route path='/SeccionSubasta' element={<SeccionSubasta />}/>
         <Route path='/DetallesSubasta/:pkCodSubasta' element={<DetallesSubasta />}/>
-        
+        <Route path='/Dashboard' element={<Dashboard />}/>
+        <Route path='/Help' element={<Help />}/>
+
         {/*CRUD USUARIOS*/}
         <Route path='/ListUsuario' element={<ProtectedRoute element={ListUsuario} roles={['administrador', 'Administrador']} />} />
         <Route path="/EditUsuario/:identificacion" element={<ProtectedRoute element={EditUsuario} roles={['administrador', 'Administrador']} />} />
