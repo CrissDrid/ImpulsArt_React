@@ -4,6 +4,9 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import 'primereact/resources/themes/saga-blue/theme.css';  // Importa el tema de PrimeReact
+import 'primereact/resources/primereact.min.css';           // Importa los estilos básicos de PrimeReact
+import 'primeicons/primeicons.css'; 
 
 
 const root = ReactDOM.createRoot(document.getElementById('root'));

@@ -1,0 +1,94 @@
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.image-container {
+  width: 85%;
+  height: 0;
+  padding-bottom: 85%;
+  margin-bottom: 15px;
+  position: relative;
+  overflow: hidden;
+  border-radius: 1rem;
+  background-color: #8D33FF;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.product-image {
+  position: absolute;
+  top: 5%;
+  left: 5%;
+  width: 90%;
+  height: 90%;
+  object-fit: contain;
+  background-color: white;
+  box-shadow: 0 0 15px rgba(127, 126, 43, 0.733);
+  border-radius: 0.8rem;
+}
+
+.rating-container{
+  display: flex;
+  justify-content: center;
+  margin-right: 4.5rem;
+  margin-top: 10rem !important;
+}
+
+.p-rating .p-rating-icon {
+  font-size: 1.8rem !important;
+  color: #8D33FF;
+}
+
+.p-tag{
+  height: 25px;
+  margin-top: 10px;
+  align-content: end;
+}
+
+.custom-inputnumber .p-inputnumber-button {
+  background-color: #6c7a89; /* Color de fondo */
+  color: #ffffff; /* Color del ícono */
+  border-radius: 5px; /* Borde redondeado */
+  border: none; /* Sin bordes */
+  width: 100%; /* Ocupa todo el ancho */
+  height: 40px; /* Altura fija */
+}
+
+.custom-inputnumber .p-inputnumber-button .pi {
+  font-size: 1.2rem; /* Tamaño del ícono */
+}
+
+.custom-inputnumber .p-inputnumber-input {
+  text-align: center; /* Alinear el número al centro */
+  border: none; /* Sin bordes */
+  font-size: 1.5rem; /* Tamaño del texto */
+  width: 100%; /* Ancho completo */
+  height: 40px; /* Altura fija */
+}
+
+
+.p-button-rounded {
+  border-radius: 2rem !important;
+}
+
+.p-button-primary {
+  background-color: #8D33FF !important;
+  border-color: #8D33FF !important;
+}
+
+.description {
+  max-height: 100px;
+  overflow-y: auto;
+}
+.comprar-btn {
+  color: white;
+  background-color: #8D33FF !important;
+  border-color: white !important;
+  border-radius: 50px !important;
+  margin-left: auto;
+  padding: 5px 23px !important;
+  max-width: 10rem;
+  height: 2.7rem !important;
+}

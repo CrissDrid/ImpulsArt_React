@@ -29,6 +29,7 @@ import ProtectedRoute from './ProtectedRoute'; // Importar ProtectedRoute
 import Profile from './Profile';
 import SeccionSubasta from './SeccionSubasta';
 import DetallesSubasta from './DetallesSubasta';
+import DetalleObras from './DetalleObras';
 
 function AppRoutes() { // Cambia el nombre de la función a AppRoutes
   return (
@@ -46,6 +47,7 @@ function AppRoutes() { // Cambia el nombre de la función a AppRoutes
         <Route path='/galery' element={<Galery/>}/>
         <Route path='/SeccionSubasta' element={<SeccionSubasta />}/>
         <Route path='/DetallesSubasta/:pkCodSubasta' element={<DetallesSubasta />}/>
+        <Route path="/DetalleObras/:pkCod_Producto" element={<DetalleObras />} />
         
         {/*CRUD USUARIOS*/}
         <Route path='/ListUsuario' element={<ProtectedRoute element={ListUsuario} roles={['administrador', 'Administrador']} />} />
