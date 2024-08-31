@@ -1,38 +1,36 @@
 .container {
   max-width: 1200px;
   margin: 0 auto;
+  margin-bottom: 3rem;
 }
 
 .image-container {
-  width: 85%;
-  height: 0;
-  padding-bottom: 85%;
-  margin-bottom: 15px;
-  position: relative;
-  overflow: hidden;
+  max-width: 38rem;
+  max-width: 38rem;
+  width: auto;
+  height: auto;
+  padding: 20px; 
   border-radius: 1rem;
   background-color: #8D33FF;
   display: flex;
   justify-content: center;
   align-items: center;
+  border: 5px solid #8D33FF; 
 }
 
 .product-image {
-  position: absolute;
-  top: 5%;
-  left: 5%;
-  width: 90%;
-  height: 90%;
+  width: 100%;
+  height: auto;
   object-fit: contain;
   background-color: white;
-  box-shadow: 0 0 15px rgba(127, 126, 43, 0.733);
   border-radius: 0.8rem;
 }
+
 
 .rating-container{
   display: flex;
   justify-content: center;
-  margin-right: 4.5rem;
+  margin-right: 1rem;
   margin-top: 10rem !important;
 }
 
@@ -41,10 +39,46 @@
   color: #8D33FF;
 }
 
+.nombreObra{
+  font-family: "Nunito", sans-serif;
+  font-size: 3rem;
+  margin-bottom: 2rem;
+}
+
 .p-tag{
   height: 25px;
-  margin-top: 10px;
+  margin-top: 18px;
   align-content: end;
+}
+
+.p-stock{
+  font-size: 0.8rem;
+}
+
+.p-dimensiones{
+  font-size: 0.8rem;
+}
+
+.stokydimensiones{
+  margin-bottom: 1.5rem;
+}
+
+.costoObra{
+  font-family: "Nunito", sans-serif;
+  font-size: 2rem;
+  margin-right: 0.5rem;
+}
+
+.comprar-btn{
+  color: white;
+  background-color: #8D33FF !important;
+  border-color: white !important;
+  border-radius: 50px !important;
+  margin-top: 0.5rem;
+  margin-left: auto;
+  padding: 5px 23px !important;
+  max-width: 10rem;
+  height: 2.7rem !important;
 }
 
 .custom-inputnumber .p-inputnumber-button {
@@ -82,13 +116,62 @@
   max-height: 100px;
   overflow-y: auto;
 }
-.comprar-btn {
-  color: white;
+
+
+.btn-increment{
+  border-radius: 0px 5px 5px 0px !important;
   background-color: #8D33FF !important;
-  border-color: white !important;
-  border-radius: 50px !important;
-  margin-left: auto;
-  padding: 5px 23px !important;
-  max-width: 10rem;
-  height: 2.7rem !important;
+}
+
+.btn-decrement{
+  width: 36.95px;
+  border-radius: 5px 0px 0px 5px !important;
+  background-color: #8D33FF !important;
+}
+
+.input-cantidad{
+  border-radius: 0 !important;
+}
+
+.input-cantidad[readonly] {
+  background-color: white;
+  cursor: not-allowed;
+  pointer-events: none;
+  user-select: none;
+  border: 1px solid #ced4da;
+}
+
+.pi-plus{
+  font-size: 0.8rem;
+  color: white;
+}
+
+.pi-minus{
+  font-size: 0.8rem;
+  color: white;
+}
+
+.countdown-timer .timer {
+  display: flex;
+  justify-content: start;
+  align-items: center;
+  font-size: 2rem;
+  font-weight: bold;
+}
+
+.countdown-timer .timer span {
+  margin: 0 5px;
+}
+
+.countdown-timer .timer span:nth-child(odd) {
+  min-width: 50px;
+  text-align: center;
+  background-color: #f0f0f0;
+  padding: 10px;
+  border-radius: 5px;
+}
+
+.countdown-timer .timer span:nth-child(even) {
+  font-size: 1rem;
+  margin-top: 15px;
 }

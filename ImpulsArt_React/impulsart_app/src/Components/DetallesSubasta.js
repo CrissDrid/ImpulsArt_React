@@ -1,7 +1,11 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import '../Styles/DetallesSubasta.css';
+import { Rating } from 'primereact/rating';
+import { Tag } from 'primereact/tag';
+import '../Styles/DetallesObra.css';
+import Navbar_init from './Navbar_init';
+import Footer from './Footer';
 
 function DetallesSubasta() {
   const { pkCodSubasta } = useParams();
@@ -17,29 +21,28 @@ function DetallesSubasta() {
     descripcion: '',
     estadoSubasta: '',
     precioInicial: '',
+    fechaInicio:'',
     fechaFinalizacion: '',
     imagen: '',
-    imagenPreview: ''
+    imagenPreview: '',
+    rating: 0
   });
 
-  const [ofertas, setOfertas] = useState([]);
-  const [ofertaMasAlta, setOfertaMasAlta] = useState(null);
-  const [nuevoMonto, setNuevoMonto] = useState('');
-  const [mensaje, setMensaje] = useState('');
-  
+  const [timeLeft, setTimeLeft] = useState({
+    days: 0,
+    hours: 0,
+    minutes: 0,
+    seconds: 0
+  });
+
   useEffect(() => {
     const loadSubasta = async () => {
       try {
-        // Leer datos del usuario desde localStorage
-        const user = JSON.parse(localStorage.getItem('user'));
-        if (user) {
-          console.log('Datos del usuario:', user);
-          // Puedes utilizar `user.identificacion` para cualquier operación adicional
-        }
-        
-        // Cargar los detalles de la subasta
         const result = await axios.get(`http://localhost:8086/api/subasta/list/${pkCodSubasta}`);
         const subastaData = result.data.data[0];
+
+        console.log('Datos de subasta:', subastaData);
+
         setSubasta({
           nombreProducto: subastaData.obras.nombreProducto,
           costo: subastaData.obras.costo,
@@ -51,19 +54,12 @@ function DetallesSubasta() {
           descripcion: subastaData.obras.descripcion,
           estadoSubasta: subastaData.estadoSubasta,
           precioInicial: subastaData.precioInicial,
+          fechaInicio: subastaData.fechaInicio,
           fechaFinalizacion: subastaData.fechaFinalizacion,
           imagen: subastaData.obras.imagen,
-          imagenPreview: subastaData.obras.imagen
+          imagenPreview: subastaData.obras.imagen,
+          rating: subastaData.rating || 0
         });
-
-        // Cargar las ofertas de la subasta
-        const ofertaResult = await axios.get(`http://localhost:8086/api/oferta/OfertaPorSubasta/${pkCodSubasta}`);
-        setOfertas(ofertaResult.data.data);
-
-        // Cargar la oferta más alta
-        const ofertaMasAltaResult = await axios.get(`http://localhost:8086/api/oferta/OfertaMasAlta/${pkCodSubasta}`);
-        setOfertaMasAlta(ofertaMasAltaResult.data.data);
-
       } catch (error) {
         console.error('Error al cargar la subasta:', error);
       }
@@ -72,121 +68,88 @@ function DetallesSubasta() {
     loadSubasta();
   }, [pkCodSubasta]);
 
-  const formatDate = (dateString) => {
-    const [year, month, day] = dateString.split('-');
-    const date = new Date(year, month - 1, day);
-    return date.toLocaleDateString('es-CO', { 
-      timeZone: 'America/Bogota',
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit'
-    });
-  };
-
-  const formatTime = (timeString) => {
-    const [hours, minutes] = timeString.split(':');
-    return `${hours}:${minutes}`;
-  };
-  
-
-  const handleSubmitOferta = async () => {
-    try {
-      // Leer datos del usuario desde localStorage
-
-      const user = JSON.parse(localStorage.getItem('user'));
+  useEffect(() => {
+    const calculateTimeLeft = () => {
       const now = new Date();
-      const colombiaTime = new Date(now.toLocaleString('en-US', { timeZone: 'America/Bogota' }));
+      const endDate = new Date(subasta.fechaFinalizacion);
+      const difference = endDate - now;
 
-      const ofertaData = {
-        monto: nuevoMonto,
-        fechaOferta: colombiaTime.toISOString().split('T')[0],
-        horaOferta: colombiaTime.toTimeString().split(' ')[0],
-        fk_Identificacion: user.identificacion,
-        fk_subasta: pkCodSubasta
-      };
+      let timeLeft = {};
 
-      // Enviar la oferta al backend
-      const response = await axios.post('http://localhost:8086/api/oferta/create', ofertaData);
-
-      if (response.data.status === 'success') {
-        setMensaje('Oferta registrada exitosamente.');
-        // Recargar ofertas para mostrar la nueva oferta
-        const ofertaResult = await axios.get(`http://localhost:8086/api/oferta/OfertaPorSubasta/${pkCodSubasta}`);
-        setOfertas(ofertaResult.data.data);
-
-        const ofertaMasAltaResult = await axios.get(`http://localhost:8086/api/oferta/OfertaMasAlta/${pkCodSubasta}`);
-        setOfertaMasAlta(ofertaMasAltaResult.data.data);
+      if (difference > 0) {
+        timeLeft = {
+          days: String(Math.floor(difference / (1000 * 60 * 60 * 24))).padStart(2, '0'),
+          hours: String(Math.floor((difference / (1000 * 60 * 60)) % 24)).padStart(2, '0'),
+          minutes: String(Math.floor((difference / 1000 / 60) % 60)).padStart(2, '0'),
+          seconds: String(Math.floor((difference / 1000) % 60)).padStart(2, '0')
+        };
       } else {
-        setMensaje('Error al registrar la oferta.');
+        timeLeft = { days: "00", hours: "00", minutes: "00", seconds: "00" };
       }
-    } catch (error) {
-      console.error('Error al enviar la oferta:', error);
-      setMensaje('Error al registrar la oferta.');
-    }
+
+      setTimeLeft(timeLeft);
+    };
+
+    const timer = setInterval(calculateTimeLeft, 1000);
+
+    return () => clearInterval(timer);
+  }, [subasta.fechaFinalizacion]);
+
+  const handleRatingChange = (e) => {
+    setSubasta({ ...subasta, rating: e.value });
   };
 
   return (
-    <div className="detalles-subasta-container">
-      <div className="image-section">
-        <img src={subasta.imagen} alt={subasta.nombreProducto} className="product-image" />
-      </div>
-      <div className="details-section">
-        <h1 className="product-name">{subasta.nombreProducto}</h1>
-        <h5 className="product-category">Categoría: {subasta.categoriaNombre}</h5>
-        <p className="product-description">{subasta.descripcion}</p>
-        <div className="product-specs">
-          <p><strong>Peso:</strong> {subasta.peso}</p>
-          <p><strong>Tamaño:</strong> {subasta.tamano}</p>
+    <>
+    <Navbar_init/>
+    <div className="container mt-4">
+      <div className="row">
+        <div className="col-md-6">
+          <div className="image-container">
+            <img src={subasta.imagen} alt={subasta.nombreProducto} className="product-image" />
+          </div>
+          <div className="rating-container mt-2">
+            <Rating 
+              value={subasta.rating} 
+              onChange={handleRatingChange} 
+              cancel={false} 
+              stars={5}
+              onIcon="bi bi-star-fill"
+              offIcon="bi bi-star"
+            />
+          </div>
         </div>
-      </div>
-      <div className="offer-section">
-        <h2>Realizar Oferta</h2>
-        <input
-          type="number"
-          placeholder={`$ ${subasta.precioInicial} COP`}
-          min={subasta.precioInicial}
-          value={nuevoMonto}
-          onChange={(e) => setNuevoMonto(e.target.value)}
-          className="offer-input"
-        />
-        <button onClick={handleSubmitOferta} className="offer-button">Ingresar oferta</button>
-        {mensaje && <p className="response-message">{mensaje}</p>}
-        <div className="offers-list">
-          <h3>Lista de ofertas:</h3>
-          <table className="offers-table">
-            <thead>
-              <tr>
-                <th>Nombre</th>
-                <th>Monto</th>
-                <th>Fecha</th>
-                <th>Hora</th>
-              </tr>
-            </thead>
-            <tbody>
-              {ofertas.map((oferta) => (
-                <tr key={oferta.pkCod_oferta}>
-                  <td>{`${oferta.usuarios.nombre} ${oferta.usuarios.apellido}`}</td>
-                  <td>${oferta.monto}</td>
-                  <td>{formatDate(oferta.fechaOferta)}</td>
-                  <td>{formatTime(oferta.horaOferta)}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-        <div className="highest-bid">
-          <h3>Puja más alta</h3>
-          {ofertaMasAlta ? (
-            <>
-              <p><strong>Nombre:</strong> {`${ofertaMasAlta.usuarios.nombre} ${ofertaMasAlta.usuarios.apellido}`}</p>
-              <p><strong>Monto:</strong> ${ofertaMasAlta.monto}</p>
-            </>
-          ) : (
-            <p>No hay ofertas.</p>
-          )}
+        <div className="col-md-6">
+          <div className='row'>
+            <div className='col-md-10'>
+              <h1 className='nombreObra'>{subasta.nombreProducto}</h1>
+            </div>
+            <div className='col-md-2 d-flex justify-content-end'>
+              <Tag value={subasta.categoriaNombre} className="mb-2" />
+            </div>
+          </div>
+          <p className="description">{subasta.descripcion}</p>
+          <div className='row stokydimensiones'>
+            <div className='col-md-6'>
+              <p className='p-dimensiones'><strong>Dimensiones:</strong> {subasta.tamano}</p>
+              <p className='p-dimensiones'><strong>Peso:</strong> {subasta.peso}</p>
+              <p className='p-stock'><strong>Stock:</strong> {subasta.cantidad}</p>
+            </div>
+          </div>
+          <div className="countdown-timer">
+            <h5>Tiempo restante para la subasta:</h5>
+            <div className="timer">
+              <span>{timeLeft.days}</span><span>Día</span> 
+              <span>{timeLeft.hours}</span><span>Horas</span> 
+              <span>{timeLeft.minutes}</span><span>Min</span> 
+              <span>{timeLeft.seconds}</span><span>Seg</span>
+            </div>
+          </div>
         </div>
       </div>
     </div>
+    <Footer/>
+    </>
   );
 }
 

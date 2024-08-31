@@ -3,8 +3,6 @@ import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import { Tag } from 'primereact/tag';
 import { Rating } from 'primereact/rating';
-import { InputNumber } from 'primereact/inputnumber';
-import { Button } from 'primereact/button';
 import '../Styles/DetallesObra.css';
 import Navbar_init from './Navbar_init';
 import Footer from './Footer';
@@ -21,6 +19,7 @@ function DetallesObra() {
     cantidad: 1,
     rating: 0
   });
+  const [cantidadCompra, setCantidadCompra] = useState(0);
 
   useEffect(() => {
     const loadObra = async () => {
@@ -34,6 +33,7 @@ function DetallesObra() {
           categoriaNombre: obraData.categoria.nombreCategoria,
           imagen: obraData.imagen,
           tamano: obraData.tamano,
+          peso: obraData.peso,
           cantidad: obraData.cantidad,
           rating: obraData.rating || 0
         });
@@ -47,6 +47,25 @@ function DetallesObra() {
 
   const handleRatingChange = (e) => {
     setObra({ ...obra, rating: e.value });
+  };
+
+  const increment = () => {
+    if (cantidadCompra < obra.cantidad) {
+      setCantidadCompra(cantidadCompra + 1);
+    }
+  };
+
+  const decrement = () => {
+    if (cantidadCompra > 0) {
+      setCantidadCompra(cantidadCompra - 1);
+    }
+  };
+
+  const handleChange = (e) => {
+    const value = parseInt(e.target.value, 10);
+    if (!isNaN(value) && value >= 0 && value <= obra.cantidad) {
+      setCantidadCompra(value);
+    }
   };
 
   return (
@@ -64,41 +83,58 @@ function DetallesObra() {
                 onChange={handleRatingChange} 
                 cancel={false} 
                 stars={5}
-                onIcon="bi bi-palette-fill"
-                offIcon="bi bi-palette"
+                onIcon="bi bi-star-fill"
+                offIcon="bi bi-star"
               />
             </div>
           </div>
           <div className="col-md-6">
             <div className='row'>
               <div className='col-md-10'>
-                <h2>{obra.nombreProducto}</h2>
+                <h1 className='nombreObra'>{obra.nombreProducto}</h1>
               </div>
               <div className='col-md-2 d-flex justify-content-end'>
                 <Tag value={obra.categoriaNombre} className="mb-2" />
               </div>
             </div>
             <p className="description">{obra.descripcion}</p>
-            <p><strong>Tamaño:</strong> {obra.tamano}</p>
-            <p><strong>Stock:</strong> {obra.cantidad}</p>
-            <div className="d-flex align-items-center justify-content-between mt-3">
-              <InputNumber 
-                value={0}
-                showButtons 
-                buttonLayout="vertical"
-                style={{ width: '4rem' }}
-                decrementButtonClassName="p-button-secondary"
-                incrementButtonClassName="p-button-secondary"
-                incrementButtonIcon="pi pi-plus"
-                decrementButtonIcon="pi pi-minus"
-                min={0}
-                max={obra.cantidad}
-              />
+            <div className='row stokydimensiones'>
+              <div className='col-md-6'>
+                <p className='p-dimensiones'><strong>Dimensiones:</strong> {obra.tamano}</p>
+                <p className='p-dimensiones'><strong>Peso:</strong> {obra.peso}</p>
+                <p className='p-stock'><strong>Stock:</strong> {obra.cantidad}</p>
             </div>
-            <div className="d-flex align-items-center justify-content-between mt-3">
-              <span className="font-bold text-lg">Costo: {obra.costo}</span>
             </div>
-            <Button label="Comprar" className="p-button-rounded p-button-primary mt-3" />
+            <div className='row'>
+              <div className='col-md-6'>
+                <div className="d-flex align-items-center justify-content-start">
+                  <button onClick={decrement} className="btn btn-decrement">
+                    <i className="pi pi-minus"></i>
+                  </button>
+                  <input
+                    type="number"
+                    readOnly
+                    value={cantidadCompra}
+                    onChange={handleChange}
+                    min="0"
+                    max={obra.cantidad}
+                    className="input-cantidad form-control text-center"
+                    style={{ width: '4rem' }}
+                  />
+                  <button onClick={increment} className="btn btn-increment">
+                    <i className="pi pi-plus "></i>
+                  </button>
+                </div>
+              </div>
+              <div className='col-md-6'>
+                <div className="d-flex align-items-center justify-content-end">
+                <h1 className='costoObra'>{obra.costo}</h1>
+                </div>
+              </div>
+            </div>
+            <div className='d-flex align-items-center justify-content-end'>
+            <button className="btn btn-primary w-25 py-2 comprar-btn " type="submit">Comprar</button>
+            </div>
           </div>
         </div>
       </div>
