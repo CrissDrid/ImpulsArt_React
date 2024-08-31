@@ -20,22 +20,21 @@ export const FormSubasta = () => {
     const toast = useRef(null);
     const [user, setUser] = useState(JSON.parse(localStorage.getItem('user')));
     const [subasta, setSubasta] = useState({
-        nombreProducto: "",
-        peso: "",
-        costo: "",
-        tamano: "",
-        alto: "",
-        ancho: "",
-        categoriaId: "",
-        cantidad: 1,
-        descripcion: "",
-        estadoSubasta: "Activo",
-        precioInicial: "",
-        fechaInicio: new Date().toISOString().slice(0, 10),
-        fechaFinalizacion: "",
-        usuarioIds: user.identificacion,
-        imagen: null
-    });
+      nombreProducto: "",
+      peso: "",
+      costo: "",
+      tamano: "",
+      alto: "",
+      ancho: "",
+      categoriaId: "",
+      cantidad: 1,
+      descripcion: "",
+      estadoSubasta: "Activo",
+      precioInicial: "",
+      fechaFinalizacion: "",
+      usuarioIds: user.identificacion,
+      imagen: null
+  });
 
     const [categorias, setCategorias] = useState([]);
     const [isDescriptionOverLimit, setIsDescriptionOverLimit] = useState(false);
@@ -95,49 +94,46 @@ export const FormSubasta = () => {
     };
 
     const handleSubmit = async (e) => {
-        e.preventDefault();
-        
-        // Validaciones
-        if (!subasta.nombreProducto || !subasta.precioInicial || !subasta.peso || !subasta.tamano || !subasta.categoriaId || !subasta.descripcion || !subasta.imagen) {
-            toast.current.show({ severity: 'warn', summary: 'Advertencia', detail: 'Todos los campos deben estar completos' });
-            return;
-        }
-        
-        if (subasta.nombreProducto.length > 50) {
-            toast.current.show({ severity: 'warn', summary: 'Advertencia', detail: 'El nombre de la obra debe contener un máximo de 50 caracteres' });
-            return;
-        }
-        
-        if (subasta.alto === "0cm" || subasta.ancho === "0cm") {
-            toast.current.show({ severity: 'warn', summary: 'Advertencia', detail: 'El tamaño no puede ser 0cm' });
-            return;
-        }
-        
-        if (subasta.peso === "0Kg") {
-            toast.current.show({ severity: 'warn', summary: 'Advertencia', detail: 'El peso no puede ser 0Kg' });
-            return;
-        }
-        
-        // Validar el precio inicial
-        const rawPrice = subasta.precioInicial.replace(/[^0-9]/g, '');
-        if (parseInt(rawPrice, 10) > 1500000) {
-            toast.current.show({ severity: 'warn', summary: 'Advertencia', detail: 'La oferta inicial no puede superar $1,500,000' });
-            return;
-        }
-        
-        if (subasta.precioInicial === "$0") {
-            toast.current.show({ severity: 'warn', summary: 'Advertencia', detail: 'La oferta inicial no puede ser $0' });
-            return;
-        }
-        
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
+      e.preventDefault();
+  
+      // Validaciones
+      if (!subasta.nombreProducto || !subasta.precioInicial || !subasta.peso || !subasta.tamano || !subasta.categoriaId || !subasta.descripcion || !subasta.imagen) {
+          toast.current.show({ severity: 'warn', summary: 'Advertencia', detail: 'Todos los campos deben estar completos' });
+          return;
+      }
+  
+      if (subasta.nombreProducto.length > 50) {
+          toast.current.show({ severity: 'warn', summary: 'Advertencia', detail: 'El nombre de la obra debe contener un máximo de 50 caracteres' });
+          return;
+      }
+  
+      if (subasta.alto === "0cm" || subasta.ancho === "0cm") {
+          toast.current.show({ severity: 'warn', summary: 'Advertencia', detail: 'El tamaño no puede ser 0cm' });
+          return;
+      }
+  
+      if (subasta.peso === "0Kg") {
+          toast.current.show({ severity: 'warn', summary: 'Advertencia', detail: 'El peso no puede ser 0Kg' });
+          return;
+      }
+  
+      // Validar el precio inicial
+      const rawPrice = subasta.precioInicial.replace(/[^0-9]/g, '');
+      if (parseInt(rawPrice, 10) > 1500000) {
+          toast.current.show({ severity: 'warn', summary: 'Advertencia', detail: 'La oferta inicial no puede superar $1,500,000' });
+          return;
+      }
+  
+      if (subasta.precioInicial === "$0") {
+          toast.current.show({ severity: 'warn', summary: 'Advertencia', detail: 'La oferta inicial no puede ser $0' });
+          return;
+      }
+  
+      const today = new Date();
+        today.setHours(23, 59, 59, 999); // Establecer al final del día
 
-        const selectedDate = new Date(subasta.fechaFinalizacion + 'T00:00:00');
-
-        // Para depuración
-        console.log('Today:', today);
-        console.log('Selected Date:', selectedDate);
+        const selectedDate = new Date(subasta.fechaFinalizacion);
+        selectedDate.setHours(23, 59, 59, 999); // Establecer al final del día
 
         if (selectedDate <= today) {
             toast.current.show({ severity: 'warn', summary: 'Advertencia', detail: 'La fecha de finalización debe ser después de la fecha actual' });
@@ -146,68 +142,76 @@ export const FormSubasta = () => {
 
         const maxDate = new Date();
         maxDate.setDate(today.getDate() + 7);
-        maxDate.setHours(0, 0, 0, 0);
+        maxDate.setHours(23, 59, 59, 999); // Establecer al final del día
 
         if (selectedDate > maxDate) {
             toast.current.show({ severity: 'warn', summary: 'Advertencia', detail: 'La fecha de finalización no puede ser mayor a 1 semana desde hoy' });
             return;
         }
         
-        // Muestra el SweetAlert de confirmación
-        Swal.fire({
-            title: '¿Estás seguro?',
-            text: '¡No podrás revertir esto!',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#8D33FF',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'Sí, crear obra!',
-            cancelButtonText: 'Cancelar'
-        }).then(async (result) => {
-            if (result.isConfirmed) {
-                const formData = new FormData();
-                formData.append('nombreProducto', subasta.nombreProducto);
-                formData.append('peso', subasta.peso);
-                formData.append('costo', subasta.costo);
-                formData.append('tamano', subasta.tamano);
-                formData.append('alto', subasta.alto);
-                formData.append('ancho',subasta.ancho);
-                formData.append('categoriaId', subasta.categoriaId);
-                formData.append('cantidad', subasta.cantidad);
-                formData.append('descripcion', subasta.descripcion);
-                formData.append('estadoSubasta', subasta.estadoSubasta);
-                formData.append('precioInicial', subasta.precioInicial.replace(/[^0-9]/g, ''));
-                formData.append('fechaInicio', subasta.fechaInicio);
-                formData.append('fechaFinalizacion', subasta.fechaFinalizacion);
-                formData.append('usuarioIds', subasta.usuarioIds);
-                if (subasta.imagen) {
-                    formData.append('imagen', subasta.imagen);
-                }
-                
-                try {
-                    const response = await axios.post("http://localhost:8086/api/subasta/create", formData, {
-                        headers: {
-                            'Content-Type': 'multipart/form-data'
-                        }
-                    });
-                    console.log(response.data);
-                    
-                    // Muestra el SweetAlert de éxito
-                    Swal.fire(
-                        '¡Felicidades!',
-                        'Has iniciado una subasta con éxito.',
-                        'success'
-                    );
-
-                    navigate(-1);
-
-                } catch (error) {
-                    console.error('Error al enviar el formulario:', error);
-                    toast.current.show({ severity: 'error', summary: 'Error', detail: 'Error al enviar el formulario' });
-                }
-            }
-        });
-    };
+      if (selectedDate <= today) {
+          toast.current.show({ severity: 'warn', summary: 'Advertencia', detail: 'La fecha de finalización debe ser después de la fecha actual' });
+          return;
+      }
+  
+      // Muestra el SweetAlert de confirmación
+      Swal.fire({
+          title: '¿Estás seguro?',
+          text: '¡No podrás revertir esto!',
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonColor: '#8D33FF',
+          cancelButtonColor: '#d33',
+          confirmButtonText: 'Sí, crear obra!',
+          cancelButtonText: 'Cancelar'
+      }).then(async (result) => {
+          if (result.isConfirmed) {
+              const formData = new FormData();
+              formData.append('nombreProducto', subasta.nombreProducto);
+              formData.append('peso', subasta.peso);
+              formData.append('costo', subasta.costo);
+              formData.append('tamano', subasta.tamano);
+              formData.append('alto', subasta.alto);
+              formData.append('ancho', subasta.ancho);
+              formData.append('categoriaId', subasta.categoriaId);
+              formData.append('cantidad', subasta.cantidad);
+              formData.append('descripcion', subasta.descripcion);
+              formData.append('estadoSubasta', subasta.estadoSubasta);
+              formData.append('precioInicial', subasta.precioInicial.replace(/[^0-9]/g, ''));
+              formData.append('fechaInicio', subasta.fechaInicio);
+              formData.append('fechaFinalizacion', selectedDate.toISOString());  // Ajustar fechaFinalizacion
+              formData.append('usuarioIds', subasta.usuarioIds);
+              if (subasta.imagen) {
+                  formData.append('imagen', subasta.imagen);
+              }
+  
+              try {
+                  const response = await axios.post("http://localhost:8086/api/subasta/create", formData, {
+                      headers: {
+                          'Content-Type': 'multipart/form-data'
+                      }
+                  });
+                  console.log(response.data);
+  
+                  // Muestra el SweetAlert de éxito
+                  Swal.fire(
+                      '¡Felicidades!',
+                      'Has iniciado una subasta con éxito.',
+                      'success'
+                  );
+  
+                  navigate(-1);
+  
+              } catch (error) {
+                  console.error('Error al enviar el formulario:', error);
+                  toast.current.show({ severity: 'error', summary: 'Error', detail: 'Error al enviar el formulario' });
+              }
+          }
+      });
+  };
+  
+  
+  
     
 
     const handleCancel = () => {
@@ -311,19 +315,19 @@ export const FormSubasta = () => {
                       </div>
                     </div>
                     <div className="col-md-6">
-                    <div className="form-floating">
-                      <input 
-                        className="form-control" 
-                        id="floatingFechaFinalizacion" 
-                        placeholder="Fecha de Finalización" 
-                        name="fechaFinalizacion" 
-                        value={subasta.fechaFinalizacion} 
-                        onChange={handleInputChange} 
-                        type="date" 
-                        min={new Date().toISOString().split('T')[0]} 
-                      />
-                      <label htmlFor="floatingFechaFinalizacion">Fecha de Finalización</label>
-                    </div>
+                      <div className="form-floating">
+                          <input 
+                              className="form-control" 
+                              id="floatingFechaFinalizacion" 
+                              placeholder="Fecha de Finalización" 
+                              name="fechaFinalizacion" 
+                              value={subasta.fechaFinalizacion} 
+                              onChange={handleInputChange} 
+                              type="date" 
+                              min={new Date().toISOString().split('T')[0]} 
+                          />
+                          <label htmlFor="floatingFechaFinalizacion">Fecha de Finalización</label>
+                      </div>
                     </div>
                   </div>
                 </div>
