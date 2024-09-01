@@ -9,6 +9,7 @@ import Footer from './Footer';
 
 //Autenticacion de apis
 import '../Auth/AuthToken';
+import AuthToken from '../Auth/AuthToken';
 
 function DetallesObra() {
   const { pkCod_Producto } = useParams();
@@ -27,7 +28,7 @@ function DetallesObra() {
   useEffect(() => {
     const loadObra = async () => {
       try {
-        const result = await axios.get(`http://localhost:8086/api/obra/list/${pkCod_Producto}`);
+        const result = await AuthToken.get(`http://localhost:8086/api/obra/list/${pkCod_Producto}`);
         const obraData = result.data.data;
         setObra({
           nombreProducto: obraData.nombreProducto,

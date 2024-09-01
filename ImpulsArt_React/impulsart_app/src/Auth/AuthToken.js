@@ -1,4 +1,5 @@
 import axios from 'axios';
+import Swal from 'sweetalert2';
 
 // Crea una instancia de axios con la configuración base
 const AuthToken = axios.create({
@@ -28,9 +29,18 @@ AuthToken.interceptors.response.use(
   (error) => {
     if (error.response && error.response.status === 401) {
       // Manejo de error 401 (Unauthorized)
-      // Redirige a la página de inicio de sesión
-      // Puedes usar el enrutador para redirigir en lugar de window.location.href si estás usando React Router
-      window.location.href = '/login';
+      Swal.fire({
+        title: 'Sesión Expirada',
+        text: 'Tu sesión ha expirado. Por favor, inicia sesión nuevamente.',
+        icon: 'error',
+        confirmButtonText: 'Iniciar Sesión'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          // Redirige a la página de inicio de sesión después de que el usuario cierre la alerta
+          localStorage.removeItem('authToken');
+          window.location.href = '/Login';
+        }
+      });
     }
     // Rechaza la promesa si ocurre un error en la respuesta
     return Promise.reject(error);

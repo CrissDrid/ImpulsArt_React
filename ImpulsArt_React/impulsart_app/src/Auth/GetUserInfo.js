@@ -10,6 +10,14 @@ const GetUserInfo = () => {
       
       // Decodifica el token
       const decodedToken = jwtDecode(cleanToken);
+
+      // Verificar la expiración del token
+      const currentTime = Date.now() / 1000; // Tiempo actual en segundos
+      if (decodedToken.exp && decodedToken.exp < currentTime) {
+        // Token expirado
+        localStorage.removeItem('authToken');
+        return { userName: '', rol: [], identificacion: '' };
+      }
       
       // Verifica que los datos decodificados sean válidos
       if (decodedToken && decodedToken.userName) {

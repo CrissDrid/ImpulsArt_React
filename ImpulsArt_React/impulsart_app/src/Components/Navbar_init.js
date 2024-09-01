@@ -3,19 +3,37 @@ import { useNavigate, Link } from 'react-router-dom';
 import Logo from '../Resources/Logo.svg';
 import { BsPersonCircle } from 'react-icons/bs';
 
+// Autenticacion de token
+import AuthToken from '../Auth/AuthToken';
 // Asegúrate Obtener datos del usuario
 import GetUserInfo from '../Auth/GetUserInfo'; 
 
 function Navbar_init() {
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [userName, setUserName] = useState('');
+  const [identificacion, setIdentificacion] = useState([]);
+  const [usuario, setUsuario] = useState([]);
   const [rol, setRol] = useState([]);
   const navigate = useNavigate();
 
   useEffect(() => {
-    const { userName, rol } = GetUserInfo();
-    setUserName(userName);
-    setRol(rol || []); // Asegúrate de que 'rol' sea un array
+    const fetchData = async () => {
+      try {
+        // Obtener datos del usuario
+        const { rol, identificacion } = await GetUserInfo();
+        setIdentificacion(identificacion);
+        setRol(rol || []);
+
+        // Cargar datos relacionados con el usuario
+        if (identificacion) {
+          const result = await AuthToken.get(`usuario/list/${identificacion}`);
+          setUsuario(result.data.data);
+        }
+      } catch (error) {
+        console.error('Error al cargar los datos del usuario:', error);
+      }
+    };
+
+    fetchData();
   }, []);
 
   const toggleDropdown = () => {
@@ -25,7 +43,6 @@ function Navbar_init() {
   const handleLogout = () => {
     localStorage.removeItem('authToken');
     localStorage.removeItem('userName');
-    setUserName('');
     setRol([]);
     setDropdownOpen(false);
     navigate('/login', { replace: true });
@@ -70,7 +87,7 @@ function Navbar_init() {
                 </button>
                 {dropdownOpen && (
                   <ul className="dropdown-menu show" aria-labelledby="navbarDropdownMenuLink">
-                    <li className='username'>{userName}</li>
+                    <li className='username'>{usuario.userName}</li>
                     <li><hr className="dropdown-divider" /></li>
                     <li><Link to='/Profile' className='dropdown-item'>Mi perfil</Link></li>
                     <li><hr className="dropdown-divider" /></li>

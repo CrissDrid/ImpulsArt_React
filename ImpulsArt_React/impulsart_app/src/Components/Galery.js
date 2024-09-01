@@ -16,19 +16,22 @@ function Galery() {
   const [showSubasta, setShowSubasta] = useState(false);
   const navigate = useNavigate();
 
+  // Obtener la identificación del usuario una vez al montar el componente
   useEffect(() => {
-
-    if (showSubasta) {
-      getSubasta();
-    } else {
-      getObra();
-    }
-
-    //Obtener la identificacion del usuario
     const { identificacion } = GetUserInfo();
     setIdentificacion(identificacion);
+  }, []);
 
-  }, [showSubasta]);
+  // Cargar obras o subastas dependiendo de showSubasta
+  useEffect(() => {
+    if (identificacion) {
+      if (showSubasta) {
+        getSubasta();
+      } else {
+        getObra();
+      }
+    }
+  }, [showSubasta, identificacion]);
 
   const getObra = async () => {
     try {
@@ -36,15 +39,21 @@ function Galery() {
       setListObra(response.data.data);
     } catch (e) {
       console.error('Error en getObra:', e.response ? e.response.data : e.message);
+      if (e.response && e.response.status === 401) {
+        
+      }
     }
   };
 
   const getSubasta = async () => {
     try {
-      const response = await AuthToken.get(`subasta/historialObraSubastas/${identificacion}`);
+      const response = await AuthToken.get(`subasta/historialSubastas/${identificacion}`);
       setListSubasta(response.data.data);
     } catch (e) {
       console.error('Error en getSubasta:', e.response ? e.response.data : e.message);
+      if (e.response && e.response.status === 401) {
+        
+      }
     }
   };
 
@@ -82,8 +91,12 @@ function Galery() {
               : `obra/delete/${pkCod_Producto}`;
   
             try {
+
               await AuthToken.delete(deleteUrl);
+              
               Swal.fire('Eliminado', 'La obra ha sido eliminada.', 'success');
+              window.location.reload();
+
               if (showSubasta) {
                 getSubasta();
               } else {

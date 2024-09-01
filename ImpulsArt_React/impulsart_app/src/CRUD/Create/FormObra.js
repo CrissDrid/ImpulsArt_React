@@ -42,6 +42,7 @@ const FormObra = () => {
     //Cargar identificacion
     const { identificacion } = GetUserInfo();
     setIdentificacion(identificacion);
+    console.log("Identificación obtenida:", identificacion);
     
     const loadCategorias = async () => {
       try {
@@ -54,6 +55,16 @@ const FormObra = () => {
 
     loadCategorias();
   }, []);  // Asegúrate de que el efecto se ejecute cuando identificacion cambie
+
+  //Actualizar el id user
+  useEffect(() => {
+    if (identificacion) {
+      setObra(prevObra => ({
+        ...prevObra,
+        usuarioIds: identificacion
+      }));
+    }
+  }, [identificacion]);
 
 
   const handleInputChange = (e) => {

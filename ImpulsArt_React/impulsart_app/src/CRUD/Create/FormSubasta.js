@@ -63,6 +63,16 @@ export const FormSubasta = () => {
       loadCategorias();
     }, []);  // Asegúrate de que el efecto se ejecute cuando identificacion cambie
 
+  //Actualizar el id user
+  useEffect(() => {
+    if (identificacion) {
+      setSubasta(prevSubasta => ({
+        ...prevSubasta,
+        usuarioIds: identificacion
+      }));
+    }
+  }, [identificacion]);
+
     useEffect(() => {
       // Establecer fechaInicio a la fecha y hora actual
       const now = new Date();
