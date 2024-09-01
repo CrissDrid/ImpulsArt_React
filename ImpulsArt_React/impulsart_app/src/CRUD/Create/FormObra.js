@@ -10,11 +10,17 @@ import { Toast } from 'primereact/toast';
 import Swal from 'sweetalert2';
 import '../../Styles/CreateObra.css';
 
+//Autenticacion de apis
+import AuthToken from '../../Auth/AuthToken';
+// Asegúrate Obtener datos del usuario
+import GetUserInfo from '../../Auth/GetUserInfo'; 
+
+
 const FormObra = () => {
   const navigate = useNavigate();
+  const [identificacion, setIdentificacion] = useState('');
   const toast = useRef(null); // Definición de la referencia para el Toast
-  const [roles, setRoles] = useState(JSON.parse(localStorage.getItem('userRoles')) || { tipoUsuario: 'usuario común' });
-  const [user, setUser] = useState(JSON.parse(localStorage.getItem('user')));
+
   const [obra, setObra] = useState({
     nombreProducto: "",
     costo: "",
@@ -25,29 +31,30 @@ const FormObra = () => {
     cantidad: "",
     categoriaId: "",  // Cambiado a "categoria"
     descripcion: "",
-    usuarioIds: user.identificacion,
+    usuarioIds: identificacion,
     imagen: null
   });
   const [categorias, setCategorias] = useState([]); 
   const [isDescriptionOverLimit, setIsDescriptionOverLimit] = useState(false);
 
   useEffect(() => {
+
+    //Cargar identificacion
+    const { identificacion } = GetUserInfo();
+    setIdentificacion(identificacion);
     
-    const storedRoles = JSON.parse(localStorage.getItem('userRoles'));
-    if (storedRoles) {
-      setRoles(storedRoles);
-    }
     const loadCategorias = async () => {
       try {
-        const result = await axios.get('http://localhost:8086/api/categoria/all');
-        setCategorias(result.data.data);  // Supongo que las categorías están en result.data.data
+        const result = await AuthToken.get('categoria/all');
+        setCategorias(result.data.data);
       } catch (error) {
         console.error('Error al cargar las categorías:', error);
       }
     };
 
-    loadCategorias();  // Cargar las categorías cuando se monta el componente
-  }, []);
+    loadCategorias();
+  }, []);  // Asegúrate de que el efecto se ejecute cuando identificacion cambie
+
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -122,10 +129,9 @@ const FormObra = () => {
             formData.append(key, obra[key]);
           }
   
-          const response = await axios.post("http://localhost:8086/api/obra/create", formData, {
+          const result = await AuthToken.post("http://localhost:8086/api/obra/create", formData, {
             headers: { 'Content-Type': 'multipart/form-data' }
           });
-          console.log('Respuesta del servidor:', response.data);
   
           Swal.fire(
             'Felicidades!',

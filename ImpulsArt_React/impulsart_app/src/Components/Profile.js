@@ -7,6 +7,9 @@ import UserData from './UserData';
 import ChangePWD from './ChangePWD';
 import Galery from './Galery';
 
+//Autenticacion de apis
+import '../Auth/AuthToken';
+
 function Profile() {
   const [userData, setUserData] = useState(null);
   const [hasChanges, setHasChanges] = useState(false);

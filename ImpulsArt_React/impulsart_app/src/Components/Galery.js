@@ -4,40 +4,48 @@ import axios from 'axios';
 import Swal from 'sweetalert2';
 import '../Styles/Galery.css';
 
+//Autenticacion de apis
+import AuthToken from '../Auth/AuthToken'; 
+// Obtener datos del usuario
+import GetUserInfo from '../Auth/GetUserInfo'; 
 
 function Galery() {
   const [listObra, setListObra] = useState([]);
+  const [identificacion, setIdentificacion] = useState('');
   const [listSubasta, setListSubasta] = useState([]);
-  const [user, setUser] = useState(JSON.parse(localStorage.getItem('user')));
   const [showSubasta, setShowSubasta] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
+
     if (showSubasta) {
       getSubasta();
     } else {
       getObra();
     }
+
+    //Obtener la identificacion del usuario
+    const { identificacion } = GetUserInfo();
+    setIdentificacion(identificacion);
+
   }, [showSubasta]);
 
-  const getObra = () => {
-    axios.get(`http://localhost:8086/api/obra/historialObras/${user.identificacion}`)
-      .then((response) => {
-        setListObra(response.data.data);
-      })
-      .catch((e) => {
-        console.error('Error en getObra:', e.response ? e.response.data : e.message);
-      });
+  const getObra = async () => {
+    try {
+      const response = await AuthToken.get(`obra/historialObras/${identificacion}`);
+      setListObra(response.data.data);
+    } catch (e) {
+      console.error('Error en getObra:', e.response ? e.response.data : e.message);
+    }
   };
 
-  const getSubasta = () => {
-    axios.get(`http://localhost:8086/api/subasta/historialObraSubastas/${user.identificacion}`)
-      .then((response) => {
-        setListSubasta(response.data.data);
-      })
-      .catch((e) => {
-        console.error('Error en getSubasta:', e.response ? e.response.data : e.message);
-      });
+  const getSubasta = async () => {
+    try {
+      const response = await AuthToken.get(`subasta/historialObraSubastas/${identificacion}`);
+      setListSubasta(response.data.data);
+    } catch (e) {
+      console.error('Error en getSubasta:', e.response ? e.response.data : e.message);
+    }
   };
 
   const handleCardClick = (pkCod_Producto, pkCod_Subasta) => {
@@ -67,24 +75,24 @@ function Galery() {
           cancelButtonText: 'Cancelar',
           confirmButtonColor: "#FF5733",
           cancelButtonColor: "#8D33FF",
-        }).then((deleteResult) => {
+        }).then(async (deleteResult) => {
           if (deleteResult.isConfirmed) {
             const deleteUrl = showSubasta
-              ? `http://localhost:8086/api/subasta/delete/${pkCod_Producto}`
-              : `http://localhost:8086/api/obra/delete/${pkCod_Producto}`;
-            axios.delete(deleteUrl)
-              .then(() => {
-                Swal.fire('Eliminado', 'La obra ha sido eliminada.', 'success');
-                if (showSubasta) {
-                  getSubasta();
-                } else {
-                  getObra();
-                }
-              })
-              .catch((e) => {
-                console.error('Error en eliminar obra:', e.response ? e.response.data : e.message);
-                Swal.fire('Error', 'No se pudo eliminar la obra.', 'error');
-              });
+              ? `subasta/delete/${pkCod_Subasta}`
+              : `obra/delete/${pkCod_Producto}`;
+  
+            try {
+              await AuthToken.delete(deleteUrl);
+              Swal.fire('Eliminado', 'La obra ha sido eliminada.', 'success');
+              if (showSubasta) {
+                getSubasta();
+              } else {
+                getObra();
+              }
+            } catch (e) {
+              console.error('Error en eliminar obra:', e.response ? e.response.data : e.message);
+              Swal.fire('Error', 'No se pudo eliminar la obra.', 'error');
+            }
           }
         });
       }

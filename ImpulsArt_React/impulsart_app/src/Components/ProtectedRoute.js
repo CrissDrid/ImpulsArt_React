@@ -1,17 +1,16 @@
-import React from 'react';
-import { Route, Navigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import GetUserInfo from '../Auth/GetUserInfo';
+import { Navigate } from 'react-router-dom';
 
-const ProtectedRoute = ({ element: Element, roles, ...rest }) => {
-  // Recupera los roles del usuario desde el localStorage
-  const userRoles = JSON.parse(localStorage.getItem('userRoles')) || {};
+const ProtectedRoute = ({ element: Element, rol: requiredRoles = [], ...rest }) => {
+  const [rol, setRol] = useState([]);
 
-  // Verifica si el usuario tiene alguno de los roles requeridos
-  const hasAccess = roles.includes(userRoles.tipoUsuario);
+  useEffect(() => {
+    const { rol } = GetUserInfo();
+    setRol(rol || []);
+  }, []);
 
-  // Agrega logs para depuración
-  console.log('User Roles:', userRoles);
-  console.log('Required Roles:', roles);
-  console.log('Has Access:', hasAccess);
+  const hasAccess = requiredRoles.length > 0 && requiredRoles.some(requiredRoles => requiredRoles.includes(rol));
 
   return hasAccess ? <Element {...rest} /> : <Navigate to="/no-access" />;
 };

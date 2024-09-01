@@ -5,6 +5,11 @@ import Logo from '../../Resources/Logo.svg';
 import Art from '../../Resources/Img-Art3.avif';
 import { Link } from 'react-router-dom';
 
+//Autenticacion de apis
+import '../../Auth/AuthToken';
+//Obtener datos de usuario
+import '../../Auth/GetUserInfo';
+
 export const FormDespacho = () => {
   
     let navigate = useNavigate()

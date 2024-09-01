@@ -1,9 +1,10 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom'; // Asegúrate de importar Link si no está importado
-import 'bootstrap/dist/css/bootstrap.min.css';
-import 'bootstrap/dist/js/bootstrap.bundle.min.js'; // Asegúrate de importar el bundle que incluye Popper.js
-import 'bootstrap-icons/font/bootstrap-icons.css';
+import { BiSearch } from 'react-icons/bi';
+import { Left } from 'react-bootstrap/lib/Media';
+
+//Autenticacion de apis
+import AuthToken from '../Auth/AuthToken';
 
 function Album() {
   const [listObra, setListObra] = useState([]);
@@ -36,14 +37,13 @@ function Album() {
     }
   };
 
-  const getObra = () => {
-    axios.get("http://localhost:8086/api/obra/all")
-      .then((response) => {
-        setListObra(normalizeData(response.data));
-      })
-      .catch((e) => {
-        console.log(e);
-      });
+  const getObra = async () => {
+    try {
+      const response = await AuthToken.get('obra/all');
+      setListObra(normalizeData(response.data));
+    } catch (error) {
+      console.error('Error en getObra:', error);
+    }
   };
 
   const getObraByCategoria = () => {
@@ -95,9 +95,7 @@ function Album() {
             <h5 className="card-title">{obra.nombreProducto}</h5>
             <p className="card-text">{obra.descripcion}</p>
             <div className="d-flex justify-content-between align-items-center">
-              <Link to={`/DetalleObras/${obra.pkCod_Producto}`} className="btn btn-outline-primary mx-2">
-                Ver detalles de la obra
-              </Link>
+              <small className="text-body-secondary">9 mins</small>
             </div>
           </div>
         </div>
@@ -110,7 +108,7 @@ function Album() {
     <div className="album py-5 bg-custom-color">
       <div className="container">
 
-        {/* FORMULARIO PARA BUSCAR POR FILTRO */}
+        {/*FORMULARIO PARA BUSCAR POR FILTRO*/}
         <div className="row">
           <div className="col-md-6 d-flex">
             <select
@@ -135,10 +133,10 @@ function Album() {
             />
           </div>
         </div>
-        {/* FORMULARIO PARA BUSCAR POR FILTRO */}
+         {/*FORMULARIO PARA BUSCAR POR FILTRO*/}
 
-        <br />
-        <br />
+        <br/>
+        <br/>
         <div className="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">{renderCards()}</div>
       </div>
       <div className="d-flex justify-content-center mt-3">

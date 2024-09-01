@@ -7,6 +7,9 @@ import Logo from '../../Resources/Logo.png';
 import Paleta from '../../Resources/Spot.svg';
 import Navbar_init from '../../Components/Navbar_init';
 
+//Autenticacion de apis
+import AuthToken from '../../Auth/AuthToken';
+
 export const ListObra = () => {
 
     const [listObra, setListObra] = useState([]);
@@ -37,7 +40,7 @@ export const ListObra = () => {
     };
 
     const getObra = () => {
-        axios.get("http://localhost:8086/api/obra/all")
+        AuthToken.get("http://localhost:8086/api/obra/all")
             .then((response) => {
                 setListObra(normalizeData(response.data));
             })
@@ -47,7 +50,7 @@ export const ListObra = () => {
     };
 
     const getObraByCategoria = () => {
-        axios.get(`http://localhost:8086/api/obra/categoria/${categoria}`)
+        AuthToken.get(`http://localhost:8086/api/obra/categoria/${categoria}`)
             .then((response) => {
                 setListObra(normalizeData(response.data));
             })
@@ -78,7 +81,7 @@ export const ListObra = () => {
 
     //DELETE USERS
     const deleteObra = async (pkCod_Producto) => {
-        await axios.delete(`http://localhost:8086/api/obra/delete/${pkCod_Producto}`)
+        await AuthToken.delete(`http://localhost:8086/api/obra/delete/${pkCod_Producto}`)
         getObra()
     }
     //DELETE USERS

@@ -5,6 +5,9 @@ import Logo from '../../Resources/Logo.svg';
 import Art from '../../Resources/Img-Art3.avif';
 import { Link } from 'react-router-dom';
 
+//Autenticacion de apis
+import '../../Auth/AuthToken';
+
 export const FormUsuario = () => {
 
     let navigate = useNavigate()

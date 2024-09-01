@@ -7,6 +7,9 @@ import Logo from '../../Resources/Logo.png';
 import Paleta from '../../Resources/Spot.svg';
 import Navbar_init from '../../Components/Navbar_init';
 
+//Autenticacion de apis
+import AuthToken from '../../Auth/AuthToken';
+
 export const ListSubasta = () => {
 
     const [listSubasta, setListSubasta] = useState([]);
@@ -25,7 +28,7 @@ export const ListSubasta = () => {
 
     //GET ALL SUBASTAS
     const getSubasta = () => {
-        axios.get("http://localhost:8086/api/subasta/subastaYobras")
+        AuthToken.get("http://localhost:8086/api/subasta/subastaYobras")
             .then((response) => {
                 setListSubasta(response.data.data);
             })
@@ -37,7 +40,7 @@ export const ListSubasta = () => {
 
     //GET SUBASTA BY ESTADO
     const getSubastaPorEstado = () => {
-        axios.get(`http://localhost:8086/api/subasta/estado/${estadoSubasta}`)
+        AuthToken.get(`http://localhost:8086/api/subasta/estado/${estadoSubasta}`)
             .then((response) => {
                 setListSubasta(response.data.data); // Actualizar listSubasta en lugar de estadoSubasta
             })
@@ -49,7 +52,7 @@ export const ListSubasta = () => {
 
     //DELETE SUBASTA
     const deleteSubasta = async (pkCodSubasta) => {
-        await axios.delete(`http://localhost:8086/api/subasta/delete/${pkCodSubasta}`)
+        await AuthToken.delete(`http://localhost:8086/api/subasta/delete/${pkCodSubasta}`)
         getSubasta()
     };
     //DELETE SUBASTA

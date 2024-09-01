@@ -9,6 +9,9 @@ import { InputTextarea } from 'primereact/inputtextarea';
 import { Toast } from 'primereact/toast';
 import Swal from 'sweetalert2';
 
+//Autenticacion de apis
+import AuthToken from '../../Auth/AuthToken';
+
 export const EditObra = () => {
     let navigate = useNavigate();
     const toast = useRef(null);
@@ -34,30 +37,41 @@ export const EditObra = () => {
     const [formChanged, setFormChanged] = useState(false);
 
     useEffect(() => {
-        const loadObra = async () => {
-            try {
-                const result = await axios.get(`http://localhost:8086/api/obra/list/${pkCod_Producto}`);
-                const data = result.data.data;
-                const loadedObra = {
-                    ...data,
-                    tamano: data.alto && data.ancho ? `${data.alto} x ${data.ancho}` : "",
-                    categoriaId: data.categoria ? data.categoria.pkCod_Categoria.toString() : "",
-                    imagen: data.imagen // Mantener la URL de la imagen existente
-                };
-                setObra(loadedObra);
-                setInitialObra(loadedObra); // Guardar los valores iniciales
-                if (data.imagen) {
-                  setImagePreview(`http://localhost:8086/api/obra/image/${data.imagen}`);
-              }
-            } catch (error) {
-                console.error('Error al cargar la obra:', error);
-                toast.current.show({ severity: 'error', summary: 'Error', detail: 'No se pudo cargar la obra.' });
-            }
+
+        // Cargar datos de la obra
+const loadObra = async () => {
+    try {
+        // Solicitar los detalles de la obra usando AuthToken
+        const response = await AuthToken.get(`obra/list/${pkCod_Producto}`);
+        // Extraer los datos de la respuesta correctamente
+        const data = response.data.data;
+
+        // Crear un objeto con los datos cargados
+        const loadedObra = {
+            ...data,
+            tamano: data.alto && data.ancho ? `${data.alto} x ${data.ancho}` : "",
+            categoriaId: data.categoria ? data.categoria.pkCod_Categoria.toString() : "",
+            imagen: data.imagen // Mantener la URL de la imagen existente
         };
+
+        // Actualizar el estado con los datos cargados
+        setObra(loadedObra);
+        setInitialObra(loadedObra); // Guardar los valores iniciales
+
+        // Configurar la vista previa de la imagen si existe
+        if (data.imagen) {
+            setImagePreview(`http://localhost:8086/api/obra/image/${data.imagen}`);
+        }
+    } catch (error) {
+        // Manejo de errores en la carga de la obra
+        console.error('Error al cargar la obra:', error);
+        toast.current.show({ severity: 'error', summary: 'Error', detail: 'No se pudo cargar la obra.' });
+    }
+};
 
         const loadCategorias = async () => {
             try {
-                const result = await axios.get('http://localhost:8086/api/categoria/all');
+                const result = await AuthToken.get('categoria/all');
                 setCategorias(result.data.data);
             } catch (error) {
                 console.error('Error al cargar las categorías:', error);
@@ -177,7 +191,7 @@ export const EditObra = () => {
                         formData.append(key, obra[key]);
                     }
 
-                    await axios.put(`http://localhost:8086/api/obra/update/${pkCod_Producto}`, formData, {
+                    await AuthToken.post(`http://localhost:8086/api/obra/update/${pkCod_Producto}`, formData, {
                         headers: { 'Content-Type': 'multipart/form-data' }
                     });
 

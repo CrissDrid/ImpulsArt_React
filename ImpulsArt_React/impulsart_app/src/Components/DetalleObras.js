@@ -7,6 +7,9 @@ import '../Styles/DetallesObra.css';
 import Navbar_init from './Navbar_init';
 import Footer from './Footer';
 
+//Autenticacion de apis
+import '../Auth/AuthToken';
+
 function DetallesObra() {
   const { pkCod_Producto } = useParams();
   const [obra, setObra] = useState({

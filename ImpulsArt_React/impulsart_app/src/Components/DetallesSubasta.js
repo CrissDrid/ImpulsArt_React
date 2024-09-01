@@ -7,6 +7,9 @@ import '../Styles/DetallesObra.css';
 import Navbar_init from './Navbar_init';
 import Footer from './Footer';
 
+//Autenticacion de apis
+import AuthToken from '../Auth/AuthToken';
+
 function DetallesSubasta() {
   const { pkCodSubasta } = useParams();
   
@@ -38,7 +41,7 @@ function DetallesSubasta() {
   useEffect(() => {
     const loadSubasta = async () => {
       try {
-        const result = await axios.get(`http://localhost:8086/api/subasta/list/${pkCodSubasta}`);
+        const result = await AuthToken.get(`http://localhost:8086/api/subasta/list/${pkCodSubasta}`);
         const subastaData = result.data.data[0];
 
         console.log('Datos de subasta:', subastaData);

@@ -1,68 +1,47 @@
 import React, { useState, useEffect } from 'react';
-import { useLocation, useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import Logo from '../Resources/Logo.svg';
 import { BsPersonCircle } from 'react-icons/bs';
 
-
+// Asegúrate Obtener datos del usuario
+import GetUserInfo from '../Auth/GetUserInfo'; 
 
 function Navbar_init() {
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [userName, setUserName] = useState(localStorage.getItem('userName') || '');
-  const [roles, setRoles] = useState(JSON.parse(localStorage.getItem('userRoles')) || {
-    esAsesor: false,
-    esDomiciliario: false,
-    tipoUsuario: 'usuario común',
-  });
+  const [userName, setUserName] = useState('');
+  const [rol, setRol] = useState([]);
   const navigate = useNavigate();
-  const location = useLocation();
 
   useEffect(() => {
-    if (location.state) {
-      if (location.state.userName) {
-        setUserName(location.state.userName);
-      }
-
-      const newRoles = {
-        esAsesor: location.state.roles?.esAsesor || false,
-        esDomiciliario: location.state.roles?.esDomiciliario || false,
-        tipoUsuario: location.state.roles?.tipoUsuario || 'usuario común',
-      };
-
-      setRoles(newRoles);
-      localStorage.setItem('userRoles', JSON.stringify(newRoles));
-    }
-  }, [location.state]);
+    const { userName, rol } = GetUserInfo();
+    setUserName(userName);
+    setRol(rol || []); // Asegúrate de que 'rol' sea un array
+  }, []);
 
   const toggleDropdown = () => {
     setDropdownOpen(!dropdownOpen);
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('token');
+    localStorage.removeItem('authToken');
     localStorage.removeItem('userName');
-    localStorage.removeItem('userRoles');
     setUserName('');
-    setRoles({
-      esAsesor: false,
-      esDomiciliario: false,
-      tipoUsuario: 'usuario común',
-    });
+    setRol([]);
     setDropdownOpen(false);
     navigate('/login', { replace: true });
-    
   };
 
   return (
     <nav className="navbar navbar-expand-lg">
       <div className="container-fluid">
-          <Link to='/Home'><img className='nav-logo' src={Logo} alt="" /></Link>
+        <Link to='/Home'><img className='nav-logo' src={Logo} alt="" /></Link>
         <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarTogglerDemo02" aria-controls="navbarTogglerDemo02" aria-expanded="false" aria-label="Toggle navigation">
           <span className="navbar-toggler-icon"></span>
         </button>
         <div className="collapse navbar-collapse" id="navbarTogglerDemo02">
           <ul className="navbar-nav mb-2 mb-lg-0 ms-auto">
             <li className="nav-item">
-              <Link to="/Home" style={{ textDecoration: 'none' }}><a className="nav-link active" aria-current="page" href="#" >Inicio</a></Link>
+              <Link to="/Home" style={{ textDecoration: 'none' }}><a className="nav-link active" aria-current="page" href="#">Inicio</a></Link>
             </li>
             <li className="nav-item">
               <a className="nav-link active" aria-current="page" href="#">Categorias</a>
@@ -71,10 +50,16 @@ function Navbar_init() {
               <a className="nav-link active" aria-current="page" href="#">Soporte</a>
             </li>
             <li className="nav-item">
-              <Link to='/ContactUs'className='nav-link active' aria-current="page">Contactanos</Link>
+              <Link to='/ContactUs' className='nav-link active' aria-current="page">Contactanos</Link>
             </li>
             <li className="nav-item">
               <Link to='/SeccionSubasta' className="nav-link active" aria-current="page">Seccion Subasta</Link>
+            </li>
+            <li className="nav-item">
+              <Link to='/Simulacion' className="nav-link active" aria-current="page">Simulacion</Link>
+            </li>
+            <li className="nav-item">
+              <Link to="/ContactUs" className="nav-link active" aria-current="page">Correos</Link>
             </li>
             <li className="nav-item">
               <div className="dropdown">
@@ -88,25 +73,17 @@ function Navbar_init() {
                     <li className='username'>{userName}</li>
                     <li><hr className="dropdown-divider" /></li>
                     <li><Link to='/Profile' className='dropdown-item'>Mi perfil</Link></li>
-                    {roles.esAsesor && (
-                      <li><Link to='/AsesorDashboard' className="dropdown-item">Dashboard Asesor</Link></li>
-                    )}
-                    {roles.esDomiciliario && (
-                      <li><Link to='/DomiciliarioDashboard' className="dropdown-item">Dashboard Domiciliario</Link></li>
-                    )}
-                    {roles.tipoUsuario === 'Administrador' && (
+                    <li><hr className="dropdown-divider" /></li>
+                    {rol.includes('ADMIN') && (
                       <>
                         <li><Link to='/ListObra' className="dropdown-item">CRUD obras</Link></li>
                         <li><Link to='/ListSubasta' className="dropdown-item">CRUD subasta</Link></li>
                         <li><Link to='/ListDespacho' className="dropdown-item">CRUD despacho</Link></li>
                         <li><Link to='/ListPQRS' className="dropdown-item">CRUD PQRS</Link></li>
                         <li><Link to='/ListUsuario' className="dropdown-item">CRUD Usuarios</Link></li>
-                       
+                        <li><hr className="dropdown-divider" /></li>
                       </>
-                    )} 
-                    <li><Link to='/Simulacion' className="dropdown-item">Simulacion</Link></li>
-                    <li><Link to="/ContactUs" className="dropdown-item">Correos</Link></li>
-                    <li><hr className="dropdown-divider" /></li>
+                    )}
                     <li><button className="dropdown-item" onClick={handleLogout}>Cerrar Sesión</button></li>
                   </ul>
                 )}

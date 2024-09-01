@@ -9,6 +9,11 @@ import { Toast } from 'primereact/toast';
 import Swal from 'sweetalert2';
 import '../../Styles/CreateSubasta.css';
 
+//Autenticacion de apis
+import AuthToken from '../../Auth/AuthToken';
+// Asegúrate Obtener datos del usuario
+import GetUserInfo from '../../Auth/GetUserInfo'; 
+
 const formatCurrency = (value) => {
     const number = value.replace(/[^0-9]/g, '');
     return `$${new Intl.NumberFormat('es-CO').format(number)}`;
@@ -18,7 +23,7 @@ export const FormSubasta = () => {
 
     let navigate = useNavigate();
     const toast = useRef(null);
-    const [user, setUser] = useState(JSON.parse(localStorage.getItem('user')));
+    const [identificacion, setIdentificacion] = useState('');
     const [subasta, setSubasta] = useState({
       nombreProducto: "",
       peso: "",
@@ -32,7 +37,8 @@ export const FormSubasta = () => {
       estadoSubasta: "Activo",
       precioInicial: "",
       fechaFinalizacion: "",
-      usuarioIds: user.identificacion,
+      fechaInicio: "",
+      usuarioIds: identificacion,
       imagen: null
   });
 
@@ -40,17 +46,29 @@ export const FormSubasta = () => {
     const [isDescriptionOverLimit, setIsDescriptionOverLimit] = useState(false);
 
     useEffect(() => {
-        const loadCategorias = async () => {
-            try {
-                const result = await axios.get('http://localhost:8086/api/categoria/all');
-                setCategorias(result.data.data);
-            } catch (error) {
-                console.error('Error al cargar las categorías:', error);
-            }
-        };
 
-        loadCategorias();
-    }, []);
+      //Cargar identificacion
+      const { identificacion } = GetUserInfo();
+      setIdentificacion(identificacion);
+      
+      const loadCategorias = async () => {
+        try {
+          const result = await AuthToken.get('categoria/all');
+          setCategorias(result.data.data);
+        } catch (error) {
+          console.error('Error al cargar las categorías:', error);
+        }
+      };
+  
+      loadCategorias();
+    }, []);  // Asegúrate de que el efecto se ejecute cuando identificacion cambie
+
+    useEffect(() => {
+      // Establecer fechaInicio a la fecha y hora actual
+      const now = new Date();
+      const fechaInicio = now.toISOString().slice(0, 16);  // Formato datetime-local
+      setSubasta(prevSubasta => ({ ...prevSubasta, fechaInicio }));
+  }, []);
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -129,31 +147,6 @@ export const FormSubasta = () => {
           return;
       }
   
-      const today = new Date();
-        today.setHours(23, 59, 59, 999); // Establecer al final del día
-
-        const selectedDate = new Date(subasta.fechaFinalizacion);
-        selectedDate.setHours(23, 59, 59, 999); // Establecer al final del día
-
-        if (selectedDate <= today) {
-            toast.current.show({ severity: 'warn', summary: 'Advertencia', detail: 'La fecha de finalización debe ser después de la fecha actual' });
-            return;
-        }
-
-        const maxDate = new Date();
-        maxDate.setDate(today.getDate() + 7);
-        maxDate.setHours(23, 59, 59, 999); // Establecer al final del día
-
-        if (selectedDate > maxDate) {
-            toast.current.show({ severity: 'warn', summary: 'Advertencia', detail: 'La fecha de finalización no puede ser mayor a 1 semana desde hoy' });
-            return;
-        }
-        
-      if (selectedDate <= today) {
-          toast.current.show({ severity: 'warn', summary: 'Advertencia', detail: 'La fecha de finalización debe ser después de la fecha actual' });
-          return;
-      }
-  
       // Muestra el SweetAlert de confirmación
       Swal.fire({
           title: '¿Estás seguro?',
@@ -179,14 +172,14 @@ export const FormSubasta = () => {
               formData.append('estadoSubasta', subasta.estadoSubasta);
               formData.append('precioInicial', subasta.precioInicial.replace(/[^0-9]/g, ''));
               formData.append('fechaInicio', subasta.fechaInicio);
-              formData.append('fechaFinalizacion', selectedDate.toISOString());  // Ajustar fechaFinalizacion
+              formData.append('fechaFinalizacion', subasta.fechaFinalizacion);  // Ajustar fechaFinalizacion
               formData.append('usuarioIds', subasta.usuarioIds);
               if (subasta.imagen) {
                   formData.append('imagen', subasta.imagen);
               }
   
               try {
-                  const response = await axios.post("http://localhost:8086/api/subasta/create", formData, {
+                const response = await AuthToken.post("subasta/create", formData, {
                       headers: {
                           'Content-Type': 'multipart/form-data'
                       }
@@ -210,10 +203,6 @@ export const FormSubasta = () => {
       });
   };
   
-  
-  
-    
-
     const handleCancel = () => {
         // Verificar si algún campo del formulario tiene datos
         const hasData = Object.values(subasta).some(value => value !== "" && value !== null);
@@ -323,8 +312,7 @@ export const FormSubasta = () => {
                               name="fechaFinalizacion" 
                               value={subasta.fechaFinalizacion} 
                               onChange={handleInputChange} 
-                              type="date" 
-                              min={new Date().toISOString().split('T')[0]} 
+                              type="datetime-local" 
                           />
                           <label htmlFor="floatingFechaFinalizacion">Fecha de Finalización</label>
                       </div>

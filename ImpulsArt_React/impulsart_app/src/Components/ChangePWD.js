@@ -4,6 +4,9 @@ import { Toast } from 'primereact/toast';
 import Swal from 'sweetalert2'; 
 import '../Styles/ChangePWD.css';
 
+//Autenticacion de apis
+import '../Auth/AuthToken';
+
 function ChangePWD() { 
     const [userData, setUserData] = useState(null); 
     const [currentPassword, setCurrentPassword] = useState(''); 

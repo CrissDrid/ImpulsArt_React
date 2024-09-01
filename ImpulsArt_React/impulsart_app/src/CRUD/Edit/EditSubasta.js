@@ -9,6 +9,9 @@ import { InputTextarea } from 'primereact/inputtextarea';
 import { Toast } from 'primereact/toast';
 import Swal from 'sweetalert2';
 
+//Autenticacion de apis
+import AuthToken from '../../Auth/AuthToken';
+
 const formatCurrency = (value) => {
     const number = value.replace(/[^0-9]/g, '');
     return `$${new Intl.NumberFormat('es-CO').format(number)}`;
@@ -40,7 +43,7 @@ const EditSubasta = () => {
     useEffect(() => {
         const loadSubasta = async () => {
             try {
-                const result = await axios.get(`http://localhost:8086/api/subasta/list/${pkCodSubasta}`);
+                const result = await AuthToken.get(`http://localhost:8086/api/subasta/list/${pkCodSubasta}`);
                 const subastaData = result.data.data[0];
                 setSubasta({
                     nombreProducto: subastaData.obras.nombreProducto,
@@ -66,7 +69,7 @@ const EditSubasta = () => {
 
         const loadCategorias = async () => {
             try {
-                const result = await axios.get('http://localhost:8086/api/categoria/all');
+                const result = await AuthToken.get('http://localhost:8086/api/categoria/all');
                 setCategorias(result.data.data);
             } catch (error) {
                 console.error('Error al cargar las categorías:', error);
@@ -190,7 +193,7 @@ const EditSubasta = () => {
             }
     
             try {
-                await axios.put(`http://localhost:8086/api/subasta/update/${pkCodSubasta}`, formData, {
+                await AuthToken.put(`http://localhost:8086/api/subasta/update/${pkCodSubasta}`, formData, {
                     headers: {
                         'Content-Type': 'multipart/form-data'
                     }

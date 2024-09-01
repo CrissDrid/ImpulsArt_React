@@ -4,6 +4,9 @@ import { Link } from 'react-router-dom';
 import Navbar_init from './Navbar_init';
 import Footer from './Footer';
 
+//Autenticacion de apis
+import AuthToken from '../Auth/AuthToken'; 
+
 function SeccionSubasta() {
   const [listSubasta, setListSubasta] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -26,7 +29,7 @@ function SeccionSubasta() {
   };
 
   const getSubasta = () => {
-    axios.get("http://localhost:8086/api/subasta/subastaYobras")
+    AuthToken.get("http://localhost:8086/api/subasta/subastaYobras")
       .then((response) => {
         console.log(response.data); // Verificar la estructura de los datos
         setListSubasta(normalizeData(response.data));

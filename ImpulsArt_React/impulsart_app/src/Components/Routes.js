@@ -29,6 +29,7 @@ import Profile from './Profile';
 import SeccionSubasta from './SeccionSubasta';
 import DetallesSubasta from './DetallesSubasta';
 import DetalleObras from './DetalleObras';
+import Simulacion from './Simulacion';
 
 function AppRoutes() { // Cambia el nombre de la función a AppRoutes
   return (
@@ -49,36 +50,36 @@ function AppRoutes() { // Cambia el nombre de la función a AppRoutes
         <Route path="/DetalleObras/:pkCod_Producto" element={<DetalleObras />} />
         
         {/*CRUD USUARIOS*/}
-        <Route path='/ListUsuario' element={<ProtectedRoute element={ListUsuario} roles={['administrador', 'Administrador']} />} />
-        <Route path="/EditUsuario/:identificacion" element={<ProtectedRoute element={EditUsuario} roles={['administrador', 'Administrador']} />} />
-        <Route path="/CreateUsuario" element={<ProtectedRoute element={CreateUsuario} roles={['administrador', 'Administrador']} />} />
+        <Route path='/ListUsuario' element={<ProtectedRoute element={ListUsuario} rol={['ADMIN']} />} />
+        <Route path="/EditUsuario/:identificacion" element={<ProtectedRoute element={EditUsuario} rol={['ADMIN']} />} />
+        <Route path="/CreateUsuario" element={<ProtectedRoute element={CreateUsuario} rol={['ADMIN']} />} />
         {/*CRUD USUARIOS*/}
         
         {/*CRUD OBRAS*/}
-        <Route path='/ListObra' element={<ProtectedRoute element={ListObra} roles={['administrador', 'Administrador']} />} />
-        <Route path="/EditObra/:pkCod_Producto" element={<ProtectedRoute element={EditObra} roles={['administrador', 'Administrador', 'usuario comun', 'Usuario']} />} />
-        <Route path="/CreateObra" element={<ProtectedRoute element={FormObra} roles={['administrador', 'usuario comun', 'Usuario', 'Administrador']} />} />
+        <Route path='/ListObra' element={<ProtectedRoute element={ListObra} rol={['ADMIN']} />} />
+        <Route path="/EditObra/:pkCod_Producto" element={<ProtectedRoute element={EditObra} rol={['ADMIN', 'USER', 'ASESOR', 'DOMICILIARIO']} />} />
+        <Route path="/CreateObra" element={<ProtectedRoute element={FormObra} rol={['ADMIN', 'USER', 'ASESOR', 'DOMICILIARIO']} />} />
         {/*CRUD OBRAS*/}
 
         {/*CRUD SUBASTA*/}
-        <Route path='/ListSubasta' element={<ProtectedRoute element={ListSubasta} roles={['administrador', 'Administrador']} />} />
-        <Route path="/CreateSubasta" element={<ProtectedRoute element={FormSubasta} roles={['administrador', 'Administrador', 'usuario comun', 'Usuario']} />} />
-        <Route path="/EditSubasta/:pkCodSubasta" element={<ProtectedRoute element={EditSubasta} roles={['administrador', 'Administrador', 'usuario comun', 'Usuario']} />} />
+        <Route path='/ListSubasta' element={<ProtectedRoute element={ListSubasta} rol={['ADMIN']} />} />
+        <Route path="/CreateSubasta" element={<ProtectedRoute element={FormSubasta} rol={['ADMIN', 'USER', 'ASESOR', 'DOMICILIARIO']} />} />
+        <Route path="/EditSubasta/:pkCodSubasta" element={<ProtectedRoute element={EditSubasta} rol={['ADMIN', 'USER', 'ASESOR', 'DOMICILIARIO']} />} />
         {/*CRUD SUBASTA*/}
 
         {/*CRUD DESPACHO*/}
-        <Route path="/ListDespacho" element={<ProtectedRoute element={ListDespacho} roles={['administrador', 'Administrador']} />} />
-        <Route path="/CreateDespacho" element={<ProtectedRoute element={FormDespacho} roles={['administrador', 'Administrador']} />} />
-        <Route path="/EditDespacho/:pkCod_Despacho" element={<ProtectedRoute element={EditDespacho} roles={['administrador', 'Administrador']} />} />
+        <Route path="/ListDespacho" element={<ProtectedRoute element={ListDespacho} rol={['ADMIN']} />} />
+        <Route path="/CreateDespacho" element={<ProtectedRoute element={FormDespacho} rol={['ADMIN']} />} />
+        <Route path="/EditDespacho/:pkCod_Despacho" element={<ProtectedRoute element={EditDespacho} rol={['ADMIN']} />} />
         {/*CRUD DESPACHO*/}
 
         {/*CRUD PQRS*/}
-        <Route path="/ListPQRS" element={<ProtectedRoute element={ListPQRS} roles={['administrador', 'Administrador']} />} />
-        <Route path="/CreatePQRS" element={<ProtectedRoute element={FormPQRS} roles={['administrador', 'Administrador']} />} />
-        <Route path="/EditPQRS/:pkCod_Reclamo" element={<ProtectedRoute element={EditPQRS} roles={['administrador', 'Administrador']} />} />
+        <Route path="/ListPQRS" element={<ProtectedRoute element={ListPQRS} rol={['ADMIN']} />} />
+        <Route path="/CreatePQRS" element={<ProtectedRoute element={FormPQRS} rol={['ADMIN']} />} />
+        <Route path="/EditPQRS/:pkCod_Reclamo" element={<ProtectedRoute element={EditPQRS} rol={['ADMIN']} />} />
         {/*CRUD PQRS*/}
          
-        <Route path='/Simulacion' element={<ProtectedRoute element={Simulacion} roles={['administrador', 'Administrador']}/>}/>
+        <Route path='/Simulacion' element={<ProtectedRoute element={Simulacion} rol={['ADMIN']}/>}/>
       </Routes>
     </Router>
   );
