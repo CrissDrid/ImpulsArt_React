@@ -7,11 +7,13 @@ import UserData from './UserData';
 import ChangePWD from './ChangePWD';
 import Galery from './Galery';
 
-//Autenticacion de apis
-import '../Auth/AuthToken';
-
+// Autenticación de token
+import AuthToken from '../Auth/AuthToken';
+// Asegúrate de obtener datos del usuario
+import GetUserInfo from '../Auth/GetUserInfo';
 function Profile() {
-  const [userData, setUserData] = useState(null);
+  const [usuario, setUsuario] = useState(null);
+  const [identificacion, setIdentificacion] = useState('');
   const [hasChanges, setHasChanges] = useState(false);
   const [activeTab, setActiveTab] = useState(() => {
     const storedTab = localStorage.getItem('activeTab');
@@ -19,18 +21,31 @@ function Profile() {
   });
 
   useEffect(() => {
-    const user = JSON.parse(localStorage.getItem('user'));
-    if (user) {
-      setUserData(user);
-    }
+    const fetchData = async () => {
+      try {
+        // Obtener datos del usuario
+        const { identificacion } = await GetUserInfo();
+        setIdentificacion(identificacion);
+
+        // Cargar datos relacionados con el usuario
+        if (identificacion) {
+          const response = await AuthToken.get(`/usuario/list/${identificacion}`);
+          setUsuario(response.data.data);
+        }
+      } catch (error) {
+        console.error('Error al cargar los datos del usuario:', error);
+      }
+    };
+
+    fetchData();
   }, []);
 
   useEffect(() => {
     const originalData = JSON.parse(localStorage.getItem('user'));
-    if (userData && originalData) {
-      setHasChanges(JSON.stringify(userData) !== JSON.stringify(originalData));
+    if (usuario && originalData) {
+      setHasChanges(JSON.stringify(usuario) !== JSON.stringify(originalData));
     }
-  }, [userData]);
+  }, [usuario]);
 
   useEffect(() => {
     localStorage.setItem('activeTab', activeTab);
@@ -39,7 +54,7 @@ function Profile() {
   const handleInputChange = (e) => {
     const { id, value } = e.target;
     const key = id.replace('floating', '').charAt(0).toLowerCase() + id.replace('floating', '').slice(1);
-    setUserData(prevState => ({
+    setUsuario(prevState => ({
       ...prevState,
       [key]: value
     }));
@@ -48,17 +63,17 @@ function Profile() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch(`http://localhost:8086/api/usuario/update/${userData.identificacion}`, {
+      const response = await AuthToken(`usuario/update/${identificacion}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(userData),
+        body: JSON.stringify(usuario),
       });
       const result = await response.json();
       if (response.ok) {
         console.log('Datos actualizados:', result);
-        localStorage.setItem('user', JSON.stringify(userData));
+        localStorage.setItem('user', JSON.stringify(usuario));
         setHasChanges(false);
       } else {
         console.error('Error al actualizar:', result);
@@ -68,7 +83,7 @@ function Profile() {
     }
   };
 
-  if (!userData) {
+  if (!usuario) {
     return <div>Cargando...</div>;
   }
 
@@ -82,7 +97,7 @@ function Profile() {
         </div>
       </div>
       <div className="userName">
-        <h1 className='userName'>{userData.userName || 'UserName'}</h1>
+        <h1 className='userName'>{usuario.userName || 'UserName'}</h1>
       </div>
       <div className="profile-content">
         <div className="user-nav">
