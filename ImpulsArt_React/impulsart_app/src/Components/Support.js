@@ -1,4 +1,6 @@
 import React from 'react'
+import 'bootstrap/dist/css/bootstrap.min.css';
+import 'bootstrap/dist/js/bootstrap.bundle.min.js'; // Asegúrate de importar el bundle que incluye Popper.js
 
 function Support() {
   return (
