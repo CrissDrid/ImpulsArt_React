@@ -2,34 +2,21 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import Logo from '../Resources/Logo.svg';
 import { BsPersonCircle } from 'react-icons/bs';
-<<<<<<< HEAD
-
-// Autenticacion de token
-import AuthToken from '../Auth/AuthToken';
-// Asegúrate Obtener datos del usuario
-import GetUserInfo from '../Auth/GetUserInfo'; 
-
-function Navbar_init() {
-  const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [identificacion, setIdentificacion] = useState([]);
-  const [usuario, setUsuario] = useState([]);
-  const [rol, setRol] = useState([]);
-=======
 import { Sidebar } from 'primereact/sidebar';
 import { Button } from 'primereact/button';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 
+// Autenticacion de token
+import AuthToken from '../Auth/AuthToken';
+// Asegúrate Obtener datos del usuario
+import GetUserInfo from '../Auth/GetUserInfo';
 
 function Navbar_init() {
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [identificacion, setIdentificacion] = useState([]);
   const [visible, setVisible] = useState(false);
-  const [userName, setUserName] = useState(localStorage.getItem('userName') || '');
-  const [roles, setRoles] = useState(JSON.parse(localStorage.getItem('userRoles')) || {
-    esAsesor: false,
-    esDomiciliario: false,
-    tipoUsuario: 'usuario común',
-  });
->>>>>>> origin/Mateo_Dev
+  const [usuario, setUsuario] = useState([]);
+  const [rol, setRol] = useState([]);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -63,15 +50,11 @@ function Navbar_init() {
     setRol([]);
     setDropdownOpen(false);
     navigate('/login', { replace: true });
-<<<<<<< HEAD
-=======
-
->>>>>>> origin/Mateo_Dev
   };
 
   return (
     <nav className="navbar navbar-expand-lg">
-      {roles.tipoUsuario === 'Administrador' && (
+      {rol.includes('ADMIN') && (
         <>
           <div className="d-flex align-items-center">
             <Button
@@ -187,24 +170,21 @@ function Navbar_init() {
             <li className="nav-item">
               <Link to="/Home" style={{ textDecoration: 'none' }}><a className="nav-link active" aria-current="page" href="#">Inicio</a></Link>
             </li>
-            {roles.tipoUsuario === 'Administrador' && (
-                      <>
-                       <li className="nav-item">
-              <Link to='/Dashboard' className='nav-link active' aria-current="page">Dashboard</Link>
-            </li>
-                      </>
-                    )} 
-            
+            {rol.includes('ADMIN') && (
+              <>
+                <li className="nav-item">
+                  <Link to='/Dashboard' className='nav-link active' aria-current="page">Dashboard</Link>
+                </li>
+              </>
+            )}
+
             <li className="nav-item">
               <Link to='/Help' className='nav-link active' aria-current="page">Soporte</Link>
             </li>
             <li className="nav-item">
-<<<<<<< HEAD
               <a className="nav-link active" aria-current="page" href="#">Soporte</a>
             </li>
             <li className="nav-item">
-=======
->>>>>>> origin/Mateo_Dev
               <Link to='/ContactUs' className='nav-link active' aria-current="page">Contactanos</Link>
             </li>
             <li className="nav-item">
@@ -228,34 +208,7 @@ function Navbar_init() {
                     <li className='username'>{usuario.userName}</li>
                     <li><hr className="dropdown-divider" /></li>
                     <li><Link to='/Profile' className='dropdown-item'>Mi perfil</Link></li>
-<<<<<<< HEAD
                     <li><hr className="dropdown-divider" /></li>
-                    {rol.includes('ADMIN') && (
-                      <>
-                        <li><Link to='/ListObra' className="dropdown-item">CRUD obras</Link></li>
-                        <li><Link to='/ListSubasta' className="dropdown-item">CRUD subasta</Link></li>
-                        <li><Link to='/ListDespacho' className="dropdown-item">CRUD despacho</Link></li>
-                        <li><Link to='/ListPQRS' className="dropdown-item">CRUD PQRS</Link></li>
-                        <li><Link to='/ListUsuario' className="dropdown-item">CRUD Usuarios</Link></li>
-                        <li><hr className="dropdown-divider" /></li>
-                      </>
-                    )}
-=======
-                    {roles.esAsesor && (
-                      <li><Link to='/Dashboard' className="dropdown-item">Dashboard Asesor</Link></li>
-                    )}
-                    {roles.esDomiciliario && (
-                      <li><Link to='/DomiciliarioDashboard' className="dropdown-item">Dashboard Domiciliario</Link></li>
-                    )}
-                    {roles.tipoUsuario === 'Administrador' && (
-                      <>
-
-                      </>
-                    )}
-                    <li><Link to='/Simulacion' className="dropdown-item">Simulacion</Link></li>
-                    <li><Link to="/ContactUs" className="dropdown-item">Correos</Link></li>
-                    <li><hr className="dropdown-divider" /></li>
->>>>>>> origin/Mateo_Dev
                     <li><button className="dropdown-item" onClick={handleLogout}>Cerrar Sesión</button></li>
                   </ul>
                 )}

@@ -22,7 +22,8 @@ const Register = () => {
     numCelular: "",
     direccion: "",
     contrasena: "",
-    tipoUsuario: "usuario comun"
+    tipoUsuario: "usuario comun",
+    fk_Rol: 1
   });
 
   const [confirmPassword, setConfirmPassword] = useState("");
