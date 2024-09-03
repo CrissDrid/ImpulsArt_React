@@ -80,6 +80,41 @@ const EditSubasta = () => {
         loadCategorias();
     }, [pkCodSubasta]);
 
+    const handleCostoChange = (e) => {
+        const rawValue = e.target.value.replace(/[^\d]/g, '');
+        setSubasta({ ...subasta, precioInicial: `$${new Intl.NumberFormat('es-CO').format(rawValue)}` });
+    };
+
+    const validateFechaFinalizacion = (fechaFinalizacion) => {
+            const fechaSeleccionada = new Date(fechaFinalizacion);
+            const fechaActual = new Date();
+            const cincoDias = new Date();
+            const unaSemana = new Date();
+        
+            cincoDias.setDate(fechaActual.getDate() + 5);
+            unaSemana.setDate(fechaActual.getDate() + 7);
+        
+            if (fechaSeleccionada < cincoDias) {
+                toast.current.show({
+                    severity: 'warn',
+                    summary: 'Advertencia',
+                    detail: 'La fecha de finalización debe ser al menos 5 días a partir de hoy.'
+                });
+                return false;  // Indicar que la validación falló
+            }
+        
+            if (fechaSeleccionada > unaSemana) {
+                toast.current.show({
+                    severity: 'warn',
+                    summary: 'Advertencia',
+                    detail: 'La fecha de finalización no puede ser más de una semana a partir de hoy.'
+                });
+                return false;  // Indicar que la validación falló
+            }
+        
+            return true;  // Validación exitosa
+        };
+
     const handleInputChange = (e) => {
         const { name, value } = e.target;
     
@@ -129,6 +164,11 @@ const EditSubasta = () => {
             toast.current.show({ severity: 'warn', summary: 'Advertencia', detail: 'El nombre de la obra debe contener un máximo de 50 caracteres' });
             return;
         }
+
+        // Validar fecha de finalización
+      if (!validateFechaFinalizacion(subasta.fechaFinalizacion)) {
+        return;  // Si la validación falla, no continuar
+    }
         
         if (subasta.alto === "0cm" || subasta.ancho === "0cm") {
             toast.current.show({ severity: 'warn', summary: 'Advertencia', detail: 'El tamaño no puede ser 0cm' });
@@ -354,7 +394,7 @@ const EditSubasta = () => {
                                                 placeholder="Precio Inicial"
                                                 name="precioInicial"
                                                 value={subasta.precioInicial}
-                                                onChange={handleInputChange}
+                                                onChange={handleCostoChange}
                                                 type="text"
                                             />
                                             <label htmlFor="floatingPrecioInicial">Oferta mínima</label>
@@ -369,7 +409,7 @@ const EditSubasta = () => {
                                                 name="fechaFinalizacion"
                                                 value={subasta.fechaFinalizacion}
                                                 onChange={handleInputChange}
-                                                type="date"
+                                                type="datetime-local"
                                             />
                                             <label htmlFor="floatingFechaFinalizacion">Fecha de Finalización</label>
                                         </div>

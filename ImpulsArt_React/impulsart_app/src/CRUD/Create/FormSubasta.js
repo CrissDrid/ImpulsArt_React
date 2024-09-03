@@ -80,6 +80,36 @@ export const FormSubasta = () => {
       setSubasta(prevSubasta => ({ ...prevSubasta, fechaInicio }));
   }, []);
 
+  const validateFechaFinalizacion = (fechaFinalizacion) => {
+    const fechaSeleccionada = new Date(fechaFinalizacion);
+    const fechaActual = new Date();
+    const cincoDias = new Date();
+    const unaSemana = new Date();
+
+    cincoDias.setDate(fechaActual.getDate() + 5);
+    unaSemana.setDate(fechaActual.getDate() + 7);
+
+    if (fechaSeleccionada < cincoDias) {
+        toast.current.show({
+            severity: 'warn',
+            summary: 'Advertencia',
+            detail: 'La fecha de finalización debe ser al menos 5 días a partir de hoy.'
+        });
+        return false;  // Indicar que la validación falló
+    }
+
+    if (fechaSeleccionada > unaSemana) {
+        toast.current.show({
+            severity: 'warn',
+            summary: 'Advertencia',
+            detail: 'La fecha de finalización no puede ser más de una semana a partir de hoy.'
+        });
+        return false;  // Indicar que la validación falló
+    }
+
+    return true;  // Validación exitosa
+};
+
     const handleInputChange = (e) => {
         const { name, value } = e.target;
 
@@ -134,6 +164,12 @@ export const FormSubasta = () => {
           toast.current.show({ severity: 'warn', summary: 'Advertencia', detail: 'El nombre de la obra debe contener un máximo de 50 caracteres' });
           return;
       }
+
+      // Validar fecha de finalización
+      if (!validateFechaFinalizacion(subasta.fechaFinalizacion)) {
+        return;  // Si la validación falla, no continuar
+    }
+
   
       if (subasta.alto === "0cm" || subasta.ancho === "0cm") {
           toast.current.show({ severity: 'warn', summary: 'Advertencia', detail: 'El tamaño no puede ser 0cm' });
