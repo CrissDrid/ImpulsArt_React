@@ -20,7 +20,6 @@ const Register = () => {
     fechaNacimiento: "",
     email: "",
     numCelular: "",
-    direccion: "",
     contrasena: "",
     tipoUsuario: "usuario comun",
     fk_Rol: 1
@@ -28,7 +27,7 @@ const Register = () => {
 
   const [confirmPassword, setConfirmPassword] = useState("");
 
-  const { nombre, apellido, fechaNacimiento, email, numCelular, direccion, contrasena, userName, identificacion } = usuario;
+  const { nombre, apellido, fechaNacimiento, email, numCelular, contrasena, userName, identificacion } = usuario;
 
   const onInputChange = (e) => {
     setUsuario({ ...usuario, [e.target.name]: e.target.value });
@@ -71,7 +70,7 @@ const Register = () => {
   const onSubmit = async (e) => {
     e.preventDefault();
 
-    if (!userName || !identificacion || !nombre || !apellido || !fechaNacimiento || !email || !numCelular || !direccion || !contrasena) {
+    if (!userName || !identificacion || !nombre || !apellido || !fechaNacimiento || !email || !numCelular || !contrasena) {
         toast.current.show({ severity: 'error', summary: 'Error', detail: 'Todos los campos son obligatorios', life: 3000 });
         return;
     }
@@ -188,10 +187,6 @@ const Register = () => {
               <div className="form-floating">
                 <input type="number" className="form-control" id="floatingPhone" onChange={onInputChange} value={numCelular} name="numCelular" placeholder="Numero de Celular" />
                 <label htmlFor="floatingPhone">Numero de Celular</label>
-              </div>
-              <div className="form-floating">
-                <input type="text" className="form-control" id="floatingAddress" onChange={onInputChange} value={direccion} name="direccion" placeholder="Direccion" />
-                <label htmlFor="floatingAddress">Direccion</label>
               </div>
               <div className="form-floating">
                 <Password className="form-contraseña" id="floatingPassword" onChange={onInputChange} value={contrasena} name="contrasena" toggleMask placeholder="Contraseña"
