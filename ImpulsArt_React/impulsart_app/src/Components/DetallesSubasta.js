@@ -7,7 +7,7 @@ import '../Styles/DetallesObra.css';
 import Navbar_init from './Navbar_init';
 import Footer from './Footer';
 
-//Autenticacion de apis
+// Autenticación de APIs
 import AuthToken from '../Auth/AuthToken';
 
 function DetallesSubasta() {
@@ -37,6 +37,14 @@ function DetallesSubasta() {
     minutes: 0,
     seconds: 0
   });
+
+  const [ofertas, setOfertas] = useState([
+    { id: 1, usuario: 'Usuario1', monto: 100 },
+    { id: 2, usuario: 'Usuario2', monto: 150 },
+    { id: 3, usuario: 'Usuario3', monto: 200 }
+  ]);
+
+  const [ofertaMasAlta, setOfertaMasAlta] = useState(null);
 
   useEffect(() => {
     const loadSubasta = async () => {
@@ -98,8 +106,19 @@ function DetallesSubasta() {
     return () => clearInterval(timer);
   }, [subasta.fechaFinalizacion]);
 
+  useEffect(() => {
+    if (ofertas.length > 0) {
+      const maxOffer = Math.max(...ofertas.map(o => o.monto));
+      setOfertaMasAlta(ofertas.find(o => o.monto === maxOffer));
+    }
+  }, [ofertas]);
+
   const handleRatingChange = (e) => {
     setSubasta({ ...subasta, rating: e.value });
+  };
+
+  const handlePujar = () => {
+    alert('Aquí puedes implementar la lógica para pujar.');
   };
 
   return (
@@ -147,6 +166,23 @@ function DetallesSubasta() {
               <span>{timeLeft.minutes}</span><span>Min</span> 
               <span>{timeLeft.seconds}</span><span>Seg</span>
             </div>
+          </div>
+          <div className="offers-section mt-4">
+            <h5>Ofertas:</h5>
+            <ul className="list-group">
+              {ofertas.map(oferta => (
+                <li key={oferta.id} className="list-group-item">
+                  {oferta.usuario}: ${oferta.monto}
+                </li>
+              ))}
+            </ul>
+            {ofertaMasAlta && (
+              <div className="highest-offer mt-3">
+                <h5>Oferta más alta:</h5>
+                <p>{ofertaMasAlta.usuario}: ${ofertaMasAlta.monto}</p>
+              </div>
+            )}
+            <button onClick={handlePujar} className="btn btn-primary mt-3">Pujar</button>
           </div>
         </div>
       </div>
