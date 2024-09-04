@@ -177,16 +177,29 @@ function Navbar_init() {
                 </li>
               </>
             )}
-
-            <li className="nav-item">
+            {rol.includes('ASESOR') && (
+              <>
+                <li className="nav-item">
+                  <Link to='/DashboardAsesor' className='nav-link active' aria-current="page">Dashboard</Link>
+                </li>
+                <li className="nav-item">
+              <Link to='/Responder' className="nav-link active" aria-current="page">Respuestas</Link>
+            </li>
+              </>
+            )}
+            {rol.includes('USER') && (
+              <>
+              <li className="nav-item">
               <Link to='/Help' className='nav-link active' aria-current="page">Soporte</Link>
             </li>
-            <li className="nav-item">
-              <a className="nav-link active" aria-current="page" href="#">Soporte</a>
-            </li>
+              </>
+            )}
+            
             <li className="nav-item">
               <Link to='/ContactUs' className='nav-link active' aria-current="page">Contactanos</Link>
             </li>
+            
+            
             <li className="nav-item">
               <Link to='/SeccionSubasta' className="nav-link active" aria-current="page">Seccion Subasta</Link>
             </li>

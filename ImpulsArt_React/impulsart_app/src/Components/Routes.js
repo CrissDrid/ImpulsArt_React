@@ -32,6 +32,9 @@ import DetalleObras from './DetalleObras';
 import Simulacion from './Simulacion';
 import Dashboard from './Dashboard';
 import Help from './Help';
+import DashboardAsesor from './DashboardAsesor';
+import ReportForm from './Reportes';
+import Responder from './Responder';
 
 function AppRoutes() { // Cambia el nombre de la función a AppRoutes
   return (
@@ -51,6 +54,9 @@ function AppRoutes() { // Cambia el nombre de la función a AppRoutes
         <Route path='/DetallesSubasta/:pkCodSubasta' element={<DetallesSubasta />}/>
         <Route path='/Dashboard' element={<Dashboard />}/>
         <Route path='/Help' element={<Help />}/>
+        <Route path='/DashboardAsesor' element={<DashboardAsesor />}/>
+        <Route path='/ReportForm' element={<ReportForm />}/>
+        <Route path='/Responder' element={<Responder />}/>
 
         <Route path="/DetalleObras/:pkCod_Producto" element={<DetalleObras />} />
         

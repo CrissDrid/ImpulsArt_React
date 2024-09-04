@@ -105,7 +105,7 @@ function Album() {
               <ul className="dropdown-menu" aria-labelledby="dropdownMenuButton">
                 <li>
                   <a className="dropdown-item" href="#">
-                    <i className="bi bi-exclamation-triangle-fill"></i> Reportar
+                    <i className="bi bi-exclamation-triangle-fill"></i> <Link to={'/ReportForm'}>Reportar</Link>
                   </a>
                 </li>
               </ul>
