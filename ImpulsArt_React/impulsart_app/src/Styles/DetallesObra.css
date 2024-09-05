@@ -31,7 +31,7 @@
   display: flex;
   justify-content: center;
   margin-right: 1rem;
-  margin-top: 10rem !important;
+  margin-top: 1rem !important;
 }
 
 .p-rating .p-rating-icon {
@@ -60,13 +60,27 @@
 }
 
 .stokydimensiones{
-  margin-bottom: 1.5rem;
+  margin-bottom: 0.5rem;
 }
 
 .costoObra{
   font-family: "Nunito", sans-serif;
   font-size: 2rem;
   margin-right: 0.5rem;
+}
+
+.costoSubasta{
+  font-family: "Nunito", sans-serif;
+  font-size: 1.8rem;
+  margin-top: 0.8rem;
+}
+
+.ofertar{
+  margin-top: 2rem;
+}
+
+.ofertaMinima{
+  margin-bottom: -0.5rem;
 }
 
 .comprar-btn{
@@ -119,12 +133,14 @@
 
 
 .btn-increment{
+  height: 38px;
   border-radius: 0px 5px 5px 0px !important;
   background-color: #8D33FF !important;
 }
 
 .btn-decrement{
-  width: 36.95px;
+  width: 50px;
+  height: 38px;
   border-radius: 5px 0px 0px 5px !important;
   background-color: #8D33FF !important;
 }
@@ -155,23 +171,53 @@
   display: flex;
   justify-content: start;
   align-items: center;
-  font-size: 2rem;
+  font-size: 1.5rem; /* Tamaño de fuente reducido */
   font-weight: bold;
+  margin-top: 0.5rem;
 }
 
 .countdown-timer .timer span {
-  margin: 0 5px;
+  margin: 0 3px; /* Reducir el margen entre los elementos */
 }
 
 .countdown-timer .timer span:nth-child(odd) {
-  min-width: 50px;
+  min-width: 40px; /* Reducir el ancho mínimo */
   text-align: center;
   background-color: #f0f0f0;
-  padding: 10px;
+  padding: 5px; /* Reducir el padding */
   border-radius: 5px;
 }
 
 .countdown-timer .timer span:nth-child(even) {
-  font-size: 1rem;
-  margin-top: 15px;
+  font-size: 0.8rem; /* Tamaño de fuente reducido para las unidades */
+  margin-top: 10px; /* Ajustar el margen superior */
 }
+
+
+.ofertas{
+  margin-top: 1rem;
+}
+
+.swal2-confirm {
+  background-color: #8D33FF !important;
+  color: white !important;
+  border: none;
+  padding: 10px 24px;
+  font-size: 16px;
+  border-radius: 5px;
+  margin-right: 10px;
+}
+
+.custom-swal-cancel {
+  background-color: #FF3333 !important;
+  color: white !important;
+  border: none;
+  padding: 10px 24px;
+  font-size: 16px;
+  border-radius: 5px;
+}
+
+.custom-swal-cancel:hover {
+  background-color: #CB2C2C !important;
+}
+

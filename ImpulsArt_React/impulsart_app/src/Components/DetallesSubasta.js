@@ -1,18 +1,20 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { Rating } from 'primereact/rating';
+import { DataTable } from 'primereact/datatable';
+import { Column } from 'primereact/column';
 import { Tag } from 'primereact/tag';
 import '../Styles/DetallesObra.css';
+import Swal from 'sweetalert2';
+import MySwal from 'sweetalert2';
 import Navbar_init from './Navbar_init';
 import Footer from './Footer';
-
-// Autenticación de APIs
 import AuthToken from '../Auth/AuthToken';
+import GetUserInfo from '../Auth/GetUserInfo';
 
 function DetallesSubasta() {
   const { pkCodSubasta } = useParams();
-  
+
   const [subasta, setSubasta] = useState({
     nombreProducto: '',
     costo: '',
@@ -24,7 +26,7 @@ function DetallesSubasta() {
     descripcion: '',
     estadoSubasta: '',
     precioInicial: '',
-    fechaInicio:'',
+    fechaInicio: '',
     fechaFinalizacion: '',
     imagen: '',
     imagenPreview: '',
@@ -38,13 +40,9 @@ function DetallesSubasta() {
     seconds: 0
   });
 
-  const [ofertas, setOfertas] = useState([
-    { id: 1, usuario: 'Usuario1', monto: 100 },
-    { id: 2, usuario: 'Usuario2', monto: 150 },
-    { id: 3, usuario: 'Usuario3', monto: 200 }
-  ]);
-
+  const [ofertas, setOfertas] = useState([]);
   const [ofertaMasAlta, setOfertaMasAlta] = useState(null);
+  const [usuarioId, setUsuarioId] = useState([]);
 
   useEffect(() => {
     const loadSubasta = async () => {
@@ -77,6 +75,13 @@ function DetallesSubasta() {
     };
 
     loadSubasta();
+
+    const fetchUserInfo = async () => {
+      const userInfo = await GetUserInfo();
+      setUsuarioId(userInfo.identificacion); // Usa 'identificacion' en lugar de 'id'
+    };
+
+    fetchUserInfo();
   }, [pkCodSubasta]);
 
   useEffect(() => {
@@ -107,19 +112,116 @@ function DetallesSubasta() {
   }, [subasta.fechaFinalizacion]);
 
   useEffect(() => {
+    const fetchOfertas = async () => {
+      try {
+        const result = await AuthToken.get(`http://localhost:8086/api/oferta/OfertaPorSubasta/${pkCodSubasta}`);
+        console.log('Ofertas:', result.data.data); // Verifica la estructura de datos aquí
+        if (result.data.status === 'success') {
+          setOfertas(result.data.data);
+        }
+      } catch (error) {
+        console.error('Error al cargar las ofertas:', error);
+      }
+    };
+  
+    fetchOfertas();
+  }, [pkCodSubasta]);
+  
+
+  useEffect(() => {
     if (ofertas.length > 0) {
       const maxOffer = Math.max(...ofertas.map(o => o.monto));
       setOfertaMasAlta(ofertas.find(o => o.monto === maxOffer));
     }
   }, [ofertas]);
 
-  const handleRatingChange = (e) => {
-    setSubasta({ ...subasta, rating: e.value });
+  const formatCurrency = (value) => {
+    return value.replace(/\D/g, '')
+      .replace(/\B(?=(\d{3})+(?!\d))/g, '.')
+      .replace(/^/, '$ ');
   };
 
   const handlePujar = () => {
-    alert('Aquí puedes implementar la lógica para pujar.');
+    MySwal.fire({
+      title: 'Ingresa tu oferta',
+      input: 'text',
+      inputValue: '$ ',
+      showCancelButton: true,
+      confirmButtonText: 'Ofertar',
+      customClass: {
+        cancelButton: 'custom-swal-cancel'
+      },
+      inputValidator: (value) => {
+        const precioInicial = typeof subasta.precioInicial === 'string' 
+          ? parseInt(subasta.precioInicial.replace(/[^0-9]/g, ''), 10)
+          : subasta.precioInicial;
+
+        const ofertaIngresada = parseInt(value.replace(/[^0-9]/g, ''), 10);
+
+        if (!ofertaIngresada || ofertaIngresada <= precioInicial) {
+          return `Debes ingresar una oferta válida que sea mayor a $${precioInicial.toLocaleString()}`;
+        }
+      },
+      preConfirm: async (value) => {
+        const formattedValue = parseInt(value.replace(/[^0-9]/g, ''), 10);
+        console.log('Oferta ingresada:', formattedValue);
+    
+        try {
+            const now = new Date();
+            const fechaOferta = now.toISOString().slice(0, 16);
+    
+            const ofertaResponse = await AuthToken.post('oferta/create', {
+                monto: formattedValue,
+                fechaOferta: fechaOferta,
+                fk_Identificacion: usuarioId,
+                fk_subasta: pkCodSubasta
+            });
+    
+            if (ofertaResponse.status === 200) {
+                // Actualizar el precio inicial de la subasta
+                const updatePriceResponse = await AuthToken.put(`http://localhost:8086/api/subasta/updatePrice/${pkCodSubasta}`, null, {
+                    params: {
+                        precioInicial: formattedValue.toString()
+                    }
+                });
+    
+                if (updatePriceResponse.status === 200) {
+                    setOfertas(prevOfertas => [
+                        ...prevOfertas,
+                        { id: prevOfertas.length + 1, usuario: 'UsuarioX', monto: formattedValue }
+                    ]);
+    
+                    setSubasta(prevSubasta => ({
+                        ...prevSubasta,
+                        precioInicial: formattedValue.toString()
+                    }));
+    
+                    MySwal.fire('Éxito', 'Oferta registrada', 'success')
+                        .then((result) => {
+                            if (result.isConfirmed) {
+                                window.location.reload();  // Recargar la página
+                            }
+                        });
+                } else {
+                    MySwal.fire('Advertencia', 'Oferta registrada pero no se pudo actualizar el precio', 'warning');
+                }
+            } else {
+                MySwal.fire('Error', 'No se pudo crear la oferta', 'error');
+            }
+        } catch (error) {
+            console.error('Error al procesar la oferta:', error);
+            MySwal.fire('Error', 'Hubo un problema al enviar la oferta', 'error');
+        }
+    },
+      didOpen: () => {
+        const input = Swal.getInput();
+        input.addEventListener('input', (e) => {
+          e.target.value = formatCurrency(e.target.value);
+        });
+      }
+    });
   };
+
 
   return (
     <>
@@ -130,15 +232,13 @@ function DetallesSubasta() {
           <div className="image-container">
             <img src={subasta.imagen} alt={subasta.nombreProducto} className="product-image" />
           </div>
-          <div className="rating-container mt-2">
-            <Rating 
-              value={subasta.rating} 
-              onChange={handleRatingChange} 
-              cancel={false} 
-              stars={5}
-              onIcon="bi bi-star-fill"
-              offIcon="bi bi-star"
-            />
+          <div className="countdown-timer">
+            <div className="timer d-flex justify-content-center">
+              <span>{timeLeft.days}</span><span>Día</span> 
+              <span>{timeLeft.hours}</span><span>Horas</span> 
+              <span>{timeLeft.minutes}</span><span>Min</span> 
+              <span>{timeLeft.seconds}</span><span>Seg</span>
+            </div>
           </div>
         </div>
         <div className="col-md-6">
@@ -151,43 +251,38 @@ function DetallesSubasta() {
             </div>
           </div>
           <p className="description">{subasta.descripcion}</p>
-          <div className='row stokydimensiones'>
+          <div className='row stokydimensiones border-bottom'>
             <div className='col-md-6'>
               <p className='p-dimensiones'><strong>Dimensiones:</strong> {subasta.tamano}</p>
               <p className='p-dimensiones'><strong>Peso:</strong> {subasta.peso}</p>
-              <p className='p-stock'><strong>Stock:</strong> {subasta.cantidad}</p>
             </div>
           </div>
-          <div className="countdown-timer">
-            <h5>Tiempo restante para la subasta:</h5>
-            <div className="timer">
-              <span>{timeLeft.days}</span><span>Día</span> 
-              <span>{timeLeft.hours}</span><span>Horas</span> 
-              <span>{timeLeft.minutes}</span><span>Min</span> 
-              <span>{timeLeft.seconds}</span><span>Seg</span>
-            </div>
-          </div>
-          <div className="offers-section mt-4">
-            <h5>Ofertas:</h5>
-            <ul className="list-group">
-              {ofertas.map(oferta => (
-                <li key={oferta.id} className="list-group-item">
-                  {oferta.usuario}: ${oferta.monto}
-                </li>
-              ))}
-            </ul>
-            {ofertaMasAlta && (
-              <div className="highest-offer mt-3">
-                <h5>Oferta más alta:</h5>
-                <p>{ofertaMasAlta.usuario}: ${ofertaMasAlta.monto}</p>
+          <div className='row ofertar'>
+            <h6 className='ofertaMinima'>Oferta minima</h6>
+              <div className="col-md-2">
+                <div className="d-flex align-items-center justify-content-start">
+                <h1 className='costoSubasta'>${parseInt(subasta.precioInicial).toLocaleString()}</h1>
+                </div>
               </div>
-            )}
-            <button onClick={handlePujar} className="btn btn-primary mt-3">Pujar</button>
+              <div className="col-md-10">
+                <div className='d-flex justify-content-end'>
+                  <button className="btn btn-primary w-25 py-2 comprar-btn" type="button" onClick={handlePujar}>Ofertar</button>
+                </div>
+              </div>
           </div>
         </div>
       </div>
+      <div className="row ofertas">
+        <div className="col-md-6">
+        <h2>Historial de Ofertas</h2>
+        <DataTable value={ofertas} responsiveLayout="scroll">
+          <Column field="usuarios.userName" header="Usuario" />
+          <Column field="monto" header="Oferta" body={(rowData) => formatCurrency(rowData.monto.toString())} />
+        </DataTable>
+        </div>
+      </div>
     </div>
-    <Footer/>
+    <Footer />
     </>
   );
 }
