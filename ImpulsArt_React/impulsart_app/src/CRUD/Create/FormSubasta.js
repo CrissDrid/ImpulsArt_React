@@ -83,31 +83,28 @@ export const FormSubasta = () => {
   const validateFechaFinalizacion = (fechaFinalizacion) => {
     const fechaSeleccionada = new Date(fechaFinalizacion);
     const fechaActual = new Date();
-    const cincoDias = new Date();
-    const unaSemana = new Date();
+    const unDia = new Date(fechaActual.getTime() + 24 * 60 * 60 * 1000);
+    const cincoDias = new Date(fechaActual.getTime() + 5 * 24 * 60 * 60 * 1000);
 
-    cincoDias.setDate(fechaActual.getDate() + 5);
-    unaSemana.setDate(fechaActual.getDate() + 7);
-
-    if (fechaSeleccionada < cincoDias) {
+    if (fechaSeleccionada < unDia) {
         toast.current.show({
             severity: 'warn',
             summary: 'Advertencia',
-            detail: 'La fecha de finalización debe ser al menos 5 días a partir de hoy.'
+            detail: 'La fecha de finalización debe ser al menos 1 día a partir de hoy.'
         });
-        return false;  // Indicar que la validación falló
+        return false;
     }
 
-    if (fechaSeleccionada > unaSemana) {
+    if (fechaSeleccionada > cincoDias) {
         toast.current.show({
             severity: 'warn',
             summary: 'Advertencia',
-            detail: 'La fecha de finalización no puede ser más de una semana a partir de hoy.'
+            detail: 'La fecha de finalización no puede ser más de 5 días a partir de hoy.'
         });
-        return false;  // Indicar que la validación falló
+        return false;
     }
 
-    return true;  // Validación exitosa
+    return true;
 };
 
     const handleInputChange = (e) => {
@@ -242,8 +239,12 @@ export const FormSubasta = () => {
                   navigate(-1);
   
               } catch (error) {
-                  console.error('Error al enviar el formulario:', error);
-                  toast.current.show({ severity: 'error', summary: 'Error', detail: 'Error al enviar el formulario' });
+                console.error('Error al enviar el formulario:', error.response ? error.response.data : error.message);
+                Swal.fire(
+                  'Error!',
+                  'Hubo un problema al crear la obra.',
+                  'error'
+                );
               }
           }
       });
