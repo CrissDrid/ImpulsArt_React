@@ -15,7 +15,6 @@ export const ListUsuario = () => {
         getUsuario();
     }, []);
 
-
       //GET ALL USERS
       const getUsuario = () => {
         axios.get("http://localhost:8086/api/usuario/all")
