@@ -6,6 +6,7 @@ import '../Styles/Profile.css';
 import UserData from './UserData';
 import ChangePWD from './ChangePWD';
 import Galery from './Galery';
+import Direcciones from './Direcciones';
 
 // Autenticación de token
 import AuthToken from '../Auth/AuthToken';
@@ -105,7 +106,7 @@ function Profile() {
           <ul>
             <li><i className="bi bi-heart-fill fs-4"></i><a href="#datos" onClick={() => setActiveTab('datosPersonales')}>Datos Personales</a></li>
             <li><i className="bi bi-palette-fill fs-4"></i><a href="#galeria" onClick={() => setActiveTab('miGaleria')}>Mi Galería</a></li>
-            <li><i className="bi bi-house-fill fs-4"></i><a href="#" >Mis Direcciones</a></li>
+            <li><i className="bi bi-house-fill fs-4"></i><a href="#Direcciones" onClick={() => setActiveTab('direcciones')}>Mis Direcciones</a></li>
             <li><i className="bi bi-shield-lock-fill fs-4"></i><a href="#clave" onClick={() => setActiveTab('cambiarContrasena')}>Cambiar Contraseña</a></li>
             <li><i className="bi bi-cart-fill fs-4"></i><a href="#">Historial de Compras</a></li>
           </ul>
@@ -113,6 +114,8 @@ function Profile() {
         {activeTab === 'datosPersonales' && <UserData />}
         {activeTab === 'cambiarContrasena' && <ChangePWD />}
         {activeTab === 'miGaleria' && <Galery/>}
+        {activeTab === 'direcciones' && <Direcciones />}
+
       </div>
       <Footer />
     </div>

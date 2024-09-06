@@ -184,6 +184,19 @@ function Navbar_init() {
             </li>
               </>
             )}
+            {rol.includes('DOMICILIARIO') && (
+              <>
+                <li className="nav-item">
+                  <Link to='/DashboardDomiciliario' className='nav-link active' aria-current="page">Dashboard </Link>
+                </li>
+                <li className="nav-item">
+              <Link to='/CrearDireccion' className='nav-link active' aria-current="page">Crear Direcciones</Link>
+            </li>
+              </>
+
+            )}
+
+            
             
             <li className="nav-item">
               <Link to='/ContactUs' className='nav-link active' aria-current="page">Contactanos</Link>
