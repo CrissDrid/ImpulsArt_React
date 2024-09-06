@@ -1,0 +1,57 @@
+.detalles-subasta-container {
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  .image-section {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+    margin-top: 1;
+  }
+  
+  .product-image {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .details-section {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  
+  .product-name {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #333;
+  }
+  
+  .product-category {
+    font-size: 1.2rem;
+    color: #666;
+  }
+  
+  .product-description {
+    font-size: 1rem;
+    color: #444;
+    margin-top: 10px;
+  }
+  
+  .product-specs {
+    font-size: 1rem;
+    color: #555;
+    margin-top: 20px;
+  }
+  
+  .btn-primary {
+    background-color: #8D33FF;
+    border-color: #8D33FF;
+  }
