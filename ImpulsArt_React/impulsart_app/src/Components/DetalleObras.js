@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { Tag } from 'primereact/tag';
 import { Rating } from 'primereact/rating';
@@ -7,12 +7,14 @@ import '../Styles/DetallesObra.css';
 import Navbar_init from './Navbar_init';
 import Footer from './Footer';
 
-//Autenticacion de apis
+// Autenticacion de apis
 import '../Auth/AuthToken';
 import AuthToken from '../Auth/AuthToken';
 
 function DetallesObra() {
+  const [identificacion, setIdentificacion] = useState('');
   const { pkCod_Producto } = useParams();
+  const navigate = useNavigate(); // Hook para redirigir
   const [obra, setObra] = useState({
     nombreProducto: '',
     costo: 0,
@@ -69,6 +71,27 @@ function DetallesObra() {
     const value = parseInt(e.target.value, 10);
     if (!isNaN(value) && value >= 0 && value <= obra.cantidad) {
       setCantidadCompra(value);
+    }
+  };
+
+  const handleComprar = async () => {
+    try {
+      // Asumimos que tienes el ID del carrito del usuario actual
+      const carritoId = 1; // Este valor debería venir de tu estado global o de donde almacenes el ID del carrito del usuario
+
+      // Llamada al backend para agregar la obra al carrito
+      await AuthToken.post(`http://localhost:8086/api/carrito/add-obra`, null, {
+        params: {
+          carritoId: carritoId,
+          obraId: pkCod_Producto
+        }
+      });
+
+      // Redirigir al carrito de compras
+      navigate('/carrito');
+    } catch (error) {
+      console.error('Error al agregar la obra al carrito:', error);
+      // Aquí puedes manejar el error, por ejemplo, mostrando un mensaje al usuario
     }
   };
 
@@ -137,7 +160,12 @@ function DetallesObra() {
               </div>
             </div>
             <div className='d-flex align-items-center justify-content-end'>
-            <button className="btn btn-primary w-25 py-2 comprar-btn " type="submit">Comprar</button>
+              <button 
+                className="btn btn-primary w-25 py-2 comprar-btn" 
+                type="button" 
+                onClick={handleComprar}>
+                Comprar
+              </button>
             </div>
           </div>
         </div>

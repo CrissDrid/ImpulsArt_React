@@ -1,0 +1,117 @@
+/* Estilos generales del contenedor */
+#carrito-compras {
+    margin-top: 2rem;
+}
+
+#carrito-compras .row.border-bottom {
+    margin-bottom: 2rem; /* Espacio entre cada obra */
+}
+
+#carrito-compras .img {
+    width: 100%;
+    max-width: 120px; /* Limitar el ancho máximo */
+    height: auto; /* Mantener la proporción de la imagen */
+    border-radius: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+#carrito-compras .img img {
+    max-width: 160%; /* Limitar la imagen al ancho del contenedor */
+    max-height: 100%; /* Limitar la altura de la imagen */
+    object-fit: contain; /* Asegurar que la imagen mantenga su proporción */
+}
+
+#carrito-compras .list-carrtio .row{
+    margin-bottom: 1rem !important;
+}
+
+/* Títulos de las tarjetas */
+#carrito-compras .card-title {
+    font-family: "Nunito", sans-serif;
+    font-size: 2rem;
+}
+
+/* Estilo del precio de la obra */
+#carrito-compras .valorObra {
+    font-family: "Nunito", sans-serif;
+    font-size: 1.6rem;
+}
+
+/* Estilos específicos para los botones de incremento y decremento dentro del carrito de compras */
+
+/* Contenedor de los botones y el input */
+#carrito-compras .inputNumber {
+    display: flex;
+    align-items: center;
+    margin-top: 1rem;
+}
+
+/* Botón de incrementar cantidad */
+#carrito-compras .btn-increment {
+    width: 40px;
+    height: 31px;
+    border-radius: 5px 0px 0px 5px !important;
+    background-color: #8D33FF !important;
+    color: white;
+}
+
+/* Botón de decrementar cantidad */
+#carrito-compras .btn-decrement {
+    width: 40px;
+    height: 31px;
+    border-radius: 0px 5px 5px 0px !important;
+    background-color: #8D33FF !important;
+    color: white;
+}
+
+/* Input para mostrar la cantidad */
+#carrito-compras .input-cantidad {
+    width: 3rem;
+    font-size: 0.875rem;
+    padding: 0.25rem;
+    text-align: center;
+    border-radius: 0;
+}
+
+/* Icono dentro de los botones */
+#carrito-compras .btn i {
+    font-size: 1rem;
+}
+
+/* Estilo de la tarjeta de subtotal */
+#carrito-compras .card-subtotal {
+    border: solid 2px #8b33ff60;
+    margin-left: 1rem;
+}
+
+/* Estilos del texto del precio y el total */
+#carrito-compras .nombrePrecio {
+    font-size: 1rem;
+}
+
+/* Estilos para la fila del total en negrita */
+#carrito-compras .total {
+    font-family: "Nunito", sans-serif;
+    font-weight: bold;
+    font-size: 1.2rem;
+}
+
+/* Botón para finalizar compra */
+#carrito-compras .btn-finalizarCompra {
+    color: white;
+    background-color: #8D33FF;
+    font-size: 1.2rem;
+}
+
+/* Texto centrado */
+#carrito-compras .text-center {
+    text-align: center;
+}
+
+/* Ajuste del input number */
+#carrito-compras .inputNumber .input-cantidad {
+    font-size: 0.9rem;
+}
