@@ -19,7 +19,7 @@ function CarritoCompras() {
         const fetchCarrito = async () => {
             try {
                 if (identificacion) {
-                    const response = await AuthToken.get(`http://localhost:8086/api/carrito/usuarioPorCarrito/${identificacion}`);
+                    const response = await AuthToken.get(`${process.env.REACT_APP_API_BASE_URL}carrito/usuarioPorCarrito/${identificacion}`);
                     setProductos(response.data.data.obra || []);
                 }
             } catch (error) {
@@ -34,7 +34,7 @@ function CarritoCompras() {
         try {
             const producto = productos.find(p => p.pkCod_Producto === id);
             if (producto && producto.cantidad < producto.stock) {
-                const response = await AuthToken.put(`http://localhost:8086/api/carrito/update-cantidad`, {
+                const response = await AuthToken.put(`${process.env.REACT_APP_API_BASE_URL}carrito/update-cantidad`, {
                     identificacion,  // Cambiamos carritoId por identificacion
                     obraId: id,
                     cantidad: producto.cantidad + 1
@@ -54,7 +54,7 @@ function CarritoCompras() {
         try {
             const producto = productos.find(p => p.pkCod_Producto === id);
             if (producto && producto.cantidad > 1) {
-                const response = await AuthToken.put(`http://localhost:8086/api/carrito/update-cantidad`, {
+                const response = await AuthToken.put(`${process.env.REACT_APP_API_BASE_URL}carrito/update-cantidad`, {
                     identificacion,  // Cambiamos carritoId por identificacion
                     obraId: id,
                     cantidad: producto.cantidad - 1
@@ -72,7 +72,7 @@ function CarritoCompras() {
 
     const eliminarProducto = async (id) => {
         try {
-            const response = await AuthToken.delete(`http://localhost:8086/api/carrito/remove-obra`, {
+            const response = await AuthToken.delete(`${process.env.REACT_APP_API_BASE_URL}api/carrito/remove-obra`, {
                 params: {
                     identificacion,  // Cambiamos carritoId por identificacion
                     obraId: id

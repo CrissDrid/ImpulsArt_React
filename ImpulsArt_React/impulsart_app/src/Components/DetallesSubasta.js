@@ -47,7 +47,7 @@ function DetallesSubasta() {
   useEffect(() => {
     const loadSubasta = async () => {
       try {
-        const result = await AuthToken.get(`http://localhost:8086/api/subasta/list/${pkCodSubasta}`);
+        const result = await AuthToken.get(`${process.env.REACT_APP_API_BASE_URL}subasta/list/${pkCodSubasta}`);
         const subastaData = result.data.data[0];
 
         console.log('Datos de subasta:', subastaData);
@@ -114,7 +114,7 @@ function DetallesSubasta() {
   useEffect(() => {
     const fetchOfertas = async () => {
       try {
-        const result = await AuthToken.get(`http://localhost:8086/api/oferta/OfertaPorSubasta/${pkCodSubasta}`);
+        const result = await AuthToken.get(`${process.env.REACT_APP_API_BASE_URL}oferta/OfertaPorSubasta/${pkCodSubasta}`);
         console.log('Ofertas:', result.data.data); // Verifica la estructura de datos aquí
         if (result.data.status === 'success') {
           setOfertas(result.data.data);
@@ -126,7 +126,6 @@ function DetallesSubasta() {
   
     fetchOfertas();
   }, [pkCodSubasta]);
-  
 
   useEffect(() => {
     if (ofertas.length > 0) {
@@ -179,7 +178,7 @@ function DetallesSubasta() {
     
             if (ofertaResponse.status === 200) {
                 // Actualizar el precio inicial de la subasta
-                const updatePriceResponse = await AuthToken.put(`http://localhost:8086/api/subasta/updatePrice/${pkCodSubasta}`, null, {
+                const updatePriceResponse = await AuthToken.put(`${process.env.REACT_APP_API_BASE_URL}subasta/updatePrice/${pkCodSubasta}`, null, {
                     params: {
                         precioInicial: formattedValue.toString()
                     }

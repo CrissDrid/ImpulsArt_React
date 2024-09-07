@@ -5,7 +5,7 @@ import Logo from '../Resources/Logo.svg';
 import Art from '../Resources/Img-Art.svg';
 import Footer from './Footer';
 
-const baseurl = "http://localhost:8086/api/usuario/login";
+const baseurl = `${process.env.REACT_APP_API_BASE_URL}usuario/login`;
 
 const Login = () => {
   const navigate = useNavigate();
@@ -19,19 +19,18 @@ const Login = () => {
 
   const iniciarSesion = async () => {
     try {
+      console.log('Datos enviados:', { email: form.email, contrasena: form.contrasena });
       const response = await axios.post(baseurl, { email: form.email, contrasena: form.contrasena });
       console.log('Server response:', response.data);
-
+  
       if (response.data.status === "success") {
         console.log('Login successful!');
         const token = response.data.token;
         const tokenType = response.data.tokenType;
-        
-        // Guardar solo el token en localStorage
+  
         localStorage.setItem('authToken', token);
         localStorage.setItem('authTokenType', tokenType);
-
-        // Aquí puedes navegar a la página principal o a otra ruta protegida
+  
         navigate('/home');
       } else {
         setError(response.data.message || 'Error al iniciar sesión');

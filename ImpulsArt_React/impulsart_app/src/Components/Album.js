@@ -20,16 +20,10 @@ function Album() {
   const [nombreProducto, setNombreProducto] = useState('');
 
   useEffect(() => {
-    if (categoria && !nombreProducto) {
-      getObraByCategoria();
-    } else if (nombreProducto && !categoria) {
-      getObraByNombreProducto();
-    } else if (categoria && nombreProducto) {
-      getObraByCategoriaAndNombreProducto();
-    } else {
+
       getObra();
-    }
-  }, [categoria, nombreProducto, currentPage]);
+
+  }, [currentPage]);
 
   const normalizeData = (data) => {
     if (Array.isArray(data)) {
@@ -48,36 +42,6 @@ function Album() {
     } catch (error) {
       console.error('Error en getObra:', error);
     }
-  };
-
-  const getObraByCategoria = () => {
-    axios.get(`http://localhost:8086/api/obra/categoria/${categoria}`)
-      .then((response) => {
-        setListObra(normalizeData(response.data));
-      })
-      .catch((e) => {
-        console.log(e);
-      });
-  };
-
-  const getObraByNombreProducto = () => {
-    axios.get(`http://localhost:8086/api/obra/nombreProducto/${nombreProducto}`)
-      .then((response) => {
-        setListObra(normalizeData(response.data));
-      })
-      .catch((e) => {
-        console.log(e);
-      });
-  };
-
-  const getObraByCategoriaAndNombreProducto = () => {
-    axios.get(`http://localhost:8086/api/obra/categoria/${categoria}/nombreProducto/${nombreProducto}`)
-      .then((response) => {
-        setListObra(normalizeData(response.data));
-      })
-      .catch((e) => {
-        console.log(e);
-      });
   };
 
   const handlePaginationClick = (pageNumber) => {

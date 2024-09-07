@@ -140,7 +140,7 @@ const FormObra = () => {
             formData.append(key, obra[key]);
           }
   
-          const result = await AuthToken.post("http://localhost:8086/api/obra/create", formData, {
+          const result = await AuthToken.post(`${process.env.REACT_APP_API_BASE_URL}obra/create`, formData, {
             headers: { 'Content-Type': 'multipart/form-data' }
           });
   

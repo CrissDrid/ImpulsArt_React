@@ -60,7 +60,7 @@ const loadObra = async () => {
 
         // Configurar la vista previa de la imagen si existe
         if (data.imagen) {
-            setImagePreview(`http://localhost:8086/api/obra/image/${data.imagen}`);
+            setImagePreview(`http://localhost:8086/api/obra/imagen/${data.imagen}`);
         }
     } catch (error) {
         // Manejo de errores en la carga de la obra
@@ -191,7 +191,7 @@ const loadObra = async () => {
                         formData.append(key, obra[key]);
                     }
 
-                    await AuthToken.post(`http://localhost:8086/api/obra/update/${pkCod_Producto}`, formData, {
+                    await AuthToken.post(`${process.env.REACT_APP_API_BASE_URL}obra/update/${pkCod_Producto}`, formData, {
                         headers: { 'Content-Type': 'multipart/form-data' }
                     });
 

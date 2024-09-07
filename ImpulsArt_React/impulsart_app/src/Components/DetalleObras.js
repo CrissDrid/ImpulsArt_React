@@ -30,7 +30,7 @@ function DetallesObra() {
   useEffect(() => {
     const loadObra = async () => {
       try {
-        const result = await AuthToken.get(`http://localhost:8086/api/obra/list/${pkCod_Producto}`);
+        const result = await AuthToken.get(`${process.env.REACT_APP_API_BASE_URL}obra/list/${pkCod_Producto}`);
         const obraData = result.data.data;
         setObra({
           nombreProducto: obraData.nombreProducto,
@@ -80,7 +80,7 @@ function DetallesObra() {
       const carritoId = 1; // Este valor debería venir de tu estado global o de donde almacenes el ID del carrito del usuario
 
       // Llamada al backend para agregar la obra al carrito
-      await AuthToken.post(`http://localhost:8086/api/carrito/add-obra`, null, {
+      await AuthToken.post(`${process.env.REACT_APP_API_BASE_URL}carrito/add-obra`, null, {
         params: {
           carritoId: carritoId,
           obraId: pkCod_Producto
