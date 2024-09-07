@@ -72,7 +72,7 @@ function CarritoCompras() {
 
     const eliminarProducto = async (id) => {
         try {
-            const response = await AuthToken.delete(`${process.env.REACT_APP_API_BASE_URL}api/carrito/remove-obra`, {
+            const response = await AuthToken.delete(`${process.env.REACT_APP_API_BASE_URL}carrito/remove-obra`, {
                 params: {
                     identificacion,  // Cambiamos carritoId por identificacion
                     obraId: id
