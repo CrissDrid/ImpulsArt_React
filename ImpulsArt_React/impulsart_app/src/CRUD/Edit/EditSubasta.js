@@ -43,7 +43,7 @@ const EditSubasta = () => {
     useEffect(() => {
         const loadSubasta = async () => {
             try {
-                const result = await AuthToken.get(`http://localhost:8086/api/subasta/list/${pkCodSubasta}`);
+                const result = await AuthToken.get(`${process.env.REACT_APP_API_BASE_URL}subasta/list/${pkCodSubasta}`);
                 const subastaData = result.data.data[0];
                 setSubasta({
                     nombreProducto: subastaData.obras.nombreProducto,
@@ -69,7 +69,7 @@ const EditSubasta = () => {
 
         const loadCategorias = async () => {
             try {
-                const result = await AuthToken.get('http://localhost:8086/api/categoria/all');
+                const result = await AuthToken.get(`${process.env.REACT_APP_API_BASE_URL}categoria/all`);
                 setCategorias(result.data.data);
             } catch (error) {
                 console.error('Error al cargar las categorías:', error);
@@ -233,7 +233,7 @@ const EditSubasta = () => {
             }
     
             try {
-                await AuthToken.put(`http://localhost:8086/api/subasta/update/${pkCodSubasta}`, formData, {
+                await AuthToken.put(`${process.env.REACT_APP_API_BASE_URL}subasta/update/${pkCodSubasta}`, formData, {
                     headers: {
                         'Content-Type': 'multipart/form-data'
                     }

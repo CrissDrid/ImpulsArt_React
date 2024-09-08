@@ -20,16 +20,10 @@ function Album() {
   const [nombreProducto, setNombreProducto] = useState('');
 
   useEffect(() => {
-    if (categoria && !nombreProducto) {
-      getObraByCategoria();
-    } else if (nombreProducto && !categoria) {
-      getObraByNombreProducto();
-    } else if (categoria && nombreProducto) {
-      getObraByCategoriaAndNombreProducto();
-    } else {
+
       getObra();
-    }
-  }, [categoria, nombreProducto, currentPage]);
+
+  }, [currentPage]);
 
   const normalizeData = (data) => {
     if (Array.isArray(data)) {
@@ -43,41 +37,11 @@ function Album() {
 
   const getObra = async () => {
     try {
-      const response = await AuthToken.get('obra/all');
+      const response = await AuthToken.get('obra/all'); // Ajusta la URL según sea necesario
       setListObra(normalizeData(response.data));
     } catch (error) {
       console.error('Error en getObra:', error);
     }
-  };
-
-  const getObraByCategoria = () => {
-    axios.get(`http://localhost:8086/api/obra/categoria/${categoria}`)
-      .then((response) => {
-        setListObra(normalizeData(response.data));
-      })
-      .catch((e) => {
-        console.log(e);
-      });
-  };
-
-  const getObraByNombreProducto = () => {
-    axios.get(`http://localhost:8086/api/obra/nombreProducto/${nombreProducto}`)
-      .then((response) => {
-        setListObra(normalizeData(response.data));
-      })
-      .catch((e) => {
-        console.log(e);
-      });
-  };
-
-  const getObraByCategoriaAndNombreProducto = () => {
-    axios.get(`http://localhost:8086/api/obra/categoria/${categoria}/nombreProducto/${nombreProducto}`)
-      .then((response) => {
-        setListObra(normalizeData(response.data));
-      })
-      .catch((e) => {
-        console.log(e);
-      });
   };
 
   const handlePaginationClick = (pageNumber) => {
@@ -89,7 +53,7 @@ function Album() {
       <div className="col" key={index}>
         <div className="card shadow-sm">
           <img
-            src={obra.imagen}
+             src={`data:${obra.TipoImagen};base64,${obra.imagen}`} // Usa el tipo MIME recibido del backend
             className="bd-placeholder-img card-img-top"
             width="100%"
             height="225"

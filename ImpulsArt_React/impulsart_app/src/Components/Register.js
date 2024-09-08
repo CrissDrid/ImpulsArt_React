@@ -116,7 +116,7 @@ const Register = () => {
     }
 
     try {
-      const response = await axios.get(`http://localhost:8086/api/usuario/list/${identificacion}`);
+      const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}usuario/list/${identificacion}`);
       if (response.data.status === 'success') {
         toast.current.show({ severity: 'error', summary: 'Error', detail: 'El usuario con ese número de identificación ya está registrado', life: 3000 });
         return;
@@ -126,7 +126,7 @@ const Register = () => {
     }
 
     try {
-        const response = await axios.post("http://localhost:8086/api/usuario/create", usuario);
+        const response = await axios.post(`${process.env.REACT_APP_API_BASE_URL}usuario/create`, usuario);
         if (response.status === 200) {
             Swal.fire({
                 title: '¡Felicidades!',

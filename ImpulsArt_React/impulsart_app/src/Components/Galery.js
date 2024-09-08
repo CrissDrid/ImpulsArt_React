@@ -116,7 +116,7 @@ function Galery() {
     return listObra.map((obra) => (
       <div className="obra-card" key={obra.pkCod_Producto} onClick={() => handleCardClick(obra.pkCod_Producto)}>
         <img
-          src={obra.imagen}
+             src={`data:${obra.TipoImagen};base64,${obra.imagen}`} // Usa el tipo MIME recibido del backend
           alt={`Imagen: ${obra.nombreProducto}`}
         />
         <div className="obra-info">
@@ -131,7 +131,7 @@ function Galery() {
     return listSubasta.map((subasta) => (
       <div className="obra-card" key={subasta.obras.id} onClick={() => handleCardClick(subasta.obras.id, subasta.pkCodSubasta)}>
         <img
-          src={subasta.obras.imagen}
+           src={`data:${subasta.obras.TipoImagen};base64,${subasta.obras.imagen}`} // Usa el tipo MIME recibido del backend
           alt={`Imagen: ${subasta.obras.nombreProducto}`}
         />
         <div className="obra-info">

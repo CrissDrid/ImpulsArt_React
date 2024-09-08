@@ -6,6 +6,7 @@ import '../Styles/ChangePWD.css';
 
 //Autenticacion de apis
 import '../Auth/AuthToken';
+import AuthToken from '../Auth/AuthToken';
 
 function ChangePWD() { 
     const [userData, setUserData] = useState(null); 
@@ -63,7 +64,7 @@ function ChangePWD() {
 
         if (result.isConfirmed) { 
             try { 
-                const response = await fetch(`http://localhost:8086/api/usuario/update/${userData.identificacion}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...userData, contrasena: newPassword }) }); 
+                const response = await AuthToken(`usuario/update/${userData.identificacion}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...userData, contrasena: newPassword }) }); 
                 const result = await response.json(); 
                 if (response.ok) { 
                     console.log('Contraseña actualizada:', result); 

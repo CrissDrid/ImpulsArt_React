@@ -29,10 +29,10 @@ function SeccionSubasta() {
   };
 
   const getSubasta = () => {
-    AuthToken.get("http://localhost:8086/api/subasta/subastaYobras")
+    AuthToken.get(`${process.env.REACT_APP_API_BASE_URL}subasta/subastaYobras`)
       .then((response) => {
-        console.log(response.data); // Verificar la estructura de los datos
-        setListSubasta(normalizeData(response.data));
+        console.log(response.data.data); // Verificar la estructura de los datos
+        setListSubasta(normalizeData(response.data.data));
       })
       .catch((e) => {
         console.log(e);
@@ -48,7 +48,7 @@ function SeccionSubasta() {
       <div className="col" key={index}>
         <div className="card shadow-sm">
           <img
-            src={subasta.obras.imagen} // Asegúrate de que `subasta.obra.imagen` es la propiedad correcta
+            src={`data:${subasta.obras.TipoImagen};base64,${subasta.obras.imagen}`} // Usa el tipo MIME recibido del backend
             className="bd-placeholder-img card-img-top"
             width="100%"
             height="225"

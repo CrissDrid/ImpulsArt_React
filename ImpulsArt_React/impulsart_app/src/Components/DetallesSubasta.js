@@ -47,7 +47,7 @@ function DetallesSubasta() {
   useEffect(() => {
     const loadSubasta = async () => {
       try {
-        const result = await AuthToken.get(`http://localhost:8086/api/subasta/list/${pkCodSubasta}`);
+        const result = await AuthToken.get(`${process.env.REACT_APP_API_BASE_URL}subasta/list/${pkCodSubasta}`);
         const subastaData = result.data.data[0];
 
         console.log('Datos de subasta:', subastaData);
@@ -66,6 +66,7 @@ function DetallesSubasta() {
           fechaInicio: subastaData.fechaInicio,
           fechaFinalizacion: subastaData.fechaFinalizacion,
           imagen: subastaData.obras.imagen,
+          TipoImagen: subastaData.obras.TipoImagen,
           imagenPreview: subastaData.obras.imagen,
           rating: subastaData.rating || 0
         });
@@ -114,7 +115,7 @@ function DetallesSubasta() {
   useEffect(() => {
     const fetchOfertas = async () => {
       try {
-        const result = await AuthToken.get(`http://localhost:8086/api/oferta/OfertaPorSubasta/${pkCodSubasta}`);
+        const result = await AuthToken.get(`${process.env.REACT_APP_API_BASE_URL}oferta/OfertaPorSubasta/${pkCodSubasta}`);
         console.log('Ofertas:', result.data.data); // Verifica la estructura de datos aquí
         if (result.data.status === 'success') {
           setOfertas(result.data.data);
@@ -126,7 +127,6 @@ function DetallesSubasta() {
   
     fetchOfertas();
   }, [pkCodSubasta]);
-  
 
   useEffect(() => {
     if (ofertas.length > 0) {
@@ -179,7 +179,7 @@ function DetallesSubasta() {
     
             if (ofertaResponse.status === 200) {
                 // Actualizar el precio inicial de la subasta
-                const updatePriceResponse = await AuthToken.put(`http://localhost:8086/api/subasta/updatePrice/${pkCodSubasta}`, null, {
+                const updatePriceResponse = await AuthToken.put(`${process.env.REACT_APP_API_BASE_URL}subasta/updatePrice/${pkCodSubasta}`, null, {
                     params: {
                         precioInicial: formattedValue.toString()
                     }
@@ -222,7 +222,6 @@ function DetallesSubasta() {
     });
   };
 
-
   return (
     <>
     <Navbar_init/>
@@ -230,7 +229,7 @@ function DetallesSubasta() {
       <div className="row">
         <div className="col-md-6">
           <div className="image-container">
-            <img src={subasta.imagen} alt={subasta.nombreProducto} className="product-image" />
+            <img src={`data:${subasta.TipoImagen};base64,${subasta.imagen}`} className="product-image" />
           </div>
           <div className="countdown-timer">
             <div className="timer d-flex justify-content-center">
