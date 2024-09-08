@@ -37,7 +37,7 @@ function Album() {
 
   const getObra = async () => {
     try {
-      const response = await AuthToken.get('obra/all');
+      const response = await AuthToken.get('obra/all'); // Ajusta la URL según sea necesario
       setListObra(normalizeData(response.data));
     } catch (error) {
       console.error('Error en getObra:', error);
@@ -53,7 +53,7 @@ function Album() {
       <div className="col" key={index}>
         <div className="card shadow-sm">
           <img
-            src={obra.imagen}
+             src={`data:${obra.TipoImagen};base64,${obra.imagen}`} // Usa el tipo MIME recibido del backend
             className="bd-placeholder-img card-img-top"
             width="100%"
             height="225"

@@ -66,6 +66,7 @@ function DetallesSubasta() {
           fechaInicio: subastaData.fechaInicio,
           fechaFinalizacion: subastaData.fechaFinalizacion,
           imagen: subastaData.obras.imagen,
+          TipoImagen: subastaData.obras.TipoImagen,
           imagenPreview: subastaData.obras.imagen,
           rating: subastaData.rating || 0
         });
@@ -221,7 +222,6 @@ function DetallesSubasta() {
     });
   };
 
-
   return (
     <>
     <Navbar_init/>
@@ -229,7 +229,7 @@ function DetallesSubasta() {
       <div className="row">
         <div className="col-md-6">
           <div className="image-container">
-            <img src={subasta.imagen} alt={subasta.nombreProducto} className="product-image" />
+            <img src={`data:${subasta.TipoImagen};base64,${subasta.imagen}`} className="product-image" />
           </div>
           <div className="countdown-timer">
             <div className="timer d-flex justify-content-center">

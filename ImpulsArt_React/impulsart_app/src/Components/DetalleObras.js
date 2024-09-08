@@ -38,6 +38,7 @@ function DetallesObra() {
           descripcion: obraData.descripcion,
           categoriaNombre: obraData.categoria.nombreCategoria,
           imagen: obraData.imagen,
+          TipoImagen: obraData.TipoImagen,
           tamano: obraData.tamano,
           peso: obraData.peso,
           cantidad: obraData.cantidad,
@@ -102,7 +103,7 @@ function DetallesObra() {
         <div className="row">
           <div className="col-md-6">
             <div className="image-container">
-              <img src={obra.imagen} alt={obra.nombreProducto} className="product-image" />
+              <img src={`data:${obra.TipoImagen};base64,${obra.imagen}`} alt={obra.nombreProducto} className="product-image" />
             </div>
             <div className="rating-container mt-2">
               <Rating 

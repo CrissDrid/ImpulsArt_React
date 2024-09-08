@@ -18,7 +18,7 @@ export const Simulacion = () => {
 
       //GET ALL USERS
       const getUsuario = () => {
-        axios.get(`${process.env.REACT_APP_API_BASE_URL}usuario/all`)
+        axios.get("http://localhost:8086/api/usuario/all")
             .then((response) => {
                 setListUsuario(response.data.data);
             })
@@ -51,7 +51,7 @@ export const Simulacion = () => {
     };
 
     const getObra = () => {
-        axios.get(`${process.env.REACT_APP_API_BASE_URL}obra/all`)
+        axios.get("http://localhost:8086/api/obra/all")
             .then((response) => {
                 setListObra(normalizeData(response.data));
             })
