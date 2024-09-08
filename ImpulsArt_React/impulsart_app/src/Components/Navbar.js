@@ -1,8 +1,8 @@
 import React from 'react';
-import { Link } from 'react-router-dom'; // Importa Link
+import { Link } from 'react-router-dom';
 import Logo from '../Resources/Logo.svg';
 
-function Navbar() {
+function Navbar({ onSupportClick, onAboutClick }) {
   return (
     <nav className="navbar navbar-expand-lg">
       <div className="container-fluid">
@@ -16,13 +16,10 @@ function Navbar() {
               <a className="nav-link active" aria-current="page" href="#">Inicio</a>
             </li>
             <li className="nav-item">
-              <a className="nav-link active" aria-current="page" href="#">Soporte</a>
+              <a className="nav-link active" aria-current="page" href="#" onClick={onAboutClick}>Nosotros</a> {/* Llama a la función de scroll para About */}
             </li>
             <li className="nav-item">
-
-              <a className="nav-link active" aria-current="page" href="#">Correos</a>
-            </li>
- <li className="nav-item">
+              <a className="nav-link active" aria-current="page" href="#" onClick={onSupportClick}>Soporte</a> {/* Llama a la función de scroll para Support */}
             </li>
             <li className="nav-item">
               <Link to="/login">
@@ -31,7 +28,7 @@ function Navbar() {
             </li>
             <li>
               <Link to="/register">
-              <button className="btn btn-primary login-btn" type="button" >Saca A Tu Artista</button>
+                <button className="btn btn-primary login-btn" type="button">Saca A Tu Artista</button>
               </Link>
             </li>
           </ul>

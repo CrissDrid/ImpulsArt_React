@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Navbar from './Navbar';
 import About from './AboutUs';
 import Spot from '../Resources/Spot.svg';
@@ -8,13 +8,16 @@ import Footer from './Footer';
 
 function LandingPage() {
   const [fraseActual, setFraseActual] = useState(0);
+  const supportRef = useRef(null); // Crear una referencia para la sección de soporte
+  const aboutRef = useRef(null); // Crear una referencia para la sección de nosotros
+
   const frases = [
     'Regístrate y únete a una comunidad de más de 100.000 personas apasionadas por el arte.',
     'Descubre miles de obras de arte únicas y encuentra la que te define.',
     'Da a conocer tu talento y vende tu arte online a un público Colombiano.',
     'Decora tu hogar con piezas que reflejen tu estilo y personalidad.'
   ];
-  const intervaloTiempo = 5000; // Cambiar cada 5 segundos (5000 milisegundos)
+  const intervaloTiempo = 5000;
 
   useEffect(() => {
     const intervalo = setInterval(() => {
@@ -28,17 +31,27 @@ function LandingPage() {
           element.classList.add('fade-in');
           setTimeout(() => {
             element.classList.remove('fade-in');
-          }, 500); // Espera a que termine la transición de entrada
-        }, 100); // Espera a que termine la transición de salida
-      }, 500); // Espera a que termine la transición de salida
+          }, 500);
+        }, 100);
+      }, 500);
     }, intervaloTiempo);
 
     return () => clearInterval(intervalo);
   }, [fraseActual]);
 
+  // Función para hacer scroll hasta el soporte
+  const handleScrollToSupport = () => {
+    supportRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  };
+
+  // Función para hacer scroll hasta la sección de nosotros
+  const handleScrollToAbout = () => {
+    aboutRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  };
+
   return (
     <div className='home-container'>
-      <Navbar/>
+      <Navbar onSupportClick={handleScrollToSupport} onAboutClick={handleScrollToAbout} />
       <div className='banner-container'>
         <div className='col-md-6 imagen-home-banner'>
           <img className='spot-img' src={Spot} alt="" />
@@ -53,9 +66,13 @@ function LandingPage() {
           </div>
         </div>
       </div>
-      <About/>
-      <Support/>
-      <Footer/>
+      <div ref={aboutRef}>
+        <About />
+      </div>
+      <div ref={supportRef}>
+        <Support />
+      </div>
+      <Footer />
     </div>
   );
 }
