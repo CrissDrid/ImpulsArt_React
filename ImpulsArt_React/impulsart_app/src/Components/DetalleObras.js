@@ -1,18 +1,21 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react'; 
 import { useParams, useNavigate } from 'react-router-dom';
-import axios from 'axios';
 import { Tag } from 'primereact/tag';
 import { Rating } from 'primereact/rating';
+import { Toast } from 'primereact/toast';
 import '../Styles/DetallesObra.css';
 import Navbar_init from './Navbar_init';
 import Footer from './Footer';
 
 // Autenticacion de apis
-import '../Auth/AuthToken';
 import AuthToken from '../Auth/AuthToken';
+import GetUserInfo from '../Auth/GetUserInfo';
 
 function DetallesObra() {
+  const toast = useRef(null);
+  const [usuario, setUsuario] = useState(null);
   const [identificacion, setIdentificacion] = useState('');
+  const [carritoId, setCarritoId] = useState(null);
   const { pkCod_Producto } = useParams();
   const navigate = useNavigate(); // Hook para redirigir
   const [obra, setObra] = useState({
@@ -21,13 +24,38 @@ function DetallesObra() {
     descripcion: '',
     categoriaNombre: '',
     imagen: '',
+    TipoImagen: '',
     tamano: '',
+    peso: '',
     cantidad: 1,
     rating: 0
   });
-  const [cantidadCompra, setCantidadCompra] = useState(0);
+  const [cantidadCompra, setCantidadCompra] = useState(1); // Se inicializa en 1 por defecto
 
   useEffect(() => {
+    const fetchData = async () => {
+      try {
+        // Obtener datos del usuario
+        const userInfo = await GetUserInfo();
+        if (userInfo) {
+          const { identificacion } = userInfo;
+          setIdentificacion(identificacion);
+
+          // Cargar datos del usuario
+          const userResponse = await AuthToken.get(`/usuario/list/${identificacion}`);
+          setUsuario(userResponse.data.data);
+        }
+      } catch (error) {
+        console.error('Error al cargar los datos del usuario:', error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  useEffect(() => {
+    if (!identificacion) return; // No hacer nada si la identificación no está disponible
+
     const loadObra = async () => {
       try {
         const result = await AuthToken.get(`${process.env.REACT_APP_API_BASE_URL}obra/list/${pkCod_Producto}`);
@@ -49,8 +77,25 @@ function DetallesObra() {
       }
     };
 
+    const loadCarritoId = async () => {
+      try {
+        const response = await AuthToken.get(`${process.env.REACT_APP_API_BASE_URL}carrito/usuarioPorCarrito/${identificacion}`);
+        const carritoData = response.data.data;
+
+        // Asegúrate de que el carrito tenga un ID válido
+        if (carritoData && carritoData.pkCod_Carrito) {
+          setCarritoId(carritoData.pkCod_Carrito);
+        } else {
+          console.error('Carrito no encontrado');
+        }
+      } catch (error) {
+        console.error('Error al cargar el carrito del usuario:', error);
+      }
+    };
+
     loadObra();
-  }, [pkCod_Producto]);
+    loadCarritoId();
+  }, [identificacion, pkCod_Producto]); // Dependencias actualizadas
 
   const handleRatingChange = (e) => {
     setObra({ ...obra, rating: e.value });
@@ -63,43 +108,60 @@ function DetallesObra() {
   };
 
   const decrement = () => {
-    if (cantidadCompra > 0) {
+    if (cantidadCompra > 1) { // Evita que la cantidad sea menor que 1
       setCantidadCompra(cantidadCompra - 1);
     }
   };
 
   const handleChange = (e) => {
     const value = parseInt(e.target.value, 10);
-    if (!isNaN(value) && value >= 0 && value <= obra.cantidad) {
+    if (!isNaN(value) && value >= 1 && value <= obra.cantidad) { // Asegura que el valor esté en el rango válido
       setCantidadCompra(value);
     }
   };
 
   const handleComprar = async () => {
+    if (!carritoId) {
+      if (toast.current) {
+        toast.current.show({ severity: 'error', summary: 'Error', detail: 'ID del carrito no disponible', life: 3000 });
+      }
+      return;
+    }
+  
+    if (cantidadCompra > obra.cantidad) {
+      if (toast.current) {
+        toast.current.show({ severity: 'warn', summary: 'Advertencia', detail: 'La cantidad seleccionada supera la cantidad disponible', life: 3000 });
+      }
+      return;
+    }
+  
     try {
-      // Asumimos que tienes el ID del carrito del usuario actual
-      const carritoId = 1; // Este valor debería venir de tu estado global o de donde almacenes el ID del carrito del usuario
-
       // Llamada al backend para agregar la obra al carrito
       await AuthToken.post(`${process.env.REACT_APP_API_BASE_URL}carrito/addObra`, null, {
         params: {
           carritoId: carritoId,
           obraId: pkCod_Producto,
-          cantidad: obra.cantidad
+          cantidad: cantidadCompra
         }
       });
-
+  
+      // Mostrar mensaje de éxito
+      if (toast.current) {
+        toast.current.show({ severity: 'success', summary: 'Éxito', detail: 'Obra añadida al carrito correctamente', life: 3000 });
+      }
+  
       // Redirigir al carrito de compras
       navigate('/carrito');
     } catch (error) {
+      toast.current.show({ severity: 'warn', summary: 'Advertencia', detail: 'La cantidad de obras que selecciono excede el stock en tu carrito de compras', life: 3000 });
       console.error('Error al agregar la obra al carrito:', error);
-      // Aquí puedes manejar el error, por ejemplo, mostrando un mensaje al usuario
     }
   };
 
   return (
     <>
       <Navbar_init />
+      <Toast ref={toast} />
       <div className="container mt-4">
         <div className="row">
           <div className="col-md-6">
@@ -132,7 +194,7 @@ function DetallesObra() {
                 <p className='p-dimensiones'><strong>Dimensiones:</strong> {obra.tamano}</p>
                 <p className='p-dimensiones'><strong>Peso:</strong> {obra.peso}</p>
                 <p className='p-stock'><strong>Stock:</strong> {obra.cantidad}</p>
-            </div>
+              </div>
             </div>
             <div className='row'>
               <div className='col-md-6'>
@@ -142,7 +204,6 @@ function DetallesObra() {
                   </button>
                   <input
                     type="number"
-                    readOnly
                     value={cantidadCompra}
                     onChange={handleChange}
                     min="0"
@@ -157,7 +218,7 @@ function DetallesObra() {
               </div>
               <div className='col-md-6'>
                 <div className="d-flex align-items-center justify-content-end">
-                <h1 className='costoObra'>{obra.costo}</h1>
+                  <h1 className='costoObra'>{obra.costo}</h1>
                 </div>
               </div>
             </div>

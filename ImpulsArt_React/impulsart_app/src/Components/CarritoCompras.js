@@ -18,52 +18,102 @@ function CarritoCompras() {
         const { identificacion } = GetUserInfo();
         setIdentificacion(identificacion);
 
-        const fetchCarrito = async () => {
-            try {
-                if (identificacion) {
-                    const response = await AuthToken.get(`${process.env.REACT_APP_API_BASE_URL}carrito/usuarioPorCarrito/${identificacion}`);
-                    const { data } = response.data;
-                    const elementosCarrito = data.elementoCarrito || [];
-                    setElementoCarrito(elementosCarrito);
-                    setCarritoId(data.pkCod_Carrito); // Asignar el carritoId
-
-                    const productos = elementosCarrito.map(item => ({
-                        ...item.obra,
-                        cantidad: item.cantidad // Incluir la cantidad del elementoCarrito
-                    }));
-                    setProductos(productos);
+        useEffect(() => {
+            const { identificacion } = GetUserInfo();
+            setIdentificacion(identificacion);
+        
+            const fetchCarrito = async () => {
+                try {
+                    if (identificacion) {
+                        const response = await AuthToken.get(`${process.env.REACT_APP_API_BASE_URL}carrito/usuarioPorCarrito/${identificacion}`);
+                        const { data } = response.data;
+                        const elementosCarrito = data.elementoCarrito || [];
+                        setElementoCarrito(elementosCarrito);
+                        setCarritoId(data.pkCod_Carrito); // Asignar el carritoId
+                        console.log('Carrito ID obtenido:', data.pkCod_Carrito);
+        
+                        const productos = elementosCarrito.map(item => ({
+                            ...item.obra,
+                            cantidad: item.cantidad // Incluir la cantidad del elementoCarrito
+                        }));
+                        setProductos(productos);
+                    }
+                } catch (error) {
+                    console.error('Error al cargar el carrito:', error);
                 }
-            } catch (error) {
-                console.error('Error al cargar el carrito:', error);
-            }
-        };
+            };
+        
+            fetchCarrito();
+        }, [identificacion]);
 
         fetchCarrito();
     }, [identificacion]);
+
+    const actualizarCantidad = async (elementoId, nuevaCantidad) => {
+        try {
+            const response = await AuthToken.put(`${process.env.REACT_APP_API_BASE_URL}carrito/updateCantidad`, null, {
+                params: {
+                    carritoId: carritoId,
+                    elementoId: elementoId,
+                    nuevaCantidad: nuevaCantidad
+                }
+            });
+
+            if (response.status === 200) {
+                // Actualizar la lista de productos después de la actualización
+                setElementoCarrito(prevElementos => prevElementos.map(item =>
+                    item.pkCod_Elemento === elementoId ? { ...item, cantidad: nuevaCantidad } : item
+                ));
+                setProductos(prevProductos => prevProductos.map(producto =>
+                    producto.pkCod_Producto === elementoId ? { ...producto, cantidad: nuevaCantidad } : producto
+                ));
+            } else {
+                console.error('Error al actualizar la cantidad:', response.data.message);
+            }
+        } catch (error) {
+            if (error.response) {
+                console.error('Error al actualizar la cantidad:', error.response.data);
+            } else {
+                console.error('Error al actualizar la cantidad:', error.message);
+            }
+        }
+    };
+
+    const incrementarCantidad = (id, cantidadActual) => {
+        const nuevaCantidad = cantidadActual + 1;
+        actualizarCantidad(id, nuevaCantidad);
+    };
+
+    const decrementarCantidad = (id, cantidadActual) => {
+        if (cantidadActual > 1) {
+            const nuevaCantidad = cantidadActual - 1;
+            actualizarCantidad(id, nuevaCantidad);
+        }
+    };
 
     const eliminarProducto = async (id) => {
         if (!carritoId) {
             console.error('Carrito ID no disponible');
             return;
         }
-
-        try {
-            const response = await AuthToken.delete(`${process.env.REACT_APP_API_BASE_URL}carrito/removeObras/${id}/${carritoId}`);
     
+        const url = `${process.env.REACT_APP_API_BASE_URL}carrito/removeObras/${carritoId}/${id}`;
+        console.log('URL de eliminación:', url);
+    
+        try {
+            const response = await AuthToken.delete(url);
+            
             if (response.status === 200) {
-                // Recargar la página después de eliminar el producto
-                window.location.reload();
+                // Actualizar el estado del carrito para eliminar el producto
+                setElementoCarrito(prevElementos => prevElementos.filter(item => item.pkCod_Elemento !== id));
+                setProductos(prevProductos => prevProductos.filter(producto => producto.pkCod_Producto !== id));
             } else {
                 console.error('Error al eliminar el producto:', response.data.message);
             }
         } catch (error) {
             if (error.response) {
-                // Error en la respuesta del servidor
                 console.error('Error al eliminar el producto:', error.response.data);
-                console.error('Status:', error.response.status);
-                console.error('Headers:', error.response.headers);
             } else {
-                // Error en la solicitud
                 console.error('Error al eliminar el producto:', error.message);
             }
         }
@@ -81,10 +131,10 @@ function CarritoCompras() {
                 <div className='row'>
                     <div className='col-md-8'>
                         {elementoCarrito.map(item => (
-                            <div key={item.obra.pkCod_Producto} className='row border-bottom'>
+                            <div key={item.pkCod_Elemento} className='row border-bottom'>
                                 <div className='col-md-3'>
                                     <div className='img'>
-                                        <img src={item.obra.imagen} alt={item.obra.nombreProducto} />
+                                        <img  src={`data:${item.obra.TipoImagen};base64,${item.obra.imagen}`} alt={item.obra.nombreProducto} />
                                     </div>
                                 </div>
                                 <div className='col-md-6'>
@@ -98,7 +148,12 @@ function CarritoCompras() {
                                     <h5 className='valorObra d-flex justify-content-end'>{item.obra.costo}</h5>
                                     <div className='col-md-3 d-flex justify-content-start'>
                                         <div className="d-flex align-items-center inputNumber">
-                                            <button className="btn btn-increment"><i className="pi pi-minus"></i></button>
+                                            <button 
+                                                className="btn btn-increment"
+                                                onClick={() => decrementarCantidad(item.pkCod_Elemento, item.cantidad)}
+                                            >
+                                                <i className="pi pi-minus"></i>
+                                            </button>
                                             <input
                                                 type="number"
                                                 readOnly
@@ -106,13 +161,18 @@ function CarritoCompras() {
                                                 min="1"
                                                 className="form-control input-cantidad text-center"
                                             />
-                                            <button className="btn btn-decrement"><i className="pi pi-plus"></i></button>
+                                            <button 
+                                                className="btn btn-decrement"
+                                                onClick={() => incrementarCantidad(item.pkCod_Elemento, item.cantidad)}
+                                            >
+                                                <i className="pi pi-plus"></i>
+                                            </button>
                                         </div>
                                     </div>
                                 </div>
                                 <div className='col-md-1'>
                                     <div className="p-2">
-                                        <Button icon="pi pi-trash" className="p-button-rounded p-button-danger" onClick={() => eliminarProducto(item.obra.pkCod_Producto)} />
+                                        <Button icon="pi pi-trash" className="p-button-rounded p-button-danger" onClick={() => eliminarProducto(item.pkCod_Elemento)} />
                                     </div>
                                 </div>
                             </div>
@@ -123,7 +183,7 @@ function CarritoCompras() {
                             <h6 className="text-center">Confirmación del Pedido</h6>
                             <ul className="list-group list-group-flush">
                                 {elementoCarrito.map(item => (
-                                    <li key={item.obra.pkCod_Producto} className="list-group-item nombrePrecio d-flex justify-content-between align-items-center">
+                                    <li key={item.pkCod_Elemento} className="list-group-item nombrePrecio d-flex justify-content-between align-items-center">
                                         {item.obra.nombreProducto}
                                         <span>${parseInt(item.obra.costo.replace(/[$,.]/g, '')) * item.cantidad}</span>
                                     </li>
