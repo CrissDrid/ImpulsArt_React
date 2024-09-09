@@ -81,10 +81,11 @@ function DetallesObra() {
       const carritoId = 1; // Este valor debería venir de tu estado global o de donde almacenes el ID del carrito del usuario
 
       // Llamada al backend para agregar la obra al carrito
-      await AuthToken.post(`${process.env.REACT_APP_API_BASE_URL}carrito/add-obra`, null, {
+      await AuthToken.post(`${process.env.REACT_APP_API_BASE_URL}carrito/addObra`, null, {
         params: {
           carritoId: carritoId,
-          obraId: pkCod_Producto
+          obraId: pkCod_Producto,
+          cantidad: obra.cantidad
         }
       });
 

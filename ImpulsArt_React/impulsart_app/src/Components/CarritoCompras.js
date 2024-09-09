@@ -10,6 +10,8 @@ import GetUserInfo from '../Auth/GetUserInfo';
 function CarritoCompras() {
     const [identificacion, setIdentificacion] = useState('');
     const [productos, setProductos] = useState([]);
+    const [elementoCarrito, setElementoCarrito] = useState([]);
+    const [carritoId, setCarritoId] = useState(null);
 
     useEffect(() => {
         // Obtener la información del usuario
@@ -20,7 +22,16 @@ function CarritoCompras() {
             try {
                 if (identificacion) {
                     const response = await AuthToken.get(`${process.env.REACT_APP_API_BASE_URL}carrito/usuarioPorCarrito/${identificacion}`);
-                    setProductos(response.data.data.obra || []);
+                    const { data } = response.data;
+                    const elementosCarrito = data.elementoCarrito || [];
+                    setElementoCarrito(elementosCarrito);
+                    setCarritoId(data.pkCod_Carrito); // Asignar el carritoId
+
+                    const productos = elementosCarrito.map(item => ({
+                        ...item.obra,
+                        cantidad: item.cantidad // Incluir la cantidad del elementoCarrito
+                    }));
+                    setProductos(productos);
                 }
             } catch (error) {
                 console.error('Error al cargar el carrito:', error);
@@ -30,56 +41,16 @@ function CarritoCompras() {
         fetchCarrito();
     }, [identificacion]);
 
-    const increment = async (id) => {
-        try {
-            const producto = productos.find(p => p.pkCod_Producto === id);
-            if (producto && producto.cantidad < producto.stock) {
-                const response = await AuthToken.put(`${process.env.REACT_APP_API_BASE_URL}carrito/update-cantidad`, {
-                    identificacion,  // Cambiamos carritoId por identificacion
-                    obraId: id,
-                    cantidad: producto.cantidad + 1
-                });
-                if (response.data.status === 'success') {
-                    setProductos(productos.map(p =>
-                        p.pkCod_Producto === id ? { ...p, cantidad: p.cantidad + 1 } : p
-                    ));
-                }
-            }
-        } catch (error) {
-            console.error('Error al incrementar la cantidad:', error);
-        }
-    };
-
-    const decrement = async (id) => {
-        try {
-            const producto = productos.find(p => p.pkCod_Producto === id);
-            if (producto && producto.cantidad > 1) {
-                const response = await AuthToken.put(`${process.env.REACT_APP_API_BASE_URL}carrito/update-cantidad`, {
-                    identificacion,  // Cambiamos carritoId por identificacion
-                    obraId: id,
-                    cantidad: producto.cantidad - 1
-                });
-                if (response.data.status === 'success') {
-                    setProductos(productos.map(p =>
-                        p.pkCod_Producto === id ? { ...p, cantidad: p.cantidad - 1 } : p
-                    ));
-                }
-            }
-        } catch (error) {
-            console.error('Error al decrementar la cantidad:', error);
-        }
-    };
-
     const eliminarProducto = async (id) => {
+        if (!carritoId) {
+            console.error('Carrito ID no disponible');
+            return;
+        }
+
         try {
-            const response = await AuthToken.delete(`${process.env.REACT_APP_API_BASE_URL}carrito/remove-obra`, {
-                params: {
-                    identificacion,  // Cambiamos carritoId por identificacion
-                    obraId: id
-                }
-            });
+            const response = await AuthToken.delete(`${process.env.REACT_APP_API_BASE_URL}carrito/removeObras/${id}/${carritoId}`);
     
-            if (response.data.status === 'success') {
+            if (response.status === 200) {
                 // Recargar la página después de eliminar el producto
                 window.location.reload();
             } else {
@@ -99,7 +70,7 @@ function CarritoCompras() {
     };
 
     const calcularTotal = () => {
-        return productos.reduce((total, producto) => total + (parseInt(producto.costo.replace(/[$,.]/g, '')) * producto.cantidad), 0);
+        return elementoCarrito.reduce((total, item) => total + (parseInt(item.obra.costo.replace(/[$,.]/g, '')) * item.cantidad), 0);
     };
 
     return (
@@ -109,39 +80,39 @@ function CarritoCompras() {
             <div id="carrito-compras" className='container'>
                 <div className='row'>
                     <div className='col-md-8'>
-                        {productos.map(producto => (
-                            <div key={producto.pkCod_Producto} className='row border-bottom'>
+                        {elementoCarrito.map(item => (
+                            <div key={item.obra.pkCod_Producto} className='row border-bottom'>
                                 <div className='col-md-3'>
                                     <div className='img'>
-                                        <img src={producto.imagen} alt={producto.nombreProducto} />
+                                        <img src={item.obra.imagen} alt={item.obra.nombreProducto} />
                                     </div>
                                 </div>
                                 <div className='col-md-6'>
                                     <div className="card-body">
-                                        <h5 className="card-title">{producto.nombreProducto}</h5>
-                                        <p className="card-text text-muted">{producto.descripcion}</p>
-                                        <small className="text-muted">Peso: {producto.peso} | Tamaño: {producto.tamano}</small>
+                                        <h5 className="card-title">{item.obra.nombreProducto}</h5>
+                                        <p className="card-text text-muted">{item.obra.descripcion}</p>
+                                        <small className="text-muted">Peso: {item.obra.peso} | Tamaño: {item.obra.tamano}</small>
                                     </div>
                                 </div>
                                 <div className='col-md-2'>
-                                    <h5 className='valorObra d-flex justify-content-end'>{producto.costo}</h5>
+                                    <h5 className='valorObra d-flex justify-content-end'>{item.obra.costo}</h5>
                                     <div className='col-md-3 d-flex justify-content-start'>
                                         <div className="d-flex align-items-center inputNumber">
-                                            <button onClick={() => decrement(producto.pkCod_Producto)} className="btn btn-increment"><i className="pi pi-minus"></i></button>
+                                            <button className="btn btn-increment"><i className="pi pi-minus"></i></button>
                                             <input
                                                 type="number"
                                                 readOnly
-                                                value={producto.cantidad}
+                                                value={item.cantidad}
                                                 min="1"
                                                 className="form-control input-cantidad text-center"
                                             />
-                                            <button onClick={() => increment(producto.pkCod_Producto)} className="btn btn-decrement"><i className="pi pi-plus"></i></button>
+                                            <button className="btn btn-decrement"><i className="pi pi-plus"></i></button>
                                         </div>
                                     </div>
                                 </div>
                                 <div className='col-md-1'>
                                     <div className="p-2">
-                                        <Button icon="pi pi-trash" className="p-button-rounded p-button-danger" onClick={() => eliminarProducto(producto.pkCod_Producto)} />
+                                        <Button icon="pi pi-trash" className="p-button-rounded p-button-danger" onClick={() => eliminarProducto(item.obra.pkCod_Producto)} />
                                     </div>
                                 </div>
                             </div>
@@ -151,10 +122,10 @@ function CarritoCompras() {
                         <div className="card card-subtotal p-3">
                             <h6 className="text-center">Confirmación del Pedido</h6>
                             <ul className="list-group list-group-flush">
-                                {productos.map(producto => (
-                                    <li key={producto.pkCod_Producto} className="list-group-item nombrePrecio d-flex justify-content-between align-items-center">
-                                        {producto.nombreProducto}
-                                        <span>${parseInt(producto.costo.replace(/[$,.]/g, '')) * producto.cantidad}</span>
+                                {elementoCarrito.map(item => (
+                                    <li key={item.obra.pkCod_Producto} className="list-group-item nombrePrecio d-flex justify-content-between align-items-center">
+                                        {item.obra.nombreProducto}
+                                        <span>${parseInt(item.obra.costo.replace(/[$,.]/g, '')) * item.cantidad}</span>
                                     </li>
                                 ))}
                                 <li className="list-group-item total d-flex justify-content-between align-items-center font-weight-bold">
