@@ -1,9 +1,7 @@
-import React, { useState } from 'react';
-import '../Styles/Stepts.css'; // Asumo que ya tienes este archivo CSS
+import React from 'react';
+import '../Styles/Stepts.css';
 
-function Stepts() {
-    const [activeStep, setActiveStep] = useState(0);
-
+function Stepts({ activeStep }) {
     return (
         <div className="container">
             <div className="row justify-content-center mt-5">
@@ -15,18 +13,14 @@ function Stepts() {
                             </div>
                             <p>Carrito</p>
                         </div>
-
                         <div className="line"></div>
-
                         <div className={`step ${activeStep >= 1 ? 'completed' : ''}`}>
                             <div className="circle">
                                 <i className="pi pi-map-marker"></i>
                             </div>
                             <p>Ubicación</p>
                         </div>
-
                         <div className="line"></div>
-
                         <div className={`step ${activeStep >= 2 ? 'completed' : ''}`}>
                             <div className="circle">
                                 <i className="pi pi-credit-card"></i>

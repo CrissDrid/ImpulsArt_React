@@ -30,7 +30,14 @@ const Register = () => {
   const { nombre, apellido, fechaNacimiento, email, numCelular, contrasena, userName, identificacion } = usuario;
 
   const onInputChange = (e) => {
-    setUsuario({ ...usuario, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    if (name === 'identificacion' || name === 'numCelular') {
+      // Limitar a 10 dígitos y solo permitir números
+      const limitedValue = value.replace(/\D/g, '').slice(0, 10);
+      setUsuario({ ...usuario, [name]: limitedValue });
+    } else {
+      setUsuario({ ...usuario, [name]: value });
+    }
   };
 
   const isEmailValid = (email) => {
@@ -42,15 +49,28 @@ const Register = () => {
 
   const isPhoneValid = (phone) => /^3\d{9}$/.test(phone);
 
-  const isIdentificationValid = (id) => /^\d{7,10}$/.test(id);
+  const isIdentificationValid = (id) => /^(\d{8}|\d{10})$/.test(id);
 
   const isDateOfBirthValid = (date) => {
     const today = new Date();
     const dob = new Date(date);
-    const age = today.getFullYear() - dob.getFullYear();
-    const monthDifference = today.getMonth() - dob.getMonth();
-    const dayDifference = today.getDate() - dob.getDate();
-    return today >= dob && age > 18 && (age > 18 || (monthDifference > 0 || (monthDifference === 0 && dayDifference >= 0)));
+    
+    if (dob > today) {
+      return { isValid: false, message: "La fecha de nacimiento no puede ser una fecha futura" };
+    }
+    
+    let age = today.getFullYear() - dob.getFullYear();
+    const monthDiff = today.getMonth() - dob.getMonth();
+    
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dob.getDate())) {
+      age--;
+    }
+    
+    if (age < 18) {
+      return { isValid: false, message: "Debe ser mayor de edad para registrarse" };
+    }
+    
+    return { isValid: true, message: "" };
   };
 
   const isStrongPassword = (password) => {
@@ -86,9 +106,9 @@ const Register = () => {
     }
 
     if (!isIdentificationValid(identificacion)) {
-        toast.current.show({ severity: 'error', summary: 'Error', detail: 'Número de documento inválido', life: 3000 });
-        return;
-    }
+      toast.current.show({ severity: 'warn', summary: 'Advertencia', detail: 'El número de documento debe tener 8 o 10 dígitos', life: 3000 });
+      return;
+  }
 
     if (!isEmailValid(email)) {
         toast.current.show({ severity: 'warn', summary: 'Advertencia', detail: 'Por favor, ingrese un correo electrónico válido', life: 3000 });
@@ -169,7 +189,16 @@ const Register = () => {
                 </div>
               </div>
               <div className="form-floating">
-                <input className="form-control" id="floatingId" onChange={onInputChange} value={identificacion} type="number" name="identificacion" placeholder="Numero de Documento" />
+                <input 
+                  className="form-control" 
+                  id="floatingId" 
+                  onChange={onInputChange} 
+                  value={identificacion} 
+                  type="text" 
+                  name="identificacion" 
+                  placeholder="Numero de Documento" 
+                  maxLength="10"
+                />
                 <label htmlFor="floatingId">Numero de Documento</label>
               </div>
               <div className="form-floating">
@@ -185,7 +214,16 @@ const Register = () => {
                 <label htmlFor="floatingDOB">Fecha de Nacimiento</label>
               </div>
               <div className="form-floating">
-                <input type="number" className="form-control" id="floatingPhone" onChange={onInputChange} value={numCelular} name="numCelular" placeholder="Numero de Celular" />
+                <input 
+                  type="text" 
+                  className="form-control" 
+                  id="floatingPhone" 
+                  onChange={onInputChange} 
+                  value={numCelular} 
+                  name="numCelular" 
+                  placeholder="Numero de Celular" 
+                  maxLength="10"
+                />
                 <label htmlFor="floatingPhone">Numero de Celular</label>
               </div>
               <div className="form-floating">

@@ -68,10 +68,6 @@ const Login = () => {
                 <label htmlFor="floatingPassword">Contraseña</label>
               </div>
               {error && <div className="alert alert-danger">{error}</div>}
-              <div className="form-check text-start my-3">
-                <input className="form-check-input" type="checkbox" value="remember-me" id="flexCheckDefault" />
-                <label className="form-check-label" htmlFor="flexCheckDefault">Recordarme</label>
-              </div>
               <button className="btn btn-primary w-100 py-2 iniciar-btn" type="submit">Iniciar Sesión</button>
               <div className="Links">
                 <p><Link className='link-contraseña link-no-underline'>¿Olvidaste tu contraseña?</Link></p>
