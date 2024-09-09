@@ -33,6 +33,7 @@ import Simulacion from './Simulacion';
 import Dashboard from './Dashboard';
 import Help from './Help';
 import CarritoCompras from './CarritoCompras';
+import PasarelaPagos from './PasarelaPagos';
 import Stepts from './Stepts';
 import DashboardAsesor from './DashboardAsesor';
 import ReportForm from './Reportes';
@@ -58,6 +59,7 @@ function AppRoutes() { // Cambia el nombre de la función a AppRoutes
         <Route path='/SeccionSubasta' element={<SeccionSubasta />}/>
         <Route path='/DetallesSubasta/:pkCodSubasta' element={<DetallesSubasta />}/>
         <Route path='/Carrito' element={<CarritoCompras/>}/>
+        <Route path='/pasarela' element={<PasarelaPagos/>}/>
         <Route path='/stepts' element={<Stepts/>}/>
         <Route path='/Dashboard' element={<Dashboard />}/>
         <Route path='/Help' element={<Help />}/>

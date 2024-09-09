@@ -151,7 +151,7 @@ function DetallesObra() {
       }
   
       // Redirigir al carrito de compras
-      navigate('/carrito');
+      navigate('/pasarela');
     } catch (error) {
       toast.current.show({ severity: 'warn', summary: 'Advertencia', detail: 'La cantidad de obras que selecciono excede el stock en tu carrito de compras', life: 3000 });
       console.error('Error al agregar la obra al carrito:', error);

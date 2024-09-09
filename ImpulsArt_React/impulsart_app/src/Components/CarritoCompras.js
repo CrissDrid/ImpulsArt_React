@@ -7,45 +7,37 @@ import '../Styles/CarritoCompras.css';
 import AuthToken from '../Auth/AuthToken';
 import GetUserInfo from '../Auth/GetUserInfo';
 
-function CarritoCompras() {
+function CarritoCompras({ onFinalizarCompra }) {
     const [identificacion, setIdentificacion] = useState('');
     const [productos, setProductos] = useState([]);
     const [elementoCarrito, setElementoCarrito] = useState([]);
     const [carritoId, setCarritoId] = useState(null);
 
     useEffect(() => {
-        // Obtener la información del usuario
         const { identificacion } = GetUserInfo();
         setIdentificacion(identificacion);
-
-        useEffect(() => {
-            const { identificacion } = GetUserInfo();
-            setIdentificacion(identificacion);
-        
-            const fetchCarrito = async () => {
-                try {
-                    if (identificacion) {
-                        const response = await AuthToken.get(`${process.env.REACT_APP_API_BASE_URL}carrito/usuarioPorCarrito/${identificacion}`);
-                        const { data } = response.data;
-                        const elementosCarrito = data.elementoCarrito || [];
-                        setElementoCarrito(elementosCarrito);
-                        setCarritoId(data.pkCod_Carrito); // Asignar el carritoId
-                        console.log('Carrito ID obtenido:', data.pkCod_Carrito);
-        
-                        const productos = elementosCarrito.map(item => ({
-                            ...item.obra,
-                            cantidad: item.cantidad // Incluir la cantidad del elementoCarrito
-                        }));
-                        setProductos(productos);
-                    }
-                } catch (error) {
-                    console.error('Error al cargar el carrito:', error);
+    
+        const fetchCarrito = async () => {
+            try {
+                if (identificacion) {
+                    const response = await AuthToken.get(`${process.env.REACT_APP_API_BASE_URL}carrito/usuarioPorCarrito/${identificacion}`);
+                    const { data } = response.data;
+                    const elementosCarrito = data.elementoCarrito || [];
+                    setElementoCarrito(elementosCarrito);
+                    setCarritoId(data.pkCod_Carrito); // Asignar el carritoId
+                    console.log('Carrito ID obtenido:', data.pkCod_Carrito);
+    
+                    const productos = elementosCarrito.map(item => ({
+                        ...item.obra,
+                        cantidad: item.cantidad // Incluir la cantidad del elementoCarrito
+                    }));
+                    setProductos(productos);
                 }
-            };
-        
-            fetchCarrito();
-        }, [identificacion]);
-
+            } catch (error) {
+                console.error('Error al cargar el carrito:', error);
+            }
+        };
+    
         fetchCarrito();
     }, [identificacion]);
 
@@ -97,12 +89,15 @@ function CarritoCompras() {
             return;
         }
     
-        const url = `${process.env.REACT_APP_API_BASE_URL}carrito/removeObras/${carritoId}/${id}`;
+        console.log('ID de producto a eliminar:', id);
+        console.log('Carrito ID:', carritoId);
+    
+        const url = `${process.env.REACT_APP_API_BASE_URL}elemento/delete/${id}`;
         console.log('URL de eliminación:', url);
     
         try {
             const response = await AuthToken.delete(url);
-            
+    
             if (response.status === 200) {
                 // Actualizar el estado del carrito para eliminar el producto
                 setElementoCarrito(prevElementos => prevElementos.filter(item => item.pkCod_Elemento !== id));
@@ -125,8 +120,6 @@ function CarritoCompras() {
 
     return (
         <>
-            <Navbar_init />
-            <Stepts />
             <div id="carrito-compras" className='container'>
                 <div className='row'>
                     <div className='col-md-8'>
@@ -193,12 +186,11 @@ function CarritoCompras() {
                                     <span>${calcularTotal()}</span>
                                 </li>
                             </ul>
-                            <button className="btn btn-finalizarCompra mt-3 w-100">Finalizar Compra</button>
+                            <button className="btn btn-finalizarCompra mt-3 w-100" onClick={onFinalizarCompra}>Finalizar Compra</button>
                         </div>
                     </div>
                 </div>
             </div>
-            <Footer />
         </>
     );
 }

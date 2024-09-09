@@ -1,7 +1,7 @@
-import Navbar_init from './Navbar_init';
 import Footer from './Footer';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js'; // Asegúrate de importar el bundle que incluye Popper.js
+import Navbar_init from './Navbar_init';
 
 function Help() {
     return (
