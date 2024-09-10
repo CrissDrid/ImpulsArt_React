@@ -139,18 +139,10 @@ function CrearDireccion() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     const isValid = validateAddress(direccion);
-
+  
     if (isValid) {
-      console.log('Datos a enviar:', {
-        departamento: selectedDepartamentoName,
-        direccion: direccion,
-        ciudad: ciudadCapital,
-        observaciones: observacion,
-        fkUsuario: identificacion
-      });
-
       try {
         const response = await AuthToken.post('direccion/create', {
           departamento: selectedDepartamentoName,
@@ -159,7 +151,7 @@ function CrearDireccion() {
           observaciones: observacion,
           fkUsuario: identificacion
         });
-      
+  
         if (response.data.status === 'success') {
           Swal.fire({
             title: '¡Éxito!',
@@ -167,18 +159,25 @@ function CrearDireccion() {
             icon: 'success',
             confirmButtonText: 'OK'
           }).then(() => {
-            // Recarga la página después de cerrar el SweetAlert
             window.location.reload();
           });
           setSuccessMessage(response.data.data);
           setError('');
         } else {
+          // Mostrar el mensaje de error cuando la dirección ya existe
           setError(response.data.data);
           setSuccessMessage('');
         }
       } catch (error) {
         console.error('Error al guardar la dirección:', error);
-        setError('Hubo un error al guardar la dirección.');
+  
+        // Verifica si el error tiene un mensaje específico del servidor
+        if (error.response && error.response.data && error.response.data.data) {
+          setError(error.response.data.data);
+        } else {
+          // Mensaje genérico en caso de que no haya un mensaje específico en el error
+          setError('Hubo un error al guardar la dirección.');
+        }
         setSuccessMessage('');
       }
     }

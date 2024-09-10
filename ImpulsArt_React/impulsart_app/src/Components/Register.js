@@ -45,7 +45,15 @@ const Register = () => {
     return emailRegex.test(email);
   };
 
-  const isOnlyLetters = (str) => /^[A-Za-z]+$/.test(str);
+  const isOnlyLettersWithValidSpaces = (str) => {
+    // Permitir solo letras y un solo espacio entre palabras, sin espacios al inicio o al final
+    return /^[A-Za-z]+( [A-Za-z]+)*$/.test(str);
+  };
+  
+  const isValidUserName = (str) => {
+    // No permitir espacios en el nombre de usuario
+    return /^[A-Za-z0-9_]+$/.test(str);
+  };
 
   const isPhoneValid = (phone) => /^3\d{9}$/.test(phone);
 
@@ -95,15 +103,21 @@ const Register = () => {
         return;
     }
 
-    if (!isOnlyLetters(nombre)) {
-        toast.current.show({ severity: 'warn', summary: 'Advertencia', detail: 'El nombre solo debe contener letras', life: 3000 });
+    if (!isOnlyLettersWithValidSpaces(nombre)) {
+        toast.current.show({ severity: 'warn', summary: 'Advertencia', detail: 'El nombre solo debe contener letras y un solo espacio entre palabras, sin espacios al inicio o al final', life: 3000 });
         return;
     }
 
-    if (!isOnlyLetters(apellido)) {
-        toast.current.show({ severity: 'warn', summary: 'Advertencia', detail: 'El apellido solo debe contener letras', life: 3000 });
+    if (!isOnlyLettersWithValidSpaces(apellido)) {
+        toast.current.show({ severity: 'warn', summary: 'Advertencia', detail: 'El apellido solo debe contener letras y no puede tener un espacio al inicio', life: 3000 });
         return;
     }
+
+    // Validar nombre de usuario
+  if (!isValidUserName(userName)) {
+    toast.current.show({ severity: 'warn', summary: 'Advertencia', detail: 'El nombre de usuario no debe contener espacios y solo debe contener letras', life: 3000 });
+    return;
+  }
 
     if (!isIdentificationValid(identificacion)) {
       toast.current.show({ severity: 'warn', summary: 'Advertencia', detail: 'El número de documento debe tener 8 o 10 dígitos', life: 3000 });
@@ -144,23 +158,30 @@ const Register = () => {
     } catch (error) {
       console.error('Error al verificar el número de identificación:', error);
     }
+    
 
-    try {
-        const response = await axios.post(`${process.env.REACT_APP_API_BASE_URL}usuario/create`, usuario);
-        if (response.status === 200) {
-            Swal.fire({
-                title: '¡Felicidades!',
-                text: 'Se ha registrado exitosamente en ImpulsArt.',
-                icon: 'success'
-            }).then(() => {
-                navigate("/login");
-            });
-        } else {
-            console.error('Error al registrar:', response.data);
-        }
-    } catch (error) {
-        console.error('Error de red:', error);
+     try {
+    const response = await axios.post(`${process.env.REACT_APP_API_BASE_URL}usuario/create`, usuario);
+    if (response.status === 200) {
+      Swal.fire({
+        title: '¡Felicidades!',
+        text: 'Se ha registrado exitosamente en ImpulsArt.',
+        icon: 'success'
+      }).then(() => {
+        navigate("/login");
+      });
+    } else {
+      // Manejar otros estados si es necesario
+      toast.current.show({ severity: 'error', summary: 'Error', detail: 'Error desconocido', life: 3000 });
     }
+  } catch (error) {
+    if (error.response && error.response.status === 409) {
+      toast.current.show({ severity: 'error', summary: 'Error', detail: error.response.data.message, life: 3000 });
+    } else {
+      console.error('Error de red:', error);
+      toast.current.show({ severity: 'error', summary: 'Error', detail: 'Error de red', life: 3000 });
+    }
+  }
 };
 
   return (
@@ -176,13 +197,13 @@ const Register = () => {
                 <div className="row">
                   <div className="col-md-6">
                     <div className="form-floating">
-                      <input className="form-control" id="floatingName" placeholder="Nombre" onChange={onInputChange} value={nombre} type="text" name="nombre" />
+                      <input className="form-control" id="floatingName" placeholder="Nombre" maxLength="30" onChange={onInputChange} value={nombre} type="text" name="nombre" />
                       <label htmlFor="floatingName">Nombre</label>
                     </div>
                   </div>
                   <div className="col-md-6">
                     <div className="form-floating">
-                      <input className="form-control" id="floatingLastName" onChange={onInputChange} value={apellido} type="text" name="apellido" placeholder="Apellido" />
+                      <input className="form-control" id="floatingLastName" maxLength="30" onChange={onInputChange} value={apellido} type="text" name="apellido" placeholder="Apellido" />
                       <label htmlFor="floatingLastName">Apellido</label>
                     </div>
                   </div>
@@ -202,7 +223,7 @@ const Register = () => {
                 <label htmlFor="floatingId">Numero de Documento</label>
               </div>
               <div className="form-floating">
-                <input type="text" className="form-control" id="floatingUserName" onChange={onInputChange} value={userName} name="userName" placeholder="User Name" />
+                <input type="text" className="form-control" id="floatingUserName" maxLength="30" onChange={onInputChange} value={userName} name="userName" placeholder="User Name" />
                 <label htmlFor="floatingUserName">User Name</label>
               </div>
               <div className="form-floating">
@@ -227,14 +248,14 @@ const Register = () => {
                 <label htmlFor="floatingPhone">Numero de Celular</label>
               </div>
               <div className="form-floating">
-                <Password className="form-contraseña" id="floatingPassword" onChange={onInputChange} value={contrasena} name="contrasena" toggleMask placeholder="Contraseña"
+                <Password className="form-contraseña" id="floatingPassword" maxLength="30" onChange={onInputChange} value={contrasena} name="contrasena" toggleMask placeholder="Contraseña"
                 promptLabel="Ingrese la contraseña"
                 weakLabel='Contraseña Débil' 
                 mediumLabel='Contraseña Media' 
                 strongLabel='Contraseña Fuerte' />
               </div>
               <div className="form-floating">
-                <Password className='form-contraseña' name='confirmPassword' toggleMask feedback={false} placeholder="Confirmar Contraseña" onChange={(e) => setConfirmPassword(e.target.value)} />
+                <Password className='form-contraseña' maxLength="30" name='confirmPassword' toggleMask feedback={false} placeholder="Confirmar Contraseña" onChange={(e) => setConfirmPassword(e.target.value)} />
               </div>
               <button className="btn btn-primary w-100 py-2 create-btn" type="submit">Crear Cuenta</button>
               <div className="Links">
