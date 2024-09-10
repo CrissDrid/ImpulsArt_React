@@ -5,6 +5,7 @@
   "dependencies": {
     "@emailjs/browser": "^4.3.3",
     "@floating-ui/core": "^1.6.0",
+    "@mapbox/mapbox-gl-geocoder": "^5.0.2",
     "@paypal/react-paypal-js": "^8.2.0",
     "@popperjs/core": "^2.11.8",
     "@testing-library/jest-dom": "^5.17.0",
@@ -17,6 +18,7 @@
     "jspdf": "^2.5.1",
     "jspdf-autotable": "^3.8.2",
     "jwt-decode": "^4.0.0",
+    "mapbox-gl": "^3.6.0",
     "md5": "^2.3.0",
     "primeicons": "^7.0.0",
     "primereact": "^10.8.2",

@@ -1,0 +1,72 @@
+.btn-agregarDireccion{
+    background-color: #8D33FF !important;
+    color: white;
+}
+
+.direcciones-title {
+    white-space: nowrap;
+    margin-right: 15px;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.observacion-textarea {
+    resize: none; /* Desactiva el redimensionamiento */
+    height: 100px; /* Establece una altura fija */
+}
+
+.suggestions-list {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    border: 1px solid #ccc;
+    max-height: 150px;
+    overflow-y: auto;
+  }
+  
+  .suggestions-list li {
+    padding: 10px;
+    cursor: pointer;
+  }
+  
+  .suggestions-list li:hover {
+    background-color: #f0f0f0;
+  }
+  .mapboxgl-ctrl-geocoder {
+    width: 100% !important;
+    max-width: none !important;
+    box-shadow: none;
+    border: 1px solid #ccc; /* Borde gris por defecto */
+    border-radius: 5px; /* Border radius */
+    transition: border-color 0.3s ease, box-shadow 0.3s ease; /* Suaviza la transición */
+  }
+  
+  .mapboxgl-ctrl-geocoder:hover {
+    border-color: #8D33FF; /* Borde morado cuando el cursor está encima */
+  }
+  
+  .mapboxgl-ctrl-geocoder--input {
+    width: 100% !important;
+    outline: none !important;
+    box-shadow: none !important;
+    border-radius: 5px; /* Border radius para el input */
+  }
+  
+  .mapboxgl-ctrl-geocoder--input:focus {
+    outline: none !important;
+    box-shadow: 0 0 0 0.2rem #d1acff !important; /* Box-shadow al hacer focus */
+    border-color: #8D33FF !important; /* Cambia el borde al hacer focus */
+    border-radius: 5px; /* Border radius junto con el box-shadow */
+  }
+  
+  /* Esto eliminará el borde punteado en Firefox */
+  .mapboxgl-ctrl-geocoder--input::-moz-focus-inner {
+    border: 0;
+  }
+  
+  /* Esto eliminará el borde punteado en otros navegadores */
+  .mapboxgl-ctrl-geocoder--input:focus {
+    outline: none;
+  }
+  
+  

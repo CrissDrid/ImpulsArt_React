@@ -219,7 +219,7 @@ function Navbar_init({ onSupportClick, onAboutClick }) {
               <>
                 <li className="nav-item">
                   <Link to="/login">
-                    <button className="btn btn-primary signup-btn">Sign in</button>
+                    <button className="btn btn-primary signup-btn">Iniciar Sesion</button>
                   </Link>
                 </li>
                 <li>
