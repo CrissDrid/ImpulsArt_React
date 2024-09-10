@@ -1,50 +1,102 @@
-import React from 'react';
-import { useLocation } from 'react-router-dom';
+import React, { useState } from 'react';
+import axios from 'axios';
+import { useParams } from 'react-router-dom';
 import Navbar_init from './Navbar_init';
-import Footer from './Footer';
+import Swal from 'sweetalert2';
 
-export const ReportForm = () => {
-    const location = useLocation();
-    const obraId = location.pathname.split('/').pop(); // Obtener el ID de la obra desde la URL
+function ReportForm() {
+  const { pkCod_Producto } = useParams();
+  const [reportOption, setReportOption] = useState('');
+  const [comentario, setComentario] = useState('');
 
-    return (
-        <div>
-            <Navbar_init />
-            <div className="container mt-5">
-                <form>
-                    <div className="row mb-3">
-                        <div className="col-md-12">
-                            <label htmlFor="reportOptions" className="form-label">Selecciona una opción para reportar:</label>
-                            <select id="reportOptions" className="form-select">
-                                <option value="inappropriate">Contenido inapropiado</option>
-                                <option value="spam">Spam</option>
-                                <option value="scam">Estafa</option>
-                                <option value="copyright">Violación de derechos de autor</option>
-                                <option value="misleading_ad">Publicidad engañosa</option>
-                                <option value="false_info">Información falsa</option>
-                                <option value="offensive">Contenido ofensivo</option>
-                                <option value="violence">Contenido que promueve violencia</option>
-                                <option value="discrimination">Contenido que promueve discriminación</option>
-                                <option value="hate">Contenido que promueve odio</option>
-                                <option value="other">Otro</option>
-                            </select>
-                        </div>
-                    </div>
+  const reportOptions = [
+    { value: '1', label: 'Inapropiado' },
+    { value: '2', label: 'Spam' },
+    { value: '3', label: 'Estafa' },
+    { value: '4', label: 'Violación de derechos de autor' },
+    { value: '5', label: 'Publicidad engañosa' },
+    { value: '6', label: 'Información Engañosa' },
+    { value: '7', label: 'Contenido ofensivo' },
+    { value: '8', label: 'Contenido que promueve violencia' },
+    { value: '9', label: 'Contenido que promueve la discriminación' },
+    { value: '10', label: 'Contenido que promueve odio' },
+    { value: '11', label: 'Otro' },
+  ];
 
-                    <div className="mb-3">
-                        <label htmlFor="comment" className="form-label">Comentarios adicionales:</label>
-                        <textarea id="comment" className="form-control" rows="4"></textarea>
-                    </div>
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-                    {/* Submit Button */}
-                    <div className="d-grid gap-2">
-                        <button type="submit" className="btn btn-primary">Enviar Reporte</button>
-                    </div>
-                </form>
-                <Footer />
-            </div>
+    if (!pkCod_Producto) {
+      console.error('El ID de la obra no está definido');
+      return;
+    }
+
+    const reportData = {
+      comentario,
+      fechaReporte: new Date().toISOString().split('T')[0],
+      fk_obra: pkCod_Producto,
+      fk_TipoReporte: reportOption,
+    };
+
+    try {
+      const response = await axios.post('http://localhost:8086/api/reporteObra/create', reportData);
+      console.log('Respuesta del servidor:', response.data);
+
+      // Mostrar alerta de éxito
+      Swal.fire({
+        title: 'Reporte enviado',
+        text: 'Tu reporte ha sido enviado exitosamente.',
+        icon: 'success',
+        confirmButtonText: 'Aceptar'
+      });
+    } catch (error) {
+      console.error('Error al enviar el reporte:', error);
+
+      // Mostrar alerta de error
+      Swal.fire({
+        title: 'Error',
+        text: 'Hubo un problema al enviar el reporte. Por favor, inténtalo de nuevo.',
+        icon: 'error',
+        confirmButtonText: 'Aceptar'
+      });
+    }
+  };
+
+  return (
+    <>
+      <Navbar_init />
+      <form onSubmit={handleSubmit}>
+        <div className="mb-3">
+          <label htmlFor="reportOption" className="form-label">Opciones de Reporte</label>
+          <select
+            id="reportOption"
+            className="form-select"
+            value={reportOption}
+            onChange={(e) => setReportOption(e.target.value)}
+            required
+          >
+            <option value="">Seleccione una opción</option>
+            {reportOptions.map(option => (
+              <option key={option.value} value={option.value}>{option.label}</option>
+            ))}
+          </select>
         </div>
-    );
-};
+        <div className="mb-3">
+          <label htmlFor="comentario" className="form-label">Comentario</label>
+          <textarea
+            id="comentario"
+            className="form-control"
+            rows="3"
+            value={comentario}
+            onChange={(e) => setComentario(e.target.value)}
+            required
+          ></textarea>
+        </div>
+        <button type="submit" className="btn btn-primary">Enviar Reporte</button>
+      </form>
+    </>
+  );
+}
 
 export default ReportForm;
+

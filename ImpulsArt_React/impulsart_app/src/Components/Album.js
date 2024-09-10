@@ -68,9 +68,10 @@ function Album() {
               </button>
               <ul className="dropdown-menu" aria-labelledby="dropdownMenuButton">
                 <li>
-                  <a className="dropdown-item" href="#">
-                    <i className="bi bi-exclamation-triangle-fill"></i> <Link to={'/ReportForm'}>Reportar</Link>
-                  </a>
+                  <Link className="dropdown-item" to={`/ReportForm/${obra.pkCod_Producto}`}
+                  >
+                    <i className="bi bi-exclamation-triangle-fill"></i> Reportar
+                  </Link>
                 </li>
               </ul>
               <div className="d-flex justify-content-between align-items-center">

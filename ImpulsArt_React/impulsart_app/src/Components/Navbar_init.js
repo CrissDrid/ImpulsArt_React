@@ -183,6 +183,12 @@ function Navbar_init({ onSupportClick, onAboutClick }) {
               </li>
             )}
 
+            {isAuthenticated && rol.includes('ASESOR') && (
+              <li className="nav-item">
+                <Link to='/DashboardAsesor' className="nav-link active" aria-current="page">PQRS y reportes</Link>
+              </li>
+            )}
+
             {isAuthenticated && (
               <li className="nav-item">
                 <Link to='/SeccionSubasta' className="nav-link active" aria-current="page">Seccion Subasta</Link>

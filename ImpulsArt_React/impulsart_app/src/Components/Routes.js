@@ -64,7 +64,7 @@ function AppRoutes() { // Cambia el nombre de la función a AppRoutes
         <Route path='/Dashboard' element={<Dashboard />}/>
         <Route path='/Help' element={<Help />}/>
         <Route path='/DashboardAsesor' element={<DashboardAsesor />}/>
-        <Route path='/ReportForm' element={<ReportForm />}/>
+        <Route path="/ReportForm/:pkCod_Producto" element={<ReportForm />} />
         <Route path='/Responder' element={<Responder />}/>
         <Route path='/DashboardDomiciliario' element={<DashboardDomiciliario />}/>
         <Route path='/EstadoEntrega' element={<EstadoEntrega />}/>
