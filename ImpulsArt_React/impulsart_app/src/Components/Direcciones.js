@@ -4,18 +4,35 @@ import '@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css';
 import '../Styles/Direcciones.css';
 import Swal from 'sweetalert2';
 
+// Autenticación de token
+import AuthToken from '../Auth/AuthToken';
+// Asegúrate de obtener datos del usuario
+import GetUserInfo from '../Auth/GetUserInfo';
+
+
 const API_KEY = 'pk.eyJ1IjoiY3Jpc3NkIiwiYSI6ImNtMHZra2JoMjA0bWUycXB2MXJoaXU0dTYifQ.VgqtW0qDyQmxUpFxkf23sQ';
 
 function CrearDireccion() {
   const [departamentos, setDepartamentos] = useState([]);
   const [ciudadCapital, setCiudadCapital] = useState('');
-  const [selectedDepartamento, setSelectedDepartamento] = useState('');
+  const [selectedDepartamentoId, setSelectedDepartamentoId] = useState('');
+  const [selectedDepartamentoName, setSelectedDepartamentoName] = useState('');
   const [direccion, setDireccion] = useState('');
   const [observacion, setObservacion] = useState('');
   const [error, setError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
   const [direccionSeleccionada, setDireccionSeleccionada] = useState(false);
+  const [identificacion, setIdentificacion] = useState('');
   const geocoderRef = useRef(null);
+
+  useEffect(() => {
+
+    //Cargar identificacion
+    const { identificacion } = GetUserInfo();
+    setIdentificacion(identificacion);
+    console.log("Identificación obtenida:", identificacion);
+    
+  }, []);
 
   useEffect(() => {
     fetch('https://api-colombia.com/api/v1/Department')
@@ -28,11 +45,12 @@ function CrearDireccion() {
   }, []);
 
   useEffect(() => {
-    if (selectedDepartamento) {
-      fetch(`https://api-colombia.com/api/v1/Department/${selectedDepartamento}`)
+    if (selectedDepartamentoId) {
+      fetch(`https://api-colombia.com/api/v1/Department/${selectedDepartamentoId}`)
         .then(response => response.json())
         .then(data => {
           setCiudadCapital(data.cityCapital ? data.cityCapital.name : '');
+          setSelectedDepartamentoName(data.name);
           if (geocoderRef.current) {
             geocoderRef.current.clear();
           }
@@ -42,8 +60,9 @@ function CrearDireccion() {
         .catch(error => console.error('Error fetching ciudad capital:', error));
     } else {
       setCiudadCapital('');
+      setSelectedDepartamentoName('');
     }
-  }, [selectedDepartamento]);
+  }, [selectedDepartamentoId]);
 
   useEffect(() => {
     const container = document.getElementById('direccion-container');
@@ -92,8 +111,24 @@ function CrearDireccion() {
   }, [ciudadCapital]);
 
   const validateAddress = (address) => {
-    return true;
-  };
+    // Expresión regular para validar tipos de vía (Calle, Carrera, Avenida, Transversal, etc.)
+    const tipoViaRegex = /^(Calle|Carrera|Avenida|Diagonal|Transversal|Tv|Cr|Cl)\s\d+/;
+  
+    // Expresión regular para validar si tiene un número de vía y puede tener un número de predio (opcional)
+    const numeroPredioRegex = /\d+(\s?#\s?\d+-?\d*)?/;
+  
+    // Verifica si cumple con al menos dos características
+    const cumpleTipoVia = tipoViaRegex.test(address); // Verifica el tipo de vía
+    const cumpleNumeroPredio = numeroPredioRegex.test(address); // Verifica el número de vía o predio
+  
+    if (cumpleTipoVia && cumpleNumeroPredio) {
+      setError(''); // Limpia el mensaje de error si cumple
+      return true;
+    } else {
+      setError('La dirección debe tener al menos un tipo de vía (Calle, Carrera, etc.) y un número.');
+      return false;
+    }
+  };  
 
   const handleObservacionChange = (e) => {
     const inputText = e.target.value;
@@ -102,22 +137,56 @@ function CrearDireccion() {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     const isValid = validateAddress(direccion);
 
     if (isValid) {
-      setSuccessMessage('La dirección se ha guardado correctamente.');
-      setError('');
-    } else {
-      setError(`La dirección ingresada no es válida o no pertenece a ${ciudadCapital}.`);
-      setSuccessMessage('');
+      console.log('Datos a enviar:', {
+        departamento: selectedDepartamentoName,
+        direccion: direccion,
+        ciudad: ciudadCapital,
+        observaciones: observacion,
+        fkUsuario: identificacion
+      });
+
+      try {
+        const response = await AuthToken.post('direccion/create', {
+          departamento: selectedDepartamentoName,
+          direccion: direccion,
+          ciudad: ciudadCapital,
+          observaciones: observacion,
+          fkUsuario: identificacion
+        });
+      
+        if (response.data.status === 'success') {
+          Swal.fire({
+            title: '¡Éxito!',
+            text: 'La dirección ha sido registrada correctamente.',
+            icon: 'success',
+            confirmButtonText: 'OK'
+          }).then(() => {
+            // Recarga la página después de cerrar el SweetAlert
+            window.location.reload();
+          });
+          setSuccessMessage(response.data.data);
+          setError('');
+        } else {
+          setError(response.data.data);
+          setSuccessMessage('');
+        }
+      } catch (error) {
+        console.error('Error al guardar la dirección:', error);
+        setError('Hubo un error al guardar la dirección.');
+        setSuccessMessage('');
+      }
     }
   };
 
   const clearForm = () => {
-    setSelectedDepartamento('');
+    setSelectedDepartamentoId('');
+    setSelectedDepartamentoName('');
     setCiudadCapital('');
     setDireccion('');
     setDireccionSeleccionada(false);
@@ -130,7 +199,7 @@ function CrearDireccion() {
   };
 
   const handleCloseModal = () => {
-    if (selectedDepartamento || ciudadCapital || direccion || observacion) {
+    if (selectedDepartamentoId || ciudadCapital || direccion || observacion) {
       Swal.fire({
         title: '¿Estás seguro?',
         text: "Si cierras el modal, perderás todos los datos ingresados.",
@@ -146,7 +215,6 @@ function CrearDireccion() {
           document.getElementById('crearDireccionModal').classList.remove('show');
           document.body.classList.remove('modal-open');
           document.querySelector('.modal-backdrop').remove();
-          // Recargar la página
           window.location.reload();
         }
       });
@@ -154,7 +222,6 @@ function CrearDireccion() {
       document.getElementById('crearDireccionModal').classList.remove('show');
       document.body.classList.remove('modal-open');
       document.querySelector('.modal-backdrop').remove();
-      // Recargar la página
       window.location.reload();
     }
   };
@@ -187,8 +254,8 @@ function CrearDireccion() {
                   <select
                     id="Departamento"
                     className="form-control"
-                    value={selectedDepartamento}
-                    onChange={e => setSelectedDepartamento(e.target.value)}
+                    value={selectedDepartamentoId}
+                    onChange={e => setSelectedDepartamentoId(e.target.value)}
                     required
                   >
                     <option value="">Selecciona un departamento</option>

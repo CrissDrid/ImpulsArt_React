@@ -11,12 +11,6 @@ import FormObra from '../CRUD/Create/FormObra';
 import ListSubasta from '../CRUD/List/ListSubasta';
 import FormSubasta from '../CRUD/Create/FormSubasta';
 import EditSubasta from '../CRUD/Edit/EditSubasta';
-import ListDespacho from '../CRUD/List/ListDespacho';
-import FormDespacho from '../CRUD/Create/FormDespacho';
-import EditDespacho from '../CRUD/Edit/EditDespacho';
-import ListPQRS from '../CRUD/List/ListPQRS';
-import FormPQRS from '../CRUD/Create/FormPQRS';
-import EditPQRS from '../CRUD/Edit/EditPQRS';
 import UserData from './UserData';
 import ChangePWD from './ChangePWD';
 import Galery from './Galery';
@@ -63,7 +57,7 @@ function AppRoutes() { // Cambia el nombre de la función a AppRoutes
         <Route path='/Dashboard' element={<Dashboard />}/>
         <Route path='/Help' element={<Help />}/>
         <Route path='/DashboardAsesor' element={<DashboardAsesor />}/>
-        <Route path='/ReportForm' element={<ReportForm />}/>
+        <Route path="/ReportForm/:pkCod_Producto" element={<ReportForm />} />
         <Route path='/Responder' element={<Responder />}/>
         <Route path='/DashboardDomiciliario' element={<DashboardDomiciliario />}/>
         <Route path='/EstadoEntrega' element={<EstadoEntrega />}/>
@@ -89,17 +83,6 @@ function AppRoutes() { // Cambia el nombre de la función a AppRoutes
         <Route path="/EditSubasta/:pkCodSubasta" element={<ProtectedRoute element={EditSubasta} rol={['ADMIN', 'USER', 'ASESOR', 'DOMICILIARIO']} />} />
         {/*CRUD SUBASTA*/}
 
-        {/*CRUD DESPACHO*/}
-        <Route path="/ListDespacho" element={<ProtectedRoute element={ListDespacho} rol={['ADMIN']} />} />
-        <Route path="/CreateDespacho" element={<ProtectedRoute element={FormDespacho} rol={['ADMIN']} />} />
-        <Route path="/EditDespacho/:pkCod_Despacho" element={<ProtectedRoute element={EditDespacho} rol={['ADMIN']} />} />
-        {/*CRUD DESPACHO*/}
-
-        {/*CRUD PQRS*/}
-        <Route path="/ListPQRS" element={<ProtectedRoute element={ListPQRS} rol={['ADMIN']} />} />
-        <Route path="/CreatePQRS" element={<ProtectedRoute element={FormPQRS} rol={['ADMIN']} />} />
-        <Route path="/EditPQRS/:pkCod_Reclamo" element={<ProtectedRoute element={EditPQRS} rol={['ADMIN']} />} />
-        {/*CRUD PQRS*/}
          
         <Route path='/Simulacion' element={<ProtectedRoute element={Simulacion} rol={['ADMIN']}/>}/>
       </Routes>
