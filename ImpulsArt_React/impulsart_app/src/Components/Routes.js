@@ -40,7 +40,6 @@ import ReportForm from './Reportes';
 import Responder from './Responder';
 import DashboardDomiciliario from './DashboardDomiciliario';
 import EstadoEntrega from './EstadoEntrega';
-import CrearDireccion from './CrearDireccion'; 
 
 function AppRoutes() { // Cambia el nombre de la función a AppRoutes
   return (
@@ -68,7 +67,6 @@ function AppRoutes() { // Cambia el nombre de la función a AppRoutes
         <Route path='/Responder' element={<Responder />}/>
         <Route path='/DashboardDomiciliario' element={<DashboardDomiciliario />}/>
         <Route path='/EstadoEntrega' element={<EstadoEntrega />}/>
-        <Route path='/CrearDireccion' element={<CrearDireccion />}/>
 
 
         <Route path="/DetalleObras/:pkCod_Producto" element={<DetalleObras />} />
