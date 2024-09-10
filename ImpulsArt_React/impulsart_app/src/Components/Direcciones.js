@@ -4,6 +4,11 @@ import '@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css';
 import '../Styles/Direcciones.css';
 import Swal from 'sweetalert2';
 
+// Autenticación de token
+import AuthToken from '../Auth/AuthToken';
+// Obtener datos del usuario
+import GetUserInfo from '../Auth/GetUserInfo';
+
 const API_KEY = 'pk.eyJ1IjoiY3Jpc3NkIiwiYSI6ImNtMHZra2JoMjA0bWUycXB2MXJoaXU0dTYifQ.VgqtW0qDyQmxUpFxkf23sQ';
 
 function CrearDireccion() {
@@ -13,9 +18,33 @@ function CrearDireccion() {
   const [direccion, setDireccion] = useState('');
   const [observacion, setObservacion] = useState('');
   const [error, setError] = useState('');
+  const [departamentoNombre, setDepartamentoNombre] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
   const [direccionSeleccionada, setDireccionSeleccionada] = useState(false);
   const geocoderRef = useRef(null);
+  const [identificacion, setIdentificacion] = useState('');
+
+  const handleDepartamentoChange = (e) => {
+    const departamentoId = e.target.value;
+    setSelectedDepartamento(departamentoId);
+  
+    // Encuentra el departamento seleccionado en el array
+    const departamentoSeleccionado = departamentos.find(depto => depto.id === departamentoId);
+    if (departamentoSeleccionado) {
+      setDepartamentoNombre(departamentoSeleccionado.name);
+    } else {
+      setDepartamentoNombre('');
+    }
+  };
+
+  useEffect(() => {
+
+    //Cargar identificacion
+    const { identificacion } = GetUserInfo();
+    setIdentificacion(identificacion);
+    console.log("Identificación obtenida:", identificacion);
+
+  }, []);
 
   useEffect(() => {
     fetch('https://api-colombia.com/api/v1/Department')
@@ -78,9 +107,22 @@ function CrearDireccion() {
       });
 
       const originalSearch = geocoder._geocode.bind(geocoder);
-      geocoder._geocode = function(query) {
+      geocoder._geocode = function (query) {
         const fullQuery = `${query}, ${ciudadCapital}, Colombia`;
         originalSearch(fullQuery);
+      };
+
+      const handleDepartamentoChange = (e) => {
+        const departamentoId = e.target.value;
+        setSelectedDepartamento(departamentoId);
+
+        // Encuentra el departamento seleccionado en el array
+        const departamentoSeleccionado = departamentos.find(depto => depto.id === departamentoId);
+        if (departamentoSeleccionado) {
+          setDepartamentoNombre(departamentoSeleccionado.name);
+        } else {
+          setDepartamentoNombre('');
+        }
       };
 
       return () => {
@@ -102,14 +144,41 @@ function CrearDireccion() {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     const isValid = validateAddress(direccion);
-
+  
     if (isValid) {
-      setSuccessMessage('La dirección se ha guardado correctamente.');
-      setError('');
+      console.log('Datos a enviar:', {
+        departamento: selectedDepartamento,
+        direccion: direccion,
+        ciudad: ciudadCapital,
+        observaciones: observacion,
+        fkUsuario: identificacion
+      });
+  
+      try {
+        const response = await AuthToken.post('direccion/create', {
+          departamento: selectedDepartamento,  // Usa departamentoNombre aquí
+          direccion: direccion,
+          ciudad: ciudadCapital,
+          observaciones: observacion,
+          fkUsuario: identificacion
+        });
+  
+        if (response.data.status === 'success') {
+          setSuccessMessage(response.data.data);
+          setError('');
+        } else {
+          setError(response.data.data);
+          setSuccessMessage('');
+        }
+      } catch (error) {
+        console.error('Error al guardar la dirección:', error);
+        setError('Hubo un error al guardar la dirección.');
+        setSuccessMessage('');
+      }
     } else {
       setError(`La dirección ingresada no es válida o no pertenece a ${ciudadCapital}.`);
       setSuccessMessage('');
@@ -188,12 +257,12 @@ function CrearDireccion() {
                     id="Departamento"
                     className="form-control"
                     value={selectedDepartamento}
-                    onChange={e => setSelectedDepartamento(e.target.value)}
+                    onChange={handleDepartamentoChange}
                     required
                   >
                     <option value="">Selecciona un departamento</option>
                     {departamentos.map(departamento => (
-                      <option key={departamento.id} value={departamento.id}>
+                      <option key={departamento.id} value={departamento.name}>
                         {departamento.name}
                       </option>
                     ))}

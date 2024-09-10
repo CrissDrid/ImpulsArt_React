@@ -1,19 +1,42 @@
 import { useEffect, useState } from 'react';
 import Navbar_init from './Navbar_init';
+import axios from 'axios';
+import AuthToken from '../Auth/AuthToken';
+import GetUserInfo from '../Auth/GetUserInfo';
 
 function CrearDireccion() {
   const [departamentos, setDepartamentos] = useState([]);
+  const [usuario, setUsuario] = useState(null);
   const [ciudadCapital, setCiudadCapital] = useState('');
   const [selectedDepartamento, setSelectedDepartamento] = useState('');
   const [direccion, setDireccion] = useState('');
   const [observacion, setObservacion] = useState('');
+  const [identificacion, setIdentificacion] = useState('');
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const userInfo = await GetUserInfo();
+        if (userInfo) {
+          const { identificacion } = userInfo;
+          setIdentificacion(identificacion);
+
+          const userResponse = await AuthToken.get(`/usuario/list/${identificacion}`);
+          setUsuario(userResponse.data.data);
+        }
+      } catch (error) {
+        console.error('Error al cargar los datos del usuario:', error);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   // Obtener departamentos de API Colombia
   useEffect(() => {
     fetch('https://api-colombia.com/api/v1/Department')
       .then(response => response.json())
       .then(data => {
-        // Filtrar Bogotá
         const departamentosFiltrados = data.filter(departamento => departamento.name !== 'Bogotá');
         setDepartamentos(departamentosFiltrados);
       })
@@ -28,25 +51,41 @@ function CrearDireccion() {
         .then(data => setCiudadCapital(data.cityCapital ? data.cityCapital.name : ''))
         .catch(error => console.error('Error fetching ciudad capital:', error));
     } else {
-      setCiudadCapital(''); // Si no hay departamento seleccionado, vaciar el campo de ciudad
+      setCiudadCapital('');
     }
   }, [selectedDepartamento]);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log({
+    
+    const requestData = {
       departamento: selectedDepartamento,
       ciudad: ciudadCapital,
-      direccion,
-      observacion,
-    });
+      direccion: direccion,
+      fkUsuario: identificacion,
+      observaciones: observacion,
+    };
+    
+    console.log('Datos enviados:', requestData);
+    
+    try {
+      const response = await AuthToken.post('direccion/create', requestData);
+      console.log('Respuesta del servidor:', response.data);
+      alert('Dirección creada con éxito');
+      setSelectedDepartamento('');
+      setCiudadCapital('');
+      setDireccion('');
+      setObservacion('');
+    } catch (error) {
+      console.error('Error al crear la dirección:', error.response ? error.response.data : error.message);
+      alert('Error al crear la dirección');
+    }
   };
 
   return (
     <div>
       <Navbar_init />
 
-      {/* Botón para abrir el modal */}
       <button
         type="button"
         className="btn btn-primary"
@@ -56,7 +95,6 @@ function CrearDireccion() {
         Crear Dirección
       </button>
 
-      {/* Modal de Bootstrap */}
       <div
         className="modal fade"
         id="crearDireccionModal"
@@ -77,7 +115,6 @@ function CrearDireccion() {
             </div>
             <div className="modal-body">
               <form onSubmit={handleSubmit}>
-                {/* Select de Departamento */}
                 <div className="mb-3">
                   <label htmlFor="Departamento" className="form-label">Departamento:</label>
                   <select
@@ -96,7 +133,6 @@ function CrearDireccion() {
                   </select>
                 </div>
 
-                {/* Campo de Ciudad Capital */}
                 <div className="mb-3">
                   <label htmlFor="city" className="form-label">Ciudad (Capital):</label>
                   <input
@@ -109,7 +145,6 @@ function CrearDireccion() {
                   />
                 </div>
 
-                {/* Input de Dirección */}
                 <div className="mb-3">
                   <label htmlFor="direccion" className="form-label">Dirección:</label>
                   <input
@@ -123,7 +158,6 @@ function CrearDireccion() {
                   />
                 </div>
 
-                {/* Input de Observación */}
                 <div className="mb-3">
                   <label htmlFor="observacion" className="form-label">Observación:</label>
                   <textarea
@@ -136,7 +170,6 @@ function CrearDireccion() {
                   ></textarea>
                 </div>
 
-                {/* Botón de Envío */}
                 <div className="d-grid gap-2">
                   <button type="submit" className="btn btn-primary">
                     Enviar

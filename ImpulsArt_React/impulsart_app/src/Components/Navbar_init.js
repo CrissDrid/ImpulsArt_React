@@ -150,12 +150,6 @@ function Navbar_init({ onSupportClick, onAboutClick }) {
               </Link>
             </li>
 
-            {isAuthenticated && rol.includes('ADMIN') && (
-              <li className="nav-item">
-                <Link to='/Dashboard' className='nav-link active' aria-current="page">Dashboard</Link>
-              </li>
-            )}
-
             {showAboutButton && (
               <li className="nav-item">
                 <button className="nav-link active" onClick={onAboutClick}>Nosotros</button>
@@ -165,17 +159,6 @@ function Navbar_init({ onSupportClick, onAboutClick }) {
             <li className="nav-item">
               <button className="nav-link active" onClick={handleSupportClick}>Soporte</button>
             </li>
-
-            {isAuthenticated && rol.includes('DOMICILIARIO') && (
-              <>
-                <li className="nav-item">
-                  <Link to='/DashboardDomiciliario' className='nav-link active' aria-current="page">Dashboard</Link>
-                </li>
-                <li className="nav-item">
-                  <Link to='/CrearDireccion' className='nav-link active' aria-current="page">Crear Direcciones</Link>
-                </li>
-              </>
-            )}
 
             {isAuthenticated && (
               <li className="nav-item">
