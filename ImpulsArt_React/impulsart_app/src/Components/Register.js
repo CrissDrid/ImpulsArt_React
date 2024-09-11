@@ -160,7 +160,7 @@ const Register = () => {
     }
     
 
-     try {
+    try {
     const response = await axios.post(`${process.env.REACT_APP_API_BASE_URL}usuario/create`, usuario);
     if (response.status === 200) {
       Swal.fire({
@@ -227,7 +227,7 @@ const Register = () => {
                 <label htmlFor="floatingUserName">User Name</label>
               </div>
               <div className="form-floating">
-                <input type="email" className="form-control" id="floatingEmail" onChange={onInputChange} value={email} name="email" placeholder="name@example.com" />
+                <input type="email" className="form-control" id="floatingEmail" maxLength="150" onChange={onInputChange} value={email} name="email" placeholder="name@example.com" />
                 <label htmlFor="floatingEmail">Email</label>
               </div>
               <div className="form-floating">

@@ -3,6 +3,7 @@ import axios from 'axios';
 import { useParams } from 'react-router-dom';
 import Navbar_init from './Navbar_init';
 import Swal from 'sweetalert2';
+import AuthToken from '../Auth/AuthToken';
 
 function ReportForm() {
   const { pkCod_Producto } = useParams();
@@ -39,7 +40,7 @@ function ReportForm() {
     };
 
     try {
-      const response = await axios.post('http://localhost:8086/api/reporteObra/create', reportData);
+      const response = await AuthToken.post('reporteObra/create', reportData);
       console.log('Respuesta del servidor:', response.data);
 
       // Mostrar alerta de éxito

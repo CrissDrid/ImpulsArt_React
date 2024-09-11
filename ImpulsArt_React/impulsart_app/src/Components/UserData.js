@@ -7,6 +7,7 @@ import '../Styles/Profile.css';
 import AuthToken from '../Auth/AuthToken';
 // Asegúrate de obtener datos del usuario
 import GetUserInfo from '../Auth/GetUserInfo';
+import axios from 'axios';
 
 function UserData() {
   const [usuario, setUsuario] = useState(null);
@@ -47,17 +48,90 @@ function UserData() {
     setUsuario((prevState) => ({ ...prevState, [key]: value }));
   };
 
-  const validateEmail = (email) => {
-    const emailRegex = /^[a-zA-Z0-9._%+-]+@(gmail|hotmail|outlook|yahoo)\.com$/;
+  const isEmailValid = (email) => {
+    const emailRegex = /^[^\s@]+@(hotmail|gmail|yahoo|outlook)\.com$/;
     return emailRegex.test(email);
+  };
+
+  const isOnlyLettersWithValidSpaces = (str) => {
+    // Permitir solo letras y un solo espacio entre palabras, sin espacios al inicio o al final
+    return /^[A-Za-z]+( [A-Za-z]+)*$/.test(str);
+  };
+  
+  const isValidUserName = (str) => {
+    // No permitir espacios en el nombre de usuario
+    return /^[A-Za-z0-9_]+$/.test(str);
+  };
+
+  const isPhoneValid = (phone) => /^3\d{9}$/.test(phone);
+
+  const isIdentificationValid = (id) => /^(\d{8}|\d{10})$/.test(id);
+
+  const isDateOfBirthValid = (date) => {
+    const today = new Date();
+    const dob = new Date(date);
+    
+    if (dob > today) {
+      return { isValid: false, message: "La fecha de nacimiento no puede ser una fecha futura" };
+    }
+    
+    let age = today.getFullYear() - dob.getFullYear();
+    const monthDiff = today.getMonth() - dob.getMonth();
+    
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dob.getDate())) {
+      age--;
+    }
+    
+    if (age < 18) {
+      return { isValid: false, message: "Debe ser mayor de edad para registrarse" };
+    }
+    
+    return { isValid: true, message: "" };
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!validateEmail(usuario.email)) {
-      toast.current.show({ severity: 'error', summary: 'Error', detail: 'Por favor, ingrese un correo válido.', life: 3000 });
+
+    if (!usuario.userName || !usuario.nombre || !usuario.apellido || !usuario.fechaNacimiento || !usuario.email || !usuario.numCelular) {
+      toast.current.show({ severity: 'error', summary: 'Error', detail: 'Todos los campos son obligatorios', life: 3000 });
       return;
-    }
+  }
+
+  if (!isOnlyLettersWithValidSpaces(usuario.nombre)) {
+      toast.current.show({ severity: 'warn', summary: 'Advertencia', detail: 'El nombre solo debe contener letras y un solo espacio entre palabras, sin espacios al inicio o al final', life: 3000 });
+      return;
+  }
+
+  if (!isOnlyLettersWithValidSpaces(usuario.apellido)) {
+      toast.current.show({ severity: 'warn', summary: 'Advertencia', detail: 'El apellido solo debe contener letras y no puede tener un espacio al inicio', life: 3000 });
+      return;
+  }
+
+  // Validar nombre de usuario
+if (!isValidUserName(usuario.userName)) {
+  toast.current.show({ severity: 'warn', summary: 'Advertencia', detail: 'El nombre de usuario no debe contener espacios y solo debe contener letras', life: 3000 });
+  return;
+}
+
+  if (!isIdentificationValid(identificacion)) {
+    toast.current.show({ severity: 'warn', summary: 'Advertencia', detail: 'El número de documento debe tener 8 o 10 dígitos', life: 3000 });
+    return;
+}
+
+  if (!isEmailValid(usuario.email)) {
+      toast.current.show({ severity: 'warn', summary: 'Advertencia', detail: 'Por favor, ingrese un correo electrónico válido', life: 3000 });
+      return;
+  }
+
+  if (!isDateOfBirthValid(usuario.fechaNacimiento)) {
+      toast.current.show({ severity: 'warn', summary: 'Advertencia', detail: usuario.fechaNacimiento ? 'Debe ser mayor de edad para registrarse' : 'Fecha de nacimiento inválida', life: 3000 });
+      return;
+  }
+
+  if (!isPhoneValid(usuario.numCelular)) {
+      toast.current.show({ severity: 'warn', summary: 'Advertencia', detail: 'Número de celular inválido. Debe contener 10 dígitos y comenzar con 3', life: 3000 });
+      return;
+  }
 
     Swal.fire({
       title: '¿Estás seguro de hacer esos cambios?',
@@ -83,20 +157,16 @@ function UserData() {
               window.location.reload(); // Recargar la página
             });
           } else {
-            console.error('Error al actualizar:', response.data);
-            Swal.fire({
-              title: 'Error',
-              text: 'Hubo un problema al actualizar los datos.',
-              icon: 'error'
-            });
+            // Manejar otros estados si es necesario
+            toast.current.show({ severity: 'error', summary: 'Error', detail: 'Error desconocido', life: 3000 });
           }
         } catch (error) {
-          console.error('Error de red:', error);
-          Swal.fire({
-            title: 'Error de red',
-            text: 'No se pudo completar la solicitud.',
-            icon: 'error'
-          });
+          if (error.response && error.response.status === 409) {
+            toast.current.show({ severity: 'error', summary: 'Error', detail: error.response.data.message, life: 3000 });
+          } else {
+            console.error('Error de red:', error);
+            toast.current.show({ severity: 'error', summary: 'Error', detail: 'Error de red', life: 3000 });
+          }
         }
       }
     });
@@ -119,13 +189,13 @@ function UserData() {
           <div className="row">
             <div className="col-md-6">
               <div className="form-floating">
-                <input className="form-control" id="floatingNombre" value={usuario.nombre || ''} onChange={handleInputChange} required />
+                <input className="form-control" id="floatingNombre" maxLength="30" value={usuario.nombre || ''} onChange={handleInputChange} required />
                 <label htmlFor="floatingNombre">Nombre</label>
               </div>
             </div>
             <div className="col-md-6">
               <div className="form-floating">
-                <input className="form-control" id="floatingApellido" value={usuario.apellido || ''} onChange={handleInputChange} required />
+                <input className="form-control" id="floatingApellido" maxLength="30" value={usuario.apellido || ''} onChange={handleInputChange} required />
                 <label htmlFor="floatingApellido">Apellido</label>
               </div>
             </div>
@@ -141,18 +211,18 @@ function UserData() {
             </div>
             <div className="col-md-6">
               <div className="form-floating">
-                <input type="text" className="form-control" id="floatingNumCelular" value={usuario.numCelular || ''} onChange={handleInputChange} required />
+                <input type="text" className="form-control" id="floatingNumCelular" maxLength="10" value={usuario.numCelular || ''} onChange={handleInputChange} required />
                 <label htmlFor="floatingNumCelular">Número de Celular</label>
               </div>
             </div>
           </div>
         </div>
         <div className="form-floating">
-          <input type="text" className="form-control" id="floatingUserName" value={usuario.userName || ''} onChange={handleInputChange} required />
+          <input type="text" className="form-control" id="floatingUserName" maxLength="30" value={usuario.userName || ''} onChange={handleInputChange} required />
           <label htmlFor="floatingUserName">User Name</label>
         </div>
         <div className="form-floating">
-          <input type="email" className="form-control" id="floatingEmail" value={usuario.email || ''} onChange={handleInputChange} required />
+          <input type="email" className="form-control" id="floatingEmail" maxLength="150" value={usuario.email || ''} onChange={handleInputChange} required />
           <label htmlFor="floatingEmail">Email</label>
         </div>
         <button className={`btn w-100 py-2 guardar-btn ${hasChanges ? 'btn-primary' : 'btn-secondary'} ${!hasChanges ? 'btn-disabled' : ''}`} type="submit" disabled={!hasChanges}>
