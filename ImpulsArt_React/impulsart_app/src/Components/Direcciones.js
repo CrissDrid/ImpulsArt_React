@@ -1,360 +1,149 @@
-import React, { useState, useEffect, useRef } from 'react';
-import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder';
-import '@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css';
-import '../Styles/Direcciones.css';
+import React, { useState, useEffect } from 'react';
+import CrearDireccion from './CrearDireccion';
 import Swal from 'sweetalert2';
-
-// Autenticación de token
+import '../Styles/Direcciones.css';
 import AuthToken from '../Auth/AuthToken';
-// Asegúrate de obtener datos del usuario
 import GetUserInfo from '../Auth/GetUserInfo';
-
-
-const API_KEY = 'pk.eyJ1IjoiY3Jpc3NkIiwiYSI6ImNtMHZra2JoMjA0bWUycXB2MXJoaXU0dTYifQ.VgqtW0qDyQmxUpFxkf23sQ';
-
-function CrearDireccion() {
-  const [departamentos, setDepartamentos] = useState([]);
-  const [ciudadCapital, setCiudadCapital] = useState('');
-  const [selectedDepartamentoId, setSelectedDepartamentoId] = useState('');
-  const [selectedDepartamentoName, setSelectedDepartamentoName] = useState('');
-  const [direccion, setDireccion] = useState('');
-  const [observacion, setObservacion] = useState('');
-  const [error, setError] = useState('');
-  const [successMessage, setSuccessMessage] = useState('');
-  const [direccionSeleccionada, setDireccionSeleccionada] = useState(false);
-  const [identificacion, setIdentificacion] = useState('');
-  const geocoderRef = useRef(null);
-
-  useEffect(() => {
-
-    //Cargar identificacion
-    const { identificacion } = GetUserInfo();
-    setIdentificacion(identificacion);
-    console.log("Identificación obtenida:", identificacion);
-    
-  }, []);
-
-  useEffect(() => {
-    fetch('https://api-colombia.com/api/v1/Department')
-      .then(response => response.json())
-      .then(data => {
-        const departamentosFiltrados = data.filter(departamento => departamento.name !== 'Bogotá');
-        setDepartamentos(departamentosFiltrados);
-      })
-      .catch(error => console.error('Error fetching departamentos:', error));
-  }, []);
-
-  useEffect(() => {
-    if (selectedDepartamentoId) {
-      fetch(`https://api-colombia.com/api/v1/Department/${selectedDepartamentoId}`)
-        .then(response => response.json())
-        .then(data => {
-          setCiudadCapital(data.cityCapital ? data.cityCapital.name : '');
-          setSelectedDepartamentoName(data.name);
-          if (geocoderRef.current) {
-            geocoderRef.current.clear();
-          }
-          setDireccion('');
-          setDireccionSeleccionada(false);
-        })
-        .catch(error => console.error('Error fetching ciudad capital:', error));
-    } else {
-      setCiudadCapital('');
-      setSelectedDepartamentoName('');
-    }
-  }, [selectedDepartamentoId]);
-
-  useEffect(() => {
-    const container = document.getElementById('direccion-container');
-    if (container && ciudadCapital) {
-      container.innerHTML = '';
-
-      const geocoder = new MapboxGeocoder({
-        accessToken: API_KEY,
-        language: 'es',
-        placeholder: `Ingresa una dirección en ${ciudadCapital}`,
-        countries: 'CO',
-        types: 'address',
-        localGeocoder: (query) => {
-          const fullQuery = `${query}, ${ciudadCapital}`;
-          return [{ place_name: fullQuery }];
-        },
-        getItemValue: (item) => {
-          return item.place_name.replace(`, ${ciudadCapital}`, '').trim();
-        },
-        mapboxgl: null,
-      });
-
-      container.style.width = '100%';
-
-      geocoder.addTo(container);
-      geocoderRef.current = geocoder;
-
-      geocoder.on('result', (e) => {
-        const address = e.result.place_name.split(',')[0].trim();
-        setDireccion(address);
-        setDireccionSeleccionada(true);
-      });
-
-      const originalSearch = geocoder._geocode.bind(geocoder);
-      geocoder._geocode = function(query) {
-        const fullQuery = `${query}, ${ciudadCapital}, Colombia`;
-        originalSearch(fullQuery);
-      };
-
-      return () => {
-        if (container) {
-          container.innerHTML = '';
-        }
-      };
-    }
-  }, [ciudadCapital]);
-
-  const validateAddress = (address) => {
-    // Expresión regular para validar tipos de vía (Calle, Carrera, Avenida, Transversal, etc.)
-    const tipoViaRegex = /^(Calle|Carrera|Avenida|Diagonal|Transversal|Tv|Cr|Cl)\s\d+/;
-  
-    // Expresión regular para validar si tiene un número de vía y puede tener un número de predio (opcional)
-    const numeroPredioRegex = /\d+(\s?#\s?\d+-?\d*)?/;
-  
-    // Verifica si cumple con al menos dos características
-    const cumpleTipoVia = tipoViaRegex.test(address); // Verifica el tipo de vía
-    const cumpleNumeroPredio = numeroPredioRegex.test(address); // Verifica el número de vía o predio
-  
-    if (cumpleTipoVia && cumpleNumeroPredio) {
-      setError(''); // Limpia el mensaje de error si cumple
-      return true;
-    } else {
-      setError('La dirección debe tener al menos un tipo de vía (Calle, Carrera, etc.) y un número.');
-      return false;
-    }
-  };  
-
-  const handleObservacionChange = (e) => {
-    const inputText = e.target.value;
-    if (inputText.length <= 150) {
-      setObservacion(inputText);
-    }
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-  
-    const isValid = validateAddress(direccion);
-  
-    if (isValid) {
-      try {
-        const response = await AuthToken.post('direccion/create', {
-          departamento: selectedDepartamentoName,
-          direccion: direccion,
-          ciudad: ciudadCapital,
-          observaciones: observacion,
-          fkUsuario: identificacion
-        });
-  
-        if (response.data.status === 'success') {
-          Swal.fire({
-            title: '¡Éxito!',
-            text: 'La dirección ha sido registrada correctamente.',
-            icon: 'success',
-            confirmButtonText: 'OK'
-          }).then(() => {
-            window.location.reload();
-          });
-          setSuccessMessage(response.data.data);
-          setError('');
-        } else {
-          // Mostrar el mensaje de error cuando la dirección ya existe
-          setError(response.data.data);
-          setSuccessMessage('');
-        }
-      } catch (error) {
-        console.error('Error al guardar la dirección:', error);
-  
-        // Verifica si el error tiene un mensaje específico del servidor
-        if (error.response && error.response.data && error.response.data.data) {
-          setError(error.response.data.data);
-        } else {
-          // Mensaje genérico en caso de que no haya un mensaje específico en el error
-          setError('Hubo un error al guardar la dirección.');
-        }
-        setSuccessMessage('');
-      }
-    }
-  };
-
-  const clearForm = () => {
-    setSelectedDepartamentoId('');
-    setSelectedDepartamentoName('');
-    setCiudadCapital('');
-    setDireccion('');
-    setDireccionSeleccionada(false);
-    setObservacion('');
-    setError('');
-    setSuccessMessage('');
-    if (geocoderRef.current) {
-      geocoderRef.current.clear();
-    }
-  };
-
-  const handleCloseModal = () => {
-    if (selectedDepartamentoId || ciudadCapital || direccion || observacion) {
-      Swal.fire({
-        title: '¿Estás seguro?',
-        text: "Si cierras el modal, perderás todos los datos ingresados.",
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
-        confirmButtonText: 'Sí, cerrar',
-        cancelButtonText: 'Cancelar'
-      }).then((result) => {
-        if (result.isConfirmed) {
-          clearForm();
-          document.getElementById('crearDireccionModal').classList.remove('show');
-          document.body.classList.remove('modal-open');
-          document.querySelector('.modal-backdrop').remove();
-          window.location.reload();
-        }
-      });
-    } else {
-      document.getElementById('crearDireccionModal').classList.remove('show');
-      document.body.classList.remove('modal-open');
-      document.querySelector('.modal-backdrop').remove();
-      window.location.reload();
-    }
-  };
-
-  return (
-    <div>
-      <Direcciones />
-      <div
-        className="modal fade"
-        id="crearDireccionModal"
-        tabIndex="-1"
-        aria-labelledby="crearDireccionModalLabel"
-        aria-hidden="true"
-      >
-        <div className="modal-dialog modal-dialog-centered">
-          <div className="modal-content">
-            <div className="modal-header">
-              <h5 className="modal-title" id="crearDireccionModalLabel">Crear Dirección</h5>
-              <button
-                type="button"
-                className="btn-close"
-                onClick={handleCloseModal}
-                aria-label="Close"
-              ></button>
-            </div>
-            <div className="modal-body">
-              <form onSubmit={handleSubmit}>
-                <div className="mb-3">
-                  <label htmlFor="Departamento" className="form-label">Departamento:</label>
-                  <select
-                    id="Departamento"
-                    className="form-control"
-                    value={selectedDepartamentoId}
-                    onChange={e => setSelectedDepartamentoId(e.target.value)}
-                    required
-                  >
-                    <option value="">Selecciona un departamento</option>
-                    {departamentos.map(departamento => (
-                      <option key={departamento.id} value={departamento.id}>
-                        {departamento.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div className="mb-3">
-                  <label htmlFor="city" className="form-label">Ciudad (Capital):</label>
-                  <input
-                    type="text"
-                    id="city"
-                    className="form-control"
-                    value={ciudadCapital}
-                    readOnly
-                    placeholder="Selecciona un departamento"
-                  />
-                </div>
-
-                {ciudadCapital && (
-                  <div className="mb-3">
-                    <label htmlFor="direccion-container" className="form-label">Dirección:</label>
-                    <div id="direccion-container"></div>
-                  </div>
-                )}
-
-                {direccionSeleccionada && (
-                  <div className="mb-3">
-                    <label htmlFor="direccion" className="form-label">Dirección Seleccionada:</label>
-                    <input
-                      type="text"
-                      id="direccion"
-                      className="form-control"
-                      value={direccion}
-                      onChange={e => setDireccion(e.target.value)}
-                      placeholder="Dirección seleccionada"
-                      required
-                      readOnly
-                    />
-                  </div>
-                )}
-
-                <div className="mb-3">
-                  <label htmlFor="observacion" className="form-label">Detalles Adicionales:</label>
-                  <textarea
-                    id="observacion"
-                    className="form-control observacion-textarea"
-                    value={observacion}
-                    onChange={handleObservacionChange}
-                    placeholder="Ingresa algun detalle adicional (Opcional)"
-                    rows="3"
-                    maxLength={150}
-                  ></textarea>
-                  <small className="text-muted">{observacion.length}/150</small>
-                </div>
-
-                {error && (
-                  <div className="alert alert-danger" role="alert">
-                    {error}
-                  </div>
-                )}
-
-                {successMessage && (
-                  <div className="alert alert-success" role="alert">
-                    {successMessage}
-                  </div>
-                )}
-
-                <div className="d-grid gap-2">
-                  <button type="submit" className="btn btn-primary">
-                    Enviar
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
+import { Modal } from 'bootstrap';
 
 function Direcciones() {
+  const [direcciones, setDirecciones] = useState([]);
+  const [identificacion, setIdentificacion] = useState(null);
+  const [direccionToEdit, setDireccionToEdit] = useState(null);
+  const [modalInstance, setModalInstance] = useState(null);
+
+  useEffect(() => {
+    const fetchUserInfo = async () => {
+      const userInfo = await GetUserInfo();
+      if (userInfo) {
+        setIdentificacion(userInfo.identificacion);
+      }
+    };
+
+    fetchUserInfo();
+
+    const modalElement = document.getElementById('crearDireccionModal');
+    const modal = new Modal(modalElement);
+    setModalInstance(modal);
+
+    return () => {
+      if (modalInstance) {
+        modalInstance.dispose();
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    if (identificacion) {
+      fetchDirecciones();
+    }
+  }, [identificacion]);
+
+  const fetchDirecciones = async () => {
+    try {
+      const response = await AuthToken.get(`direccion/historialDirecciones/${identificacion}`);
+      if (response.data.status === 'success') {
+        setDirecciones(response.data.data);
+      } else {
+        console.error('Error:', response.data.data);
+      }
+    } catch (error) {
+      console.error('Error fetching direcciones:', error);
+    }
+  };
+
+  const eliminarDireccion = async (id) => {
+    try {
+      const response = await AuthToken.delete(`direccion/delete/${id}`);
+      if (response.data.status === 'success') {
+        Swal.fire('Eliminado', 'La dirección fue eliminada correctamente', 'success').then(() => {
+          window.location.reload(); // Recargar la página después de eliminar
+        });
+      } else {
+        Swal.fire('Error', 'No se pudo eliminar la dirección', 'error');
+      }
+    } catch (error) {
+      console.error('Error eliminando dirección:', error);
+      Swal.fire('Error', 'Ocurrió un error al eliminar la dirección', 'error');
+    }
+  };
+
+  const handleEliminarClick = (id) => {
+    Swal.fire({
+      title: '¿Estás seguro?',
+      text: 'No podrás deshacer esta acción',
+      icon: 'warning',
+      showCancelButton: true,
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Sí, eliminar',
+      cancelButtonText: 'Cancelar'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        eliminarDireccion(id);
+      }
+    });
+  };
+
+  const handleEditarClick = (direccion) => {
+    setDireccionToEdit(direccion);
+    if (modalInstance) {
+      modalInstance.show();
+    }
+  };
+
+  const handleDireccionCreatedOrUpdated = () => {
+    if (modalInstance) {
+      modalInstance.hide();
+    }
+    window.location.reload(); // Recargar la página después de crear o actualizar
+  };
+
   return (
     <div className="user-data">
       <h2 className="direcciones-title">Mis Direcciones</h2>
-      <button
-        type="button"
-        className="btn btn-agregarDireccion"
-        data-bs-toggle="modal"
-        data-bs-target="#crearDireccionModal"
-      >
-        Agregar Dirección
-      </button>
+      <div className="row mb-3">
+        <div className="col-md-12 text-end">
+          <button
+            type="button"
+            className="btn btn-agregarDireccion"
+            onClick={() => {
+              setDireccionToEdit(null);
+              if (modalInstance) {
+                modalInstance.show();
+              }
+            }}
+          >
+            Agregar Dirección
+          </button>
+        </div>
+      </div>
+
+      <div className="row">
+        {direcciones.length > 0 ? (
+          direcciones.map((direccion) => (
+            <div key={direccion.id} className="col-md-6 mb-3">
+              <div className="direccion-card p-3">
+                <p><strong>Departamento y Ciudad:</strong> {direccion.departamento}, {direccion.ciudad}</p>
+                <p><strong>Dirección:</strong> {direccion.direccion}</p>
+                <p><strong>Detalles Adicionales:</strong> {direccion.observaciones}</p>
+                <button className="btn btn-editar" onClick={() => handleEditarClick(direccion)}>Editar</button>
+                <button className="btn btn-eliminar" onClick={() => handleEliminarClick(direccion.id)}>Eliminar</button>
+              </div>
+            </div>
+          ))
+        ) : (
+          <div className="col-md-12">
+            <p>No tienes direcciones registradas.</p>
+          </div>
+        )}
+      </div>
+
+      <CrearDireccion 
+        onDireccionCreated={handleDireccionCreatedOrUpdated} 
+        direccionToEdit={direccionToEdit}
+      />
     </div>
   );
 }
 
-export default CrearDireccion;
+export default Direcciones;
