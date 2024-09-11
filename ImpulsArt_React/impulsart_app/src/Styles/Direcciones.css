@@ -69,4 +69,102 @@
     outline: none;
   }
   
+  .direccion-card {
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  .card-body {
+    padding: 15px;
+  }
+  
+  .card-text {
+    margin-bottom: 5px;
+    color: #333;
+  }
+  
+  .btn-editar {
+    background-color: #8a2be2;
+    color: white;
+    border: none;
+    padding: 5px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    font-size: 14px;
+  }
+  
+  .btn-editar:hover {
+    background-color: #7a1db9;
+  }
+
+  .btn-eliminar {
+    background-color: #FF3333;
+    color: white;
+    border: none;
+    padding: 5px 15px;
+    margin-left: 0.5rem;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    font-size: 14px;
+  }
+
+  .btn-eliminar:hover {
+    background-color: #CB2C2C !important;
+  }
+
+  .page-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .direccion-container {
+    width: 85%;
+    border: 1.5px solid #ccc;
+    padding: 20px;
+    border-radius: 10px;
+    margin-top: 20px;
+  }
+  
+  .direcciones-title {
+    margin-bottom: 20px;
+    text-align: center;
+  }
+  
+  .btn-seleccionar {
+    background-color: #8a2be2;
+    color: white;
+    border: none;
+    padding: 5px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    font-size: 14px;
+  }
+  
+  .btn-seleccionar:hover {
+    background-color: #7a1db9;
+  }
+  
+  .btn-atras {
+    background-color: #8a2be2;
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 20px;
+    margin-left: 8rem; /* Posiciona el botón al lado izquierdo */
+    align-self: flex-start; /* Alinea el botón a la izquierda del contenedor */
+  }
+  
+  .btn-atras:hover {
+    background-color: #7a1db9;
+  }
+  
+  
   

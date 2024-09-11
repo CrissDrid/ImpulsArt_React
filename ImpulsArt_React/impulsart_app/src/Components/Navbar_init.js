@@ -191,6 +191,7 @@ function Navbar_init({ onSupportClick, onAboutClick }) {
                       <li className='username'>{usuario.userName}</li>
                       <li><hr className="dropdown-divider" /></li>
                       <li><Link to='/Profile' className='dropdown-item'>Mi perfil</Link></li>
+                      <li><Link to='/pasarela' className='dropdown-item'>Mi Carrito</Link></li>
                       <li><hr className="dropdown-divider" /></li>
                       <li><button className="dropdown-item" onClick={handleLogout}>Cerrar Sesión</button></li>
                     </ul>
