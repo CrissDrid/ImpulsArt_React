@@ -32,12 +32,13 @@ const EditSubasta = () => {
         estadoSubasta: "Activo",
         precioInicial: "",
         fechaFinalizacion: "",
-        imagen: null,
-        imagenPreview: null
+        imagen: ""
     });
 
     const [categorias, setCategorias] = useState([]);
-    const [formChanged, setFormChanged] = useState(false); // Estado para detectar cambios
+    const [formChanged, setFormChanged] = useState(false);
+    const [imagePreview, setImagePreview] = useState(null);
+    const [initialSubasta, setInitialSubasta] = useState({});
     const toast = React.useRef(null);
 
     useEffect(() => {
@@ -45,11 +46,14 @@ const EditSubasta = () => {
             try {
                 const result = await AuthToken.get(`${process.env.REACT_APP_API_BASE_URL}subasta/list/${pkCodSubasta}`);
                 const subastaData = result.data.data[0];
+                console.log('Datos de la subasta:', subastaData); // Depura aquí para verificar los datos
+    
+                // Configurar el estado de subasta
                 setSubasta({
                     nombreProducto: subastaData.obras.nombreProducto,
                     costo: subastaData.obras.costo,
                     peso: subastaData.obras.peso,
-                    tamano: subastaData.obras.tamano,
+                    tamano: `${subastaData.obras.alto} x ${subastaData.obras.ancho}`,
                     alto: subastaData.obras.alto,
                     ancho: subastaData.obras.ancho,
                     cantidad: subastaData.obras.cantidad,
@@ -59,14 +63,21 @@ const EditSubasta = () => {
                     estadoSubasta: subastaData.estadoSubasta,
                     precioInicial: subastaData.precioInicial,
                     fechaFinalizacion: subastaData.fechaFinalizacion,
-                    imagen: subastaData.obras.imagen,
-                    imagenPreview: subastaData.obras.imagen
+                    imagen: subastaData.obras.imagen ? `data:${subastaData.obras.tipoImagen};base64,${subastaData.obras.imagen}` : null
                 });
+    
+                // Verificar y mostrar la previsualización de la imagen
+                if (subastaData.obras.imagen) {
+                    const base64Image = `data:${subastaData.obras.tipoImagen};base64,${subastaData.obras.imagen}`;
+                    setImagePreview(base64Image);
+                } else {
+                    setImagePreview(null);
+                }
             } catch (error) {
                 console.error('Error al cargar la subasta:', error);
             }
         };
-
+    
         const loadCategorias = async () => {
             try {
                 const result = await AuthToken.get(`${process.env.REACT_APP_API_BASE_URL}categoria/all`);
@@ -75,60 +86,30 @@ const EditSubasta = () => {
                 console.error('Error al cargar las categorías:', error);
             }
         };
-
+    
         loadSubasta();
         loadCategorias();
     }, [pkCodSubasta]);
 
-    const handleCostoChange = (e) => {
-        const rawValue = e.target.value.replace(/[^\d]/g, '');
-        setSubasta({ ...subasta, precioInicial: `$${new Intl.NumberFormat('es-CO').format(rawValue)}` });
-    };
-
-    const validateFechaFinalizacion = (fechaFinalizacion) => {
-            const fechaSeleccionada = new Date(fechaFinalizacion);
-            const fechaActual = new Date();
-            const cincoDias = new Date();
-            const unaSemana = new Date();
-        
-            cincoDias.setDate(fechaActual.getDate() + 5);
-            unaSemana.setDate(fechaActual.getDate() + 7);
-        
-            if (fechaSeleccionada < cincoDias) {
-                toast.current.show({
-                    severity: 'warn',
-                    summary: 'Advertencia',
-                    detail: 'La fecha de finalización debe ser al menos 5 días a partir de hoy.'
-                });
-                return false;  // Indicar que la validación falló
-            }
-        
-            if (fechaSeleccionada > unaSemana) {
-                toast.current.show({
-                    severity: 'warn',
-                    summary: 'Advertencia',
-                    detail: 'La fecha de finalización no puede ser más de una semana a partir de hoy.'
-                });
-                return false;  // Indicar que la validación falló
-            }
-        
-            return true;  // Validación exitosa
-        };
-
     const handleInputChange = (e) => {
         const { name, value } = e.target;
-    
+
         if (name === 'precioInicial') {
+            // Formatear el valor del precio inicial como moneda
             const rawValue = value.replace(/[^0-9]/g, '');
-            setSubasta(prevSubasta => ({
-                ...prevSubasta,
-                [name]: formatCurrency(rawValue)
-            }));
+            setSubasta({ ...subasta, [name]: formatCurrency(rawValue) });
         } else if (name === 'alto' || name === 'ancho') {
+            // Eliminar caracteres no numéricos
             const rawValue = value.replace(/[^\d]/g, '');
-            const updatedValue = rawValue ? `${rawValue}cm` : '';
+            // Convertir el valor a número y limitarlo a 150
+            const numberValue = parseInt(rawValue, 10);
+            const limitedValue = numberValue > 150 ? 150 : numberValue;
+            // Actualizar el valor con la unidad 'cm'
+            const updatedValue = limitedValue ? `${limitedValue}cm` : '';
+
             setSubasta(prevSubasta => {
                 const updatedSubasta = { ...prevSubasta, [name]: updatedValue };
+                // Actualizar el campo 'tamano'
                 if (updatedSubasta.alto && updatedSubasta.ancho) {
                     updatedSubasta.tamano = `${updatedSubasta.alto} x ${updatedSubasta.ancho}`;
                 } else {
@@ -139,76 +120,104 @@ const EditSubasta = () => {
         } else {
             setSubasta({ ...subasta, [name]: value });
         }
-        setFormChanged(true); // Indicar que el formulario ha cambiado
+        setFormChanged(true);
     };
 
     const handleFileChange = (e) => {
         const file = e.target.files[0];
-        setSubasta(prevSubasta => ({
-            ...prevSubasta,
-            imagen: file,
-            imagenPreview: file ? URL.createObjectURL(file) : null
-        }));
-        setFormChanged(true); // Indicar que el formulario ha cambiado
+        if (file) {
+            const reader = new FileReader();
+    
+            reader.onloadend = () => {
+                // Actualizar la vista previa de la imagen
+                setImagePreview(reader.result);
+                // Guardar el archivo en el estado de subasta
+                setSubasta(prevSubasta => ({ ...prevSubasta, imagen: file }));
+
+                setFormChanged(true);
+            };
+    
+            // Leer el archivo como URL de datos
+            reader.readAsDataURL(file);
+        }
+    };
+
+
+    const handlePesoChange = (e) => {
+        let value = e.target.value.replace(/[^\d]/g, ''); // Elimina caracteres no numéricos
+
+        if (value === "") {
+            setSubasta({ ...subasta, peso: "" }); // Si está vacío, no establecer valor
+            return;
+        }
+
+        let numericValue = Number(value);
+
+        if (numericValue === 0) {
+            // No permitir valor 0
+            toast.current.show({ severity: 'warn', summary: 'Advertencia', detail: 'El peso debe ser mayor que 0.' });
+            return;
+        }
+
+        if (numericValue > 50) {
+            value = "50Kg"; // Limitar a 50Kg si se supera el límite
+        } else {
+            value += "Kg";
+        }
+
+        setSubasta({ ...subasta, peso: value });
+    };
+
+    const isOnlyLettersWithValidSpaces = (str) => {
+        // Permitir solo letras y un solo espacio entre palabras, sin espacios al inicio o al final
+        return /^[A-Za-z]+( [A-Za-z]+)*$/.test(str);
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
 
+        if (!isOnlyLettersWithValidSpaces(subasta.nombreProducto)) {
+            toast.current.show({ severity: 'warn', summary: 'Advertencia', detail: 'El nombre de la obra solo debe contener letras y un solo espacio entre palabras, sin espacios al inicio o al final', life: 3000 });
+            return;
+        }
+
+        if (!isOnlyLettersWithValidSpaces(subasta.descripcion)) {
+            toast.current.show({ severity: 'warn', summary: 'Advertencia', detail: 'La descripcion de la obra solo debe contener letras y un solo espacio entre palabras, sin espacios al inicio o al final', life: 3000 });
+            return;
+        }
+
         if (!subasta.nombreProducto || !subasta.precioInicial || !subasta.peso || !subasta.tamano || !subasta.categoriaId || !subasta.descripcion || !subasta.imagen) {
             toast.current.show({ severity: 'warn', summary: 'Advertencia', detail: 'Todos los campos deben estar completos' });
             return;
         }
-        
+
         if (subasta.nombreProducto.length > 50) {
             toast.current.show({ severity: 'warn', summary: 'Advertencia', detail: 'El nombre de la obra debe contener un máximo de 50 caracteres' });
             return;
         }
 
-        // Validar fecha de finalización
-      if (!validateFechaFinalizacion(subasta.fechaFinalizacion)) {
-        return;  // Si la validación falla, no continuar
-    }
-        
         if (subasta.alto === "0cm" || subasta.ancho === "0cm") {
             toast.current.show({ severity: 'warn', summary: 'Advertencia', detail: 'El tamaño no puede ser 0cm' });
             return;
         }
-        
+
         if (subasta.peso === "0Kg") {
             toast.current.show({ severity: 'warn', summary: 'Advertencia', detail: 'El peso no puede ser 0Kg' });
             return;
         }
-        
+
         // Validar el precio inicial
         const rawPrice = subasta.precioInicial.replace(/[^0-9]/g, '');
         if (parseInt(rawPrice, 10) > 1500000) {
             toast.current.show({ severity: 'warn', summary: 'Advertencia', detail: 'La oferta inicial no puede superar $1,500,000' });
             return;
         }
-        
+
         if (subasta.precioInicial === "$0") {
             toast.current.show({ severity: 'warn', summary: 'Advertencia', detail: 'La oferta inicial no puede ser $0' });
             return;
         }
-        
-        // Validar fecha de finalización
-        const today = new Date();
-        const selectedDate = new Date(subasta.fechaFinalizacion);
-        
-        if (selectedDate <= today) {
-            toast.current.show({ severity: 'warn', summary: 'Advertencia', detail: 'La fecha de finalización debe ser después de la fecha actual' });
-            return;
-        }
-        
-        const maxDate = new Date();
-        maxDate.setDate(today.getDate() + 7);
-        
-        if (selectedDate > maxDate) {
-            toast.current.show({ severity: 'warn', summary: 'Advertencia', detail: 'La fecha de finalización no puede ser mayor a 1 semana desde hoy' });
-            return;
-        }
-    
+
         // Mostrar un SweetAlert2 de confirmación
         const result = await Swal.fire({
             title: '¿Está seguro?',
@@ -220,7 +229,7 @@ const EditSubasta = () => {
             confirmButtonText: 'Sí, actualizar',
             cancelButtonText: 'Cancelar'
         });
-    
+
         if (result.isConfirmed) {
             // Si el usuario confirma, enviar el formulario
             const formData = new FormData();
@@ -231,7 +240,7 @@ const EditSubasta = () => {
                     formData.append(key, subasta[key]);
                 }
             }
-    
+
             try {
                 await AuthToken.put(`${process.env.REACT_APP_API_BASE_URL}subasta/update/${pkCodSubasta}`, formData, {
                     headers: {
@@ -253,7 +262,7 @@ const EditSubasta = () => {
                 );
             }
         }
-    };    
+    };
 
     const handleCancel = async () => {
         if (formChanged) {
@@ -268,7 +277,7 @@ const EditSubasta = () => {
                 confirmButtonText: 'Sí, cancelar',
                 cancelButtonText: 'No, volver'
             });
-    
+
             if (result.isConfirmed) {
                 navigate(-1); // Regresar a la página anterior
             }
@@ -277,185 +286,145 @@ const EditSubasta = () => {
         }
     };
 
-    useEffect(() => {
-        return () => {
-            if (subasta.imagenPreview) {
-                URL.revokeObjectURL(subasta.imagenPreview);
-            }
-        };
-    }, [subasta.imagenPreview]);
-
     return (
         <>
-        <Navbar_init />
-        <div className="register-container">
-            <div className="subasta-content row">
-                <div className="col-md-6 image-wrapper">
-                    <img className="createSubasta-img" src={Art} alt="Art" />
-                </div>
-                <div className='col-md-6'>
-                    <div className="form-subasta-container">
-                        <div className="register-image">
-                            <img className="logo-register" src={Logo} alt="Logo" />
-                        </div>
-                        <form onSubmit={handleSubmit}>
-                            <div className="form-floating">
-                                <input
-                                    className="form-control"
-                                    id="floatingNombreProducto"
-                                    placeholder="Nombre del producto"
-                                    name="nombreProducto"
-                                    value={subasta.nombreProducto}
-                                    onChange={handleInputChange}
-                                    type="text"
-                                />
-                                <label htmlFor="floatingNombreProducto">Nombre del producto</label>
+            <Navbar_init />
+            <div className="register-container">
+                <div className="subasta-content row">
+                    <div className="col-md-6 image-wrapper">
+                        <img className="createSubasta-img" src={Art} alt="Art" />
+                    </div>
+                    <div className='col-md-6'>
+                        <div className="form-subasta-container">
+                            <div className="register-image">
+                                <img className="logo-register" src={Logo} alt="Logo" />
                             </div>
-                            <div className="form-row">
-                                <div className="row">
-                                    <div className="col-md-6">
-                                        <div className="group-tamano">
-                                            <label htmlFor="tamano">Tamaño</label>
-                                            <div className="row tamano-group">
-                                                <div className="col-md-5">
-                                                    <div className="form-floating">
-                                                        <input
-                                                            className="form-control form-tamano"
-                                                            id="floatingAlto"
-                                                            placeholder="Alto"
-                                                            name="alto"
-                                                            value={subasta.alto}
-                                                            onChange={handleInputChange}
-                                                            type="text"
-                                                        />
-                                                        <label htmlFor="floatingAlto">Alto</label>
+                            <form onSubmit={handleSubmit}>
+                                <div className="form-floating">
+                                    <input
+                                        className="form-control"
+                                        id="floatingNombreProducto"
+                                        placeholder="Nombre del producto"
+                                        name="nombreProducto"
+                                        value={subasta.nombreProducto}
+                                        onChange={handleInputChange}
+                                        type="text"
+                                    />
+                                    <label htmlFor="floatingNombreProducto">Nombre del producto</label>
+                                </div>
+                                <div className="form-row">
+                                    <div className="row">
+                                        <div className="col-md-6">
+                                            <div className="group-tamano">
+                                                <label htmlFor="tamano">Tamaño</label>
+                                                <div className="row tamano-group">
+                                                    <div className="col-md-5">
+                                                        <div className="form-floating">
+                                                            <input
+                                                                className="form-control form-tamano"
+                                                                id="floatingAlto"
+                                                                placeholder="Alto"
+                                                                name="alto"
+                                                                value={subasta.alto}
+                                                                onChange={handleInputChange}
+                                                                type="text"
+                                                            />
+                                                            <label htmlFor="floatingAlto">Alto</label>
+                                                        </div>
                                                     </div>
-                                                </div>
-                                                <div className="col-md-1 text-center">
-                                                    <span className="tamano-separator">×</span>
-                                                </div>
-                                                <div className="col-md-5">
-                                                    <div className="form-floating">
-                                                        <input
-                                                            className="form-control form-tamano"
-                                                            id="floatingAncho"
-                                                            placeholder="Ancho"
-                                                            name="ancho"
-                                                            value={subasta.ancho}
-                                                            onChange={handleInputChange}
-                                                            type="text"
-                                                        />
-                                                        <label htmlFor="floatingAncho">Ancho</label>
+                                                    <div className="col-md-1 text-center">
+                                                        <span className="tamano-separator">×</span>
+                                                    </div>
+                                                    <div className="col-md-5">
+                                                        <div className="form-floating">
+                                                            <input
+                                                                className="form-control form-tamano"
+                                                                id="floatingAncho"
+                                                                placeholder="Ancho"
+                                                                name="ancho"
+                                                                value={subasta.ancho}
+                                                                onChange={handleInputChange}
+                                                                type="text"
+                                                            />
+                                                            <label htmlFor="floatingAncho">Ancho</label>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
-                                    <div className="col-md-6">
-                                        <div className="form-floating form-cantidad">
-                                            <input
-                                                className="form-control"
-                                                id="floatingPeso"
-                                                placeholder="Peso"
-                                                name="peso"
-                                                value={subasta.peso}
-                                                onChange={handleInputChange}
-                                                type="text"
-                                            />
-                                            <label htmlFor="floatingPeso">Peso</label>
+                                        <div className="col-md-6">
+                                            <div className="form-floating form-cantidad">
+                                                <input
+                                                    className="form-control"
+                                                    id="floatingPeso"
+                                                    placeholder="Peso"
+                                                    name="peso"
+                                                    value={subasta.peso}
+                                                    onChange={handlePesoChange}
+                                                    type="text"
+                                                />
+                                                <label htmlFor="floatingPeso">Peso</label>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div className="form-floating">
-                                <select
-                                    className="form-control"
-                                    id="floatingCategoriaId"
-                                    name="categoriaId"
-                                    value={subasta.categoriaId}
-                                    onChange={handleInputChange}
-                                >
-                                    <option value="">Seleccione una categoría</option>
-                                    {categorias.map(categoria => (
-                                        <option key={categoria.pkCod_Categoria} value={categoria.pkCod_Categoria}>
-                                            {categoria.nombreCategoria}
-                                        </option>
-                                    ))}
-                                </select>
-                                <label htmlFor="floatingCategoriaId">Categoría</label>
-                            </div>
-                            <div className="form-row">
-                                <div className="row">
-                                    <div className="col-md-6">
-                                        <div className="form-floating">
-                                            <input
-                                                className="form-control"
-                                                id="floatingPrecioInicial"
-                                                placeholder="Precio Inicial"
-                                                name="precioInicial"
-                                                value={subasta.precioInicial}
-                                                onChange={handleCostoChange}
-                                                type="text"
-                                            />
-                                            <label htmlFor="floatingPrecioInicial">Oferta mínima</label>
-                                        </div>
-                                    </div>
-                                    <div className="col-md-6">
-                                        <div className="form-floating">
-                                            <input
-                                                className="form-control"
-                                                id="floatingFechaFinalizacion"
-                                                placeholder="Fecha de Finalización"
-                                                name="fechaFinalizacion"
-                                                value={subasta.fechaFinalizacion}
-                                                onChange={handleInputChange}
-                                                type="datetime-local"
-                                            />
-                                            <label htmlFor="floatingFechaFinalizacion">Fecha de Finalización</label>
-                                        </div>
+                                <div className="form-floating">
+                                    <select
+                                        className="form-control"
+                                        id="floatingCategoriaId"
+                                        name="categoriaId"
+                                        value={subasta.categoriaId}
+                                        onChange={handleInputChange}
+                                    >
+                                        <option value="">Seleccione una categoría</option>
+                                        {categorias.map(categoria => (
+                                            <option key={categoria.pkCod_Categoria} value={categoria.pkCod_Categoria}>
+                                                {categoria.nombreCategoria}
+                                            </option>
+                                        ))}
+                                    </select>
+                                    <label htmlFor="floatingCategoriaId">Categoría</label>
+                                </div>
+                                <div className="form-floating">
+                                    <textarea
+                                        className="form-control"
+                                        style={{ resize: 'none', width: '100%', height: '10rem' }}
+                                        placeholder="Descripción"
+                                        name="descripcion"
+                                        value={subasta.descripcion}
+                                        onChange={handleInputChange}
+                                        maxLength="155"
+                                    />
+                                    <label htmlFor="floatingDescripcion">Descripción</label>
+                                    <div className="character-counter d-flex justify-content-end">
+                                        {subasta.descripcion.length}/155
                                     </div>
                                 </div>
-                            </div>
-                            <div className="form-floating">
-                                <textarea
-                                    className="form-control"
-                                    style={{ resize: 'none', width: '100%', height: '10rem' }}
-                                    placeholder="Descripción"
-                                    name="descripcion"
-                                    value={subasta.descripcion}
-                                    onChange={handleInputChange}
-                                    maxLength="155"
-                                />
-                                <label htmlFor="floatingDescripcion">Descripción</label>
-                                <div className="character-counter d-flex justify-content-end">
-                                    {subasta.descripcion.length}/155
+                                <div className="form-group">
+                                    <div className="image-upload" onClick={() => document.getElementById('fileInput').click()}>
+                                        {imagePreview ? (
+                                            <img src={imagePreview} alt="Previsualización" className="img-fluid preview-image" />
+                                        ) : (
+                                            <div className="image-placeholder">
+                                                <i className="cross-icon bi bi-plus"></i>
+                                                <p className='text-subirObra'>Subir Imagen</p>
+                                            </div>
+                                        )}
+                                        <input id="fileInput" type="file" name="imagen" accept="image/*" onChange={handleFileChange} style={{ display: 'none' }} />
+                                    </div>
                                 </div>
-                            </div>
-                            <div className="form-group">
-                                <div className="image-upload" onClick={() => document.getElementById('fileInput').click()}>
-                                    {subasta.imagenPreview ? (
-                                        <img src={subasta.imagenPreview} alt="Previsualización" className="img-fluid preview-image" />
-                                    ) : (
-                                        <div className="image-placeholder">
-                                            <i className="cross-icon bi bi-plus"></i>
-                                            <p className='text-subirObra'>Subir Imagen</p>
-                                        </div>
-                                    )}
-                                    <input id="fileInput" type="file" name="imagen" accept="image/*" onChange={handleFileChange} style={{ display: 'none' }} />
+                                <div className="btn-group d-flex justify-content-center">
+                                    <button className="btn btn-create btn-primary py-2 create-btn" disabled={!formChanged} type="submit">Actualizar Subasta</button>
+                                    <button className="btn btn-cancel btn-secondary py-2 cancel-btn" type="button" onClick={handleCancel}>Cancelar</button>
                                 </div>
-                            </div>
-                            <div className="btn-group d-flex justify-content-center">
-                                <button className="btn btn-create btn-primary py-2 create-btn" disabled={!formChanged} type="submit">Actualizar Subasta</button>
-                                <button className="btn btn-cancel btn-secondary py-2 cancel-btn" type="button" onClick={handleCancel}>Cancelar</button>
-                            </div>
-                        </form>
+                            </form>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-        <Footer />
-        <Toast ref={toast} />
-    </>
+            <Footer />
+            <Toast ref={toast} />
+        </>
     );
 };
 

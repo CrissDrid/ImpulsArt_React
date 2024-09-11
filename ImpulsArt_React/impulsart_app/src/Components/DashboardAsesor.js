@@ -3,60 +3,44 @@ import axios from 'axios';
 import { Tag } from 'primereact/tag';
 import { Link } from 'react-router-dom';
 import Navbar_init from "./Navbar_init";
-
-// Autenticacion de apis
+import { DataTable } from 'primereact/datatable';
+import { Column } from 'primereact/column';
+import { Button } from 'primereact/button';
+import Swal from 'sweetalert2';
+import withReactContent from 'sweetalert2-react-content';
 import AuthToken from '../Auth/AuthToken';
-// Asegúrate Obtener datos del usuario
 import GetUserInfo from '../Auth/GetUserInfo';
 
+const MySwal = withReactContent(Swal);
+
 export default function DashboardAsesor() {
-    const [showPqrs, setShowPqrs] = useState(true); // Estado para controlar qué tabla mostrar
-    const [pqrs, setPqrs] = useState([]); // Estado para datos PQRS
-    const [reportes, setReportes] = useState([]); // Estado para datos Reportes
-    const [identificacion, setIdentificacion] = useState(null); // Usa null para valores no inicializados
+    const [showPqrs, setShowPqrs] = useState(true);
+    const [pqrs, setPqrs] = useState([]);
+    const [reportes, setReportes] = useState([]);
+    const [identificacion, setIdentificacion] = useState(null);
+    const [respuesta, setRespuesta] = useState({});
 
-    const calculateDaysDifference = (dateString) => {
-        // Convierte la fecha de cadena a objeto Date
-        const fechaPQR = new Date(dateString);
-        const today = new Date();
-
-        // Calcula la diferencia en milisegundos
-        const differenceInMs = today - fechaPQR;
-
-        // Convierte la diferencia a días
-        const differenceInDays = Math.floor(differenceInMs / (1000 * 60 * 60 * 24));
-
-        return differenceInDays;
-    };
-
-    // Ejemplo de uso en tu componente
-    const getSeverity = (dias) => {
-        if (dias <= 3) {
-            return 'success'; // Verde
-        } else if (dias >= 4 && dias <= 6) {
-            return 'warning'; // Amarillo
-        } else if (dias >= 7 && dias <= 9) {
-            return 'danger'; // Rojo
-        } else {
-            return null;
-        }
-    };
-
-    // Obtener la identificación del usuario una vez al montar el componente
     useEffect(() => {
         const fetchUserInfo = async () => {
             try {
-                const { identificacion } = await GetUserInfo();
-                setIdentificacion(identificacion);
+                const userInfo = await GetUserInfo();
+                setIdentificacion(userInfo.identificacion);
             } catch (error) {
                 console.error('Error al obtener la información del usuario:', error);
             }
         };
-
         fetchUserInfo();
     }, []);
 
-    // Cargar PQRS o reportes dependiendo de showPqrs
+    useEffect(() => {
+        if (identificacion) {
+            setRespuesta(prev => ({
+                ...prev,
+                fk_Identificacion: identificacion
+            }));
+        }
+    }, [identificacion]);
+
     useEffect(() => {
         if (identificacion) {
             if (showPqrs) {
@@ -72,30 +56,79 @@ export default function DashboardAsesor() {
             const response = await AuthToken.get(`pqrs/PqrsAsignados/${identificacion}`);
             setPqrs(response.data.data);
         } catch (e) {
-            // Simplifica el manejo de errores, sin registrar en consola
-            if (e.response) {
-                console.warn('Error en la solicitud de PQRS:', e.response.status);
-            } else if (e.request) {
-                console.warn('No se recibió respuesta en PQRS:', e.request);
-            } else {
-                console.warn('Error de configuración en PQRS:', e.message);
-            }
+            console.warn('Error en la solicitud de PQRS:', e);
         }
-    }
+    };
 
     const getRespuesta = async () => {
         try {
             const response = await AuthToken.get("reporteObra/all");
             setReportes(response.data.data);
         } catch (e) {
-            // Simplifica el manejo de errores, sin registrar en consola
-            if (e.response) {
-                console.warn('Error en la solicitud de PQRS:', e.response.status);
-            } else if (e.request) {
-                console.warn('No se recibió respuesta en PQRS:', e.request);
-            } else {
-                console.warn('Error de configuración en PQRS:', e.message);
+            console.warn('Error en la solicitud de Reportes:', e);
+        }
+    };
+
+    const onSubmit = async () => {
+        console.log('Enviando respuesta:', respuesta); // Verifica el estado aquí
+        try {
+            await AuthToken.post("respuesta/create", respuesta);
+            MySwal.fire('Éxito', 'Respuesta enviada con éxito', 'success');
+            getPqrs(); // Actualiza la lista de PQRS después de enviar la respuesta
+        } catch (error) {
+            console.error(error);
+            MySwal.fire('Error', 'Hubo un problema al enviar la respuesta', 'error');
+        }
+    };
+
+    const handleResponder = async (pkCod_Pqrs) => {
+        try {
+            const result = await MySwal.fire({
+                title: 'Escribe tu respuesta',
+                input: 'textarea',
+                inputPlaceholder: 'Escribe aquí tu respuesta...',
+                showCancelButton: true,
+                confirmButtonText: 'Enviar',
+                cancelButtonText: 'Cancelar',
+                inputValidator: (value) => {
+                    if (!value) {
+                        return 'La respuesta no puede estar vacía';
+                    }
+                }
+            });
+
+            if (result.isConfirmed) {
+                const comentario = result.value;
+                setRespuesta(prev => ({
+                    ...prev,
+                    comentario,
+                    fk_Pqrs: pkCod_Pqrs // Establece el ID de PQRS aquí
+                }));
+                onSubmit(); // Envía la respuesta
             }
+        } catch (error) {
+            console.error('Error al enviar la respuesta:', error);
+            MySwal.fire('Error', 'Hubo un problema al enviar la respuesta', 'error');
+        }
+    };
+
+    const calculateDaysDifference = (dateString) => {
+        const fechaPQR = new Date(dateString);
+        const today = new Date();
+        const differenceInMs = today - fechaPQR;
+        const differenceInDays = Math.floor(differenceInMs / (1000 * 60 * 60 * 24));
+        return differenceInDays;
+    };
+
+    const getSeverity = (dias) => {
+        if (dias <= 3) {
+            return 'success';
+        } else if (dias >= 4 && dias <= 6) {
+            return 'warning';
+        } else if (dias >= 7 && dias <= 9) {
+            return 'danger';
+        } else {
+            return null;
         }
     };
 
@@ -103,86 +136,75 @@ export default function DashboardAsesor() {
         <div>
             <Navbar_init />
             <div className="btn-group mb-3" role="group" aria-label="Button group">
-                <button
-                    className="btn btn-primary"
+                <Button
+                    label="Ver PQRS"
+                    icon="pi pi-eye"
+                    className={`p-button ${showPqrs ? 'p-button-primary' : 'p-button-outlined'}`}
                     onClick={() => setShowPqrs(true)}
-                >
-                    Ver PQRS
-                </button>
-                <button
-                    className="btn btn-secondary"
+                />
+                <Button
+                    label="Ver Reportes"
+                    icon="pi pi-file"
+                    className={`p-button ${!showPqrs ? 'p-button-primary' : 'p-button-outlined'}`}
                     onClick={() => setShowPqrs(false)}
-                >
-                    Ver Reportes
-                </button>
+                />
             </div>
 
             {showPqrs ? (
                 <>
                     <h1>PQRS</h1>
-                    <table className="table table-hover">
-                        <thead>
-                            <tr>
-                                <th scope="col">Fecha</th>
-                                <th scope="col">Descripcion</th>
-                                <th scope="col">Nombre</th>
-                                <th scope="col">Apellido</th>
-                                <th scope="col">Email</th>
-                                <th scope="col">Nombre de usuario</th>
-                                <th scope="col">Prioridad</th>
-                                <th scope="col">Responder</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {pqrs.map((pqrs, index) => {
-                                const dias = calculateDaysDifference(pqrs.fechaPQRS); // Calcula los días para cada PQRS
-                                return (
-                                    <tr key={index}>
-                                        <td>{pqrs.fechaPQRS}</td>
-                                        <td>{pqrs.descripcion}</td>
-                                        <td>{pqrs.usuario.nombre}</td>
-                                        <td>{pqrs.usuario.apellido}</td>
-                                        <td>{pqrs.usuario.email}</td>
-                                        <td>{pqrs.usuario.userName}</td>
-                                        <td>
-                                            <Tag value={`${dias} Días`} severity={getSeverity(dias)} />
-                                        </td>
-                                        <td>
-                                            <Link to="/Responder" className="btn btn-sm">
-                                                <i className="bi bi-reply"></i> {/* Ícono de respuesta */}
-                                            </Link>
-                                        </td>
-                                    </tr>
-                                );
-                            })}
-                        </tbody>
-                    </table>
+                    <DataTable value={pqrs} stripedRows tableStyle={{ minWidth: '50rem' }}>
+                        <Column field="fechaPQRS" header="Fecha"></Column>
+                        <Column field="descripcion" header="Descripción"></Column>
+                        <Column field="usuario.nombre" header="Nombre"></Column>
+                        <Column field="usuario.apellido" header="Apellido"></Column>
+                        <Column field="usuario.email" header="Email"></Column>
+                        <Column field="usuario.userName" header="Nombre de usuario"></Column>
+                        <Column
+                            header="Prioridad"
+                            body={(rowData) => {
+                                const dias = calculateDaysDifference(rowData.fechaPQRS);
+                                return <Tag value={`${dias} Días`} severity={getSeverity(dias)} />;
+                            }}
+                        ></Column>
+                        <Column
+    body={(rowData) => (
+        <button
+            onClick={() => handleResponder(rowData.pkCod_Pqrs)} // Pasar el ID correcto aquí
+            style={{
+                border: 'none',
+                background: 'none',
+                cursor: 'pointer',
+                padding: '0',
+                fontSize: '1.5em'
+            }}
+        >
+            <i className="bi bi-reply"></i>
+        </button>
+    )}
+    header="Responder"
+/>
+                    </DataTable>
                 </>
             ) : (
                 <>
                     <h1>Reportes</h1>
-                    <table className="table table-hover">
-                        <thead>
-                            <tr>
-                                <th scope="col">Fecha del reporte</th>
-                                <th scope="col">Comentario</th>
-                                <th scope="col">Tipo de reporte</th>
-                                <th scope="col">Nombre de la obra</th>
-                                <th scope="col">Categoria</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {reportes.map((reporte, index) => (
-                                <tr key={index}>
-                                    <td>{reporte.fechaReporte}</td>
-                                    <td>{reporte.comentario}</td>
-                                    <td>{reporte.tipoReporte.nombre}</td>
-                                    <td>{reporte.obra.nombreProducto}</td>
-                                    <td>{reporte.obra.categoria.nombreCategoria}</td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
+                    <DataTable value={reportes} stripedRows tableStyle={{ minWidth: '50rem' }}>
+                        <Column field="fechaReporte" header="Fecha del reporte"></Column>
+                        <Column field="comentario" header="Comentario"></Column>
+                        <Column field="tipoReporte.nombre" header="Tipo de reporte"></Column>
+                        <Column field="obra.nombreProducto" header="Nombre de la obra"></Column>
+                        <Column field="obra.categoria.nombreCategoria" header="Categoría"></Column>
+                        <Column
+                            body={(rowData) => (
+                                <Link to={`/DetalleObras/${rowData.obra.pkCod_Producto}`} className="btn btn-sm">
+                                    <button className='btn btn-primary'>Ver detalle de la obra</button>
+                                </Link>
+                            )}
+                            header="Acciones"
+                        ></Column>
+
+                    </DataTable>
                 </>
             )}
         </div>

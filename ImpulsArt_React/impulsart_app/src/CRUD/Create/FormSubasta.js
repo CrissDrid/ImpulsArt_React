@@ -107,35 +107,65 @@ export const FormSubasta = () => {
     return true;
 };
 
-    const handleInputChange = (e) => {
-        const { name, value } = e.target;
+const handleInputChange = (e) => {
+  const { name, value } = e.target;
 
-        if (name === 'precioInicial') {
-            const rawValue = value.replace(/[^0-9]/g, '');
-            setSubasta({ ...subasta, [name]: formatCurrency(rawValue) });
-        } else if (name === 'alto' || name === 'ancho') {
-            const rawValue = value.replace(/[^\d]/g, '');
-            const updatedValue = rawValue ? `${rawValue}cm` : '';
-            setSubasta(prevSubasta => {
-                const updatedSubasta = { ...prevSubasta, [name]: updatedValue };
-                if (updatedSubasta.alto && updatedSubasta.ancho) {
-                    updatedSubasta.tamano = `${updatedSubasta.alto} x ${updatedSubasta.ancho}`;
-                } else {
-                    updatedSubasta.tamano = updatedSubasta.alto || updatedSubasta.ancho ? `${updatedSubasta.alto} x ${updatedSubasta.ancho}` : '';
-                }
-                return updatedSubasta;
-            });
-        } else {
-            setSubasta({ ...subasta, [name]: value });
-        }
+  if (name === 'precioInicial') {
+      // Formatear el valor del precio inicial como moneda
+      const rawValue = value.replace(/[^0-9]/g, '');
+      setSubasta({ ...subasta, [name]: formatCurrency(rawValue) });
+  } else if (name === 'alto' || name === 'ancho') {
+      // Eliminar caracteres no numéricos
+      const rawValue = value.replace(/[^\d]/g, '');
+      // Convertir el valor a número y limitarlo a 150
+      const numberValue = parseInt(rawValue, 10);
+      const limitedValue = numberValue > 150 ? 150 : numberValue;
+      // Actualizar el valor con la unidad 'cm'
+      const updatedValue = limitedValue ? `${limitedValue}cm` : '';
+
+      setSubasta(prevSubasta => {
+          const updatedSubasta = { ...prevSubasta, [name]: updatedValue };
+          // Actualizar el campo 'tamano'
+          if (updatedSubasta.alto && updatedSubasta.ancho) {
+              updatedSubasta.tamano = `${updatedSubasta.alto} x ${updatedSubasta.ancho}`;
+          } else {
+              updatedSubasta.tamano = updatedSubasta.alto || updatedSubasta.ancho ? `${updatedSubasta.alto} x ${updatedSubasta.ancho}` : '';
+          }
+          return updatedSubasta;
+      });
+  } else {
+      setSubasta({ ...subasta, [name]: value });
+  }
+};
+
+    const handleCostoChange = (e) => {
+      const rawValue = e.target.value.replace(/[^\d]/g, '');
+      setSubasta({ ...subasta, costo: formatCurrency(rawValue) });
     };
-
+  
     const handlePesoChange = (e) => {
-        let value = e.target.value.replace(/[^\d]/g, '');
-        if (value !== "") {
-            value += "Kg";
-        }
-        setSubasta({ ...subasta, peso: value });
+      let value = e.target.value.replace(/[^\d]/g, ''); // Elimina caracteres no numéricos
+    
+      if (value === "") {
+        setSubasta({ ...subasta, peso: "" }); // Si está vacío, no establecer valor
+        return;
+      }
+    
+      let numericValue = Number(value);
+    
+      if (numericValue === 0) {
+        // No permitir valor 0
+        toast.current.show({ severity: 'warn', summary: 'Advertencia', detail: 'El peso debe ser mayor que 0.' });
+        return;
+      }
+    
+      if (numericValue > 50) {
+        value = "50Kg"; // Limitar a 50Kg si se supera el límite
+      } else {
+        value += "Kg";
+      }
+    
+      setSubasta({ ...subasta, peso: value });
     };
 
     const handleDescriptionChange = (e) => {
@@ -148,11 +178,16 @@ export const FormSubasta = () => {
         setSubasta({ ...subasta, imagen: e.target.files[0] });
     };
 
+    const isOnlyLettersWithValidSpaces = (str) => {
+      // Permitir solo letras y un solo espacio entre palabras, sin espacios al inicio o al final
+      return /^[A-Za-z]+( [A-Za-z]+)*$/.test(str);
+    };
+
     const handleSubmit = async (e) => {
       e.preventDefault();
   
       // Validaciones
-      if (!subasta.nombreProducto || !subasta.precioInicial || !subasta.peso || !subasta.tamano || !subasta.categoriaId || !subasta.descripcion || !subasta.imagen) {
+      if (!subasta.nombreProducto || !subasta.precioInicial || !subasta.peso || !subasta.tamano || !subasta.categoriaId || !subasta.descripcion || !subasta.imagen || !subasta.fechaFinalizacion) {
           toast.current.show({ severity: 'warn', summary: 'Advertencia', detail: 'Todos los campos deben estar completos' });
           return;
       }
@@ -160,6 +195,16 @@ export const FormSubasta = () => {
       if (subasta.nombreProducto.length > 50) {
           toast.current.show({ severity: 'warn', summary: 'Advertencia', detail: 'El nombre de la obra debe contener un máximo de 50 caracteres' });
           return;
+      }
+
+      if (!isOnlyLettersWithValidSpaces(subasta.nombreProducto)) {
+        toast.current.show({ severity: 'warn', summary: 'Advertencia', detail: 'El nombre de la obra solo debe contener letras y un solo espacio entre palabras, sin espacios al inicio o al final', life: 3000 });
+        return;
+      }
+  
+      if (!isOnlyLettersWithValidSpaces(subasta.descripcion)) {
+        toast.current.show({ severity: 'warn', summary: 'Advertencia', detail: 'La descripcion de la obra solo debe contener letras y un solo espacio entre palabras, sin espacios al inicio o al final', life: 3000 });
+        return;
       }
 
       // Validar fecha de finalización
@@ -346,7 +391,7 @@ export const FormSubasta = () => {
                   <div className="row">
                     <div className="col-md-6">
                       <div className="form-floating">
-                        <input className="form-control" id="floatingPrecioInicial" placeholder="Precio Inicial" name="precioInicial" value={subasta.precioInicial} onChange={handleInputChange} type="text"/>
+                        <input className="form-control" id="floatingPrecioInicial" maxLength="7" placeholder="Precio Inicial" name="precioInicial" value={subasta.precioInicial} onChange={handleInputChange} type="text"/>
                         <label htmlFor="floatingPrecioInicial">Oferta mínima</label>
                       </div>
                     </div>
