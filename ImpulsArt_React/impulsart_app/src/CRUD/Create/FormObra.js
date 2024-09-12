@@ -37,6 +37,16 @@ const FormObra = () => {
   const [categorias, setCategorias] = useState([]);
   const [isDescriptionOverLimit, setIsDescriptionOverLimit] = useState(false);
 
+  const formatCurrency = (amount) => {
+    const formatter = new Intl.NumberFormat('es-CO', {
+      style: 'currency',
+      currency: 'COP',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0
+    });
+    return formatter.format(amount);
+  };
+
   useEffect(() => {
 
     //Cargar identificacion
@@ -90,6 +100,10 @@ const FormObra = () => {
         }
         return updatedObra;
       });
+    } else if (name === 'costo') {
+      // Actualizar el valor sin formatear
+      const rawValue = value.replace(/[^0-9]/g, ''); // Eliminar todo excepto números
+      setObra(prevObra => ({ ...prevObra, [name]: rawValue }));
     } else {
       setObra(prevObra => ({ ...prevObra, [name]: value }));
     }
@@ -119,7 +133,7 @@ const FormObra = () => {
       return;
     }
 
-    if (obra.costo === "$0") {
+    if (obra.costo === "0") {
       toast.current.show({ severity: 'warn', summary: 'Advertencia', detail: 'El costo no puede ser 0' });
       return;
     }
@@ -155,7 +169,8 @@ const FormObra = () => {
         try {
           const formData = new FormData();
           for (const key in obra) {
-            formData.append(key, obra[key]);
+            // Formatear el costo como número para enviar
+            formData.append(key, key === 'costo' ? obra[key].replace(/[^0-9]/g, '') : obra[key]);
           }
 
           const result = await AuthToken.post(`${process.env.REACT_APP_API_BASE_URL}obra/create`, formData, {
@@ -164,15 +179,11 @@ const FormObra = () => {
 
           Swal.fire(
             'Felicidades!',
-            'Has subido una nuvea obra con exito.',
+            'Has subido una nueva obra con éxito.',
             'success'
           ).then(() => {
             // Redirigir según el rol del usuario
-            if (result.isConfirmed) {
-              navigate(-1);
-            } else {
-              navigate(-1);
-            }
+            navigate(-1);
           });
         } catch (error) {
           console.error('Error al enviar el formulario:', error.response ? error.response.data : error.message);
@@ -210,41 +221,31 @@ const FormObra = () => {
     }
   };
 
-
-  const formatCurrency = (value) => {
-    const number = value.replace(/[^\d]/g, '');
-    return `$${new Intl.NumberFormat('es-CO').format(number)}`;
-  };
-
-  const handleCostoChange = (e) => {
-    const rawValue = e.target.value.replace(/[^\d]/g, '');
-    setObra({ ...obra, costo: formatCurrency(rawValue) });
-  };
-
   const handlePesoChange = (e) => {
     let value = e.target.value.replace(/[^\d]/g, ''); // Elimina caracteres no numéricos
-  
+
     if (value === "") {
       setObra({ ...obra, peso: "" }); // Si está vacío, no establecer valor
       return;
     }
-  
+
     let numericValue = Number(value);
-  
+
     if (numericValue === 0) {
       // No permitir valor 0
       toast.current.show({ severity: 'warn', summary: 'Advertencia', detail: 'El peso debe ser mayor que 0.' });
       return;
     }
-  
+
     if (numericValue > 50) {
       value = "50Kg"; // Limitar a 50Kg si se supera el límite
     } else {
       value += "Kg";
     }
-  
+
     setObra({ ...obra, peso: value });
   };
+
 
   const handleDescriptionChange = (e) => {
     const value = e.target.value;
@@ -275,7 +276,16 @@ const FormObra = () => {
                   <div className="row">
                     <div className="col-md-6">
                       <div className="form-floating">
-                        <input className="form-control" id="floatingCosto" maxLength="10" placeholder="Costo" name="costo" value={obra.costo} onChange={handleCostoChange} type="text" />
+                        <input
+                          className="form-control"
+                          maxLength="11"
+                          id="floatingCosto"
+                          placeholder="Costo"
+                          name="costo"
+                          value={obra.costo ? formatCurrency(obra.costo) : ''}
+                          onChange={handleInputChange}
+                          type="text"
+                        />
                         <label htmlFor="floatingCosto">Costo</label>
                       </div>
                     </div>

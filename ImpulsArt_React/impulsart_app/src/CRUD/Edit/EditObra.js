@@ -37,6 +37,16 @@ export const EditObra = () => {
     const [imagePreview, setImagePreview] = useState(null);
     const [formChanged, setFormChanged] = useState(false);
 
+    const formatCurrency = (amount) => {
+        const formatter = new Intl.NumberFormat('es-CO', {
+          style: 'currency',
+          currency: 'COP',
+          minimumFractionDigits: 0,
+          maximumFractionDigits: 0
+        });
+        return formatter.format(amount);
+      };
+
     useEffect(() => {
         // Cargar datos de la obra
         const loadObra = async () => {
@@ -111,6 +121,10 @@ export const EditObra = () => {
                 }
                 return updatedObra;
             });
+        } else if (name === 'costo') {
+            // Actualizar el valor sin formatear
+            const rawValue = value.replace(/[^0-9]/g, ''); // Eliminar todo excepto números
+            setObra(prevObra => ({ ...prevObra, [name]: rawValue }));
         } else {
             setObra(prevObra => ({ ...prevObra, [name]: value }));
         }
@@ -304,7 +318,16 @@ export const EditObra = () => {
                                     <div className="row">
                                         <div className="col-md-6">
                                             <div className="form-floating">
-                                                <input className="form-control" id="floatingCosto" maxLength="10" placeholder="Costo" name="costo" value={obra.costo} onChange={handleCostoChange} type="text" />
+                                                <input
+                                                    className="form-control"
+                                                    maxLength="11"
+                                                    id="floatingCosto"
+                                                    placeholder="Costo"
+                                                    name="costo"
+                                                    value={obra.costo ? formatCurrency(obra.costo) : ''}
+                                                    onChange={handleInputChange}
+                                                    type="text"
+                                                />
                                                 <label htmlFor="floatingCosto">Costo</label>
                                             </div>
                                         </div>

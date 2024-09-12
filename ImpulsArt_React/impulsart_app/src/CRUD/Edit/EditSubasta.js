@@ -22,16 +22,11 @@ const EditSubasta = () => {
     const navigate = useNavigate();
     const [subasta, setSubasta] = useState({
         nombreProducto: "",
-        costo: 0,
         peso: "",
         tamano: "",
-        cantidad: 0,
         categoriaId: "",
         categoriaNombre: "",
         descripcion: "",
-        estadoSubasta: "Activo",
-        precioInicial: "",
-        fechaFinalizacion: "",
         imagen: ""
     });
 
@@ -51,18 +46,13 @@ const EditSubasta = () => {
                 // Configurar el estado de subasta
                 setSubasta({
                     nombreProducto: subastaData.obras.nombreProducto,
-                    costo: subastaData.obras.costo,
                     peso: subastaData.obras.peso,
                     tamano: `${subastaData.obras.alto} x ${subastaData.obras.ancho}`,
                     alto: subastaData.obras.alto,
                     ancho: subastaData.obras.ancho,
-                    cantidad: subastaData.obras.cantidad,
                     categoriaId: subastaData.obras.categoria.pkCod_Categoria,
                     categoriaNombre: subastaData.obras.categoria.nombreCategoria,
                     descripcion: subastaData.obras.descripcion,
-                    estadoSubasta: subastaData.estadoSubasta,
-                    precioInicial: subastaData.precioInicial,
-                    fechaFinalizacion: subastaData.fechaFinalizacion,
                     imagen: subastaData.obras.imagen ? `data:${subastaData.obras.tipoImagen};base64,${subastaData.obras.imagen}` : null
                 });
     
@@ -186,7 +176,7 @@ const EditSubasta = () => {
             return;
         }
 
-        if (!subasta.nombreProducto || !subasta.precioInicial || !subasta.peso || !subasta.tamano || !subasta.categoriaId || !subasta.descripcion || !subasta.imagen) {
+        if (!subasta.nombreProducto || !subasta.peso || !subasta.tamano || !subasta.categoriaId || !subasta.descripcion || !subasta.imagen) {
             toast.current.show({ severity: 'warn', summary: 'Advertencia', detail: 'Todos los campos deben estar completos' });
             return;
         }
@@ -203,18 +193,6 @@ const EditSubasta = () => {
 
         if (subasta.peso === "0Kg") {
             toast.current.show({ severity: 'warn', summary: 'Advertencia', detail: 'El peso no puede ser 0Kg' });
-            return;
-        }
-
-        // Validar el precio inicial
-        const rawPrice = subasta.precioInicial.replace(/[^0-9]/g, '');
-        if (parseInt(rawPrice, 10) > 1500000) {
-            toast.current.show({ severity: 'warn', summary: 'Advertencia', detail: 'La oferta inicial no puede superar $1,500,000' });
-            return;
-        }
-
-        if (subasta.precioInicial === "$0") {
-            toast.current.show({ severity: 'warn', summary: 'Advertencia', detail: 'La oferta inicial no puede ser $0' });
             return;
         }
 
