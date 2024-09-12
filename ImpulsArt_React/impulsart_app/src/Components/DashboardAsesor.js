@@ -20,6 +20,18 @@ export default function DashboardAsesor() {
     const [identificacion, setIdentificacion] = useState(null);
     const [respuesta, setRespuesta] = useState({});
 
+    const deleteObra = async (pkCod_Producto) => {
+        try {
+            await AuthToken.delete(`obra/delete/${pkCod_Producto}`);
+            // Optimistic UI update: remove the obra from the list
+            setReportes(prevReportes => prevReportes.filter(report => report.obra.pkCod_Producto !== pkCod_Producto));
+            MySwal.fire('Éxito', 'Obra eliminada correctamente', 'success');
+        } catch (error) {
+            console.error('Error al eliminar la obra:', error);
+            MySwal.fire('Error', 'Hubo un problema al eliminar la obra', 'error');
+        }
+    }
+
     useEffect(() => {
         const fetchUserInfo = async () => {
             try {
@@ -46,7 +58,7 @@ export default function DashboardAsesor() {
             if (showPqrs) {
                 getPqrs();
             } else {
-                getRespuesta();
+                getReportes();
             }
         }
     }, [showPqrs, identificacion]);
@@ -55,22 +67,22 @@ export default function DashboardAsesor() {
         try {
             const response = await AuthToken.get(`pqrs/PqrsAsignados/${identificacion}`);
             setPqrs(response.data.data);
-        } catch (e) {
-            console.warn('Error en la solicitud de PQRS:', e);
+        } catch (error) {
+            console.warn('Error en la solicitud de PQRS:', error);
         }
     };
 
-    const getRespuesta = async () => {
+    const getReportes = async () => {
         try {
-            const response = await AuthToken.get("reporteObra/all");
+            const response = await AuthToken.get("reporteObra/porRevisar");
             setReportes(response.data.data);
-        } catch (e) {
-            console.warn('Error en la solicitud de Reportes:', e);
+        } catch (error) {
+            console.warn('Error en la solicitud de Reportes:', error);
         }
     };
 
-    const onSubmit = async () => {
-        console.log('Enviando respuesta:', respuesta); // Verifica el estado aquí
+    const onSubmit = async (respuesta) => {
+        console.log('Enviando respuesta:', respuesta); // Verifica el contenido aquí
         try {
             await AuthToken.post("respuesta/create", respuesta);
             MySwal.fire('Éxito', 'Respuesta enviada con éxito', 'success');
@@ -96,15 +108,31 @@ export default function DashboardAsesor() {
                     }
                 }
             });
-
+    
             if (result.isConfirmed) {
                 const comentario = result.value;
-                setRespuesta(prev => ({
-                    ...prev,
+                const updatedRespuesta = {
                     comentario,
-                    fk_Pqrs: pkCod_Pqrs // Establece el ID de PQRS aquí
-                }));
-                onSubmit(); // Envía la respuesta
+                    fk_Pqrs: pkCod_Pqrs,
+                    fk_Identificacion: identificacion
+                };
+                setRespuesta(updatedRespuesta);
+    
+                // Optimistic UI update
+                setPqrs(prevPqrs => prevPqrs.filter(pqrs => pqrs.pkCod_Pqrs !== pkCod_Pqrs));
+    
+                // Show loading indicator
+                MySwal.fire({
+                    title: 'Enviando respuesta...',
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        MySwal.showLoading();
+                    }
+                });
+    
+                await onSubmit(updatedRespuesta);
+    
+                MySwal.fire('Éxito', 'Respuesta enviada con éxito', 'success');
             }
         } catch (error) {
             console.error('Error al enviar la respuesta:', error);
@@ -154,56 +182,61 @@ export default function DashboardAsesor() {
                 <>
                     <h1>PQRS</h1>
                     <DataTable value={pqrs} stripedRows tableStyle={{ minWidth: '50rem' }}>
-                        <Column field="fechaPQRS" header="Fecha"></Column>
-                        <Column field="descripcion" header="Descripción"></Column>
-                        <Column field="usuario.nombre" header="Nombre"></Column>
-                        <Column field="usuario.apellido" header="Apellido"></Column>
-                        <Column field="usuario.email" header="Email"></Column>
-                        <Column field="usuario.userName" header="Nombre de usuario"></Column>
+                        <Column field="fechaPQRS" header="Fecha" />
+                        <Column field="descripcion" header="Descripción" />
+                        <Column field="usuario.nombre" header="Nombre" />
+                        <Column field="usuario.apellido" header="Apellido" />
+                        <Column field="usuario.email" header="Email" />
+                        <Column field="usuario.userName" header="Nombre de usuario" />
                         <Column
                             header="Prioridad"
                             body={(rowData) => {
                                 const dias = calculateDaysDifference(rowData.fechaPQRS);
                                 return <Tag value={`${dias} Días`} severity={getSeverity(dias)} />;
                             }}
-                        ></Column>
+                        />
                         <Column
-    body={(rowData) => (
-        <button
-            onClick={() => handleResponder(rowData.pkCod_Pqrs)} // Pasar el ID correcto aquí
-            style={{
-                border: 'none',
-                background: 'none',
-                cursor: 'pointer',
-                padding: '0',
-                fontSize: '1.5em'
-            }}
-        >
-            <i className="bi bi-reply"></i>
-        </button>
-    )}
-    header="Responder"
-/>
+                            body={(pqrs) => (
+                                <button
+                                    onClick={() => handleResponder(pqrs.pkCod_Pqrs)} // Pasar el ID correcto aquí
+                                    style={{
+                                        border: 'none',
+                                        background: 'none',
+                                        cursor: 'pointer',
+                                        padding: '0',
+                                        fontSize: '1.5em'
+                                    }}
+                                >
+                                    <i className="bi bi-reply"></i>
+                                </button>
+                            )}
+                            header="Responder"
+                        />
                     </DataTable>
                 </>
             ) : (
                 <>
                     <h1>Reportes</h1>
                     <DataTable value={reportes} stripedRows tableStyle={{ minWidth: '50rem' }}>
-                        <Column field="fechaReporte" header="Fecha del reporte"></Column>
-                        <Column field="comentario" header="Comentario"></Column>
-                        <Column field="tipoReporte.nombre" header="Tipo de reporte"></Column>
-                        <Column field="obra.nombreProducto" header="Nombre de la obra"></Column>
-                        <Column field="obra.categoria.nombreCategoria" header="Categoría"></Column>
+                        <Column field="fechaReporte" header="Fecha del reporte" />
+                        <Column field="comentario" header="Comentario" />
+                        <Column field="tipoReporte.nombre" header="Tipo de reporte" />
+                        <Column field="obra.nombreProducto" header="Nombre de la obra" />
+                        <Column field="obra.categoria.nombreCategoria" header="Categoría" />
                         <Column
                             body={(rowData) => (
                                 <Link to={`/DetalleObras/${rowData.obra.pkCod_Producto}`} className="btn btn-sm">
                                     <button className='btn btn-primary'>Ver detalle de la obra</button>
                                 </Link>
                             )}
-                            header="Acciones"
-                        ></Column>
-
+                            header="Ver detalle de la obra"
+                        />
+                        <Column
+                            body={(rowData) => (
+                                <button onClick={() => deleteObra(rowData.obra.pkCod_Producto)} className="btn btn-danger mx-2">Delete</button>
+                            )}
+                            header="Borrar obra"
+                        />
                     </DataTable>
                 </>
             )}
