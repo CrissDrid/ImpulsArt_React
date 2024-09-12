@@ -8,11 +8,11 @@ function Help() {
     const [searchTerm, setSearchTerm] = useState("");
 
     const tutorials = [
-        { id: "One", title: "¿Cómo puedo Iniciar sesion?", video: "https://www.youtube.com/embed/LEr3qf9FC_Q?si=g1YXm_qOj9X9Jl6t" },
-        { id: "Two", title: "¿Cómo puedo vender mi arte en ImpulsArt?", video: "https://www.youtube.com/embed/LEr3qf9FC_Q?si=g1YXm_qOj9X9Jl6t" },
-        { id: "Three", title: "¿Qué sucede si el arte que compré llega dañado?", video: "https://www.youtube.com/embed/LEr3qf9FC_Q?si=g1YXm_qOj9X9Jl6t" },
-        { id: "Four", title: "¿Cómo puedo estar seguro de que las obras de arte en ImpulsArt son auténticas?", video: "https://www.youtube.com/embed/LEr3qf9FC_Q?si=g1YXm_qOj9X9Jl6t" },
-        { id: "Five", title: "¿Cuánto tiempo se tarda en recibir mi obra de arte después de realizar la compra?", video: "https://www.youtube.com/embed/LEr3qf9FC_Q?si=g1YXm_qOj9X9Jl6t" }
+        { id: "One", title: "¿Cómo puedo Iniciar sesion?", video: "https://www.youtube.com/embed/GhiHU7aefwo?si=8J1SK_kdjPhNUXtx" },
+        { id: "Two", title: "¿Cómo puedo vender mi arte en ImpulsArt?", video: "https://www.youtube.com/embed/GhiHU7aefwo?si=8J1SK_kdjPhNUXtx" },
+        { id: "Three", title: "¿Qué sucede si el arte que compré llega dañado?", video: "https://www.youtube.com/embed/GhiHU7aefwo?si=8J1SK_kdjPhNUXtx" },
+        { id: "Four", title: "¿Cómo puedo estar seguro de que las obras de arte en ImpulsArt son auténticas?", video: "https://www.youtube.com/embed/GhiHU7aefwo?si=8J1SK_kdjPhNUXtx" },
+        { id: "Five", title: "¿Cuánto tiempo se tarda en recibir mi obra de arte después de realizar la compra?", video: "https://www.youtube.com/embed/GhiHU7aefwo?si=8J1SK_kdjPhNUXtx" }
     ];
 
     const filteredTutorials = tutorials.filter(tutorial =>

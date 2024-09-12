@@ -1,14 +1,16 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
-import { BiSearch } from 'react-icons/bi';
-import { Left } from 'react-bootstrap/lib/Media';
-import 'bootstrap/dist/css/bootstrap.min.css';
-import 'bootstrap/dist/js/bootstrap.bundle.min.js'; // Asegúrate de importar el bundle que incluye Popper.js
-import 'bootstrap-icons/font/bootstrap-icons.css';
 import { Link } from 'react-router-dom'; // Asegúrate de importar Link si no está importado
+import 'bootstrap/dist/css/bootstrap.min.css';
+import 'bootstrap/dist/js/bootstrap.bundle.min.js'; // Importa el bundle que incluye Popper.js
+import 'bootstrap-icons/font/bootstrap-icons.css';
+import Swal from 'sweetalert2';
+import withReactContent from 'sweetalert2-react-content';
 
-//Autenticacion de apis
+// Autenticación de APIs
 import AuthToken from '../Auth/AuthToken';
+
+const MySwal = withReactContent(Swal);
 
 function Album() {
   const [listObra, setListObra] = useState([]);
@@ -16,13 +18,32 @@ function Album() {
   const itemsPerPage = 9;
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = currentPage * itemsPerPage;
+  const [tipoReporte, setTipoReporte] = useState([]);
   const [categoria, setCategoria] = useState('');
   const [nombreProducto, setNombreProducto] = useState('');
+  const [selectedTipoReporte, setSelectedTipoReporte] = useState(''); // Nuevo estado para el tipo de reporte seleccionado
 
   useEffect(() => {
 
-      getObra();
+    const loadTipoReporte = async () => {
+      try {
+        const result = await AuthToken.get('tipoReporte/all');
+        console.log(result.data.data); // Verifica la estructura de datos recibida
+        setTipoReporte(result.data.data);
+      } catch (error) {
+        console.error('Error al cargar los tipos de PQRS:', error);
+      }
+    };
 
+    loadTipoReporte();
+  }, []);  // Ejecutar el efecto solo una vez al cargar el componente
+
+  const onInputChange = (e) => {
+    setTipoReporte({ ...tipoReporte, [e.target.name]: e.target.value });
+  };
+
+  useEffect(() => {
+    getObra();
   }, [currentPage]);
 
   const normalizeData = (data) => {
@@ -48,12 +69,66 @@ function Album() {
     setCurrentPage(pageNumber);
   };
 
+  const handleReport = async (obra) => {
+    const { value: formValues } = await MySwal.fire({
+      title: 'Reportar Obra',
+      html: `
+        <div style="display: flex; flex-direction: column; gap: 15px; align-items: center;">
+          <label for="tipo-reporte" style="font-size: 16px; font-weight: bold;">Selecciona el tipo de reporte</label>
+          <select id="tipo-reporte" class="swal2-select" style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #ccc;">
+            <option value="">Selecciona el tipo de reporte</option>
+            ${tipoReporte.map(tipo => `
+              <option value="${tipo.pkCod_TipoReporte}">${tipo.nombre}</option>
+            `).join('')}
+          </select>
+  
+          <label for="comentario-reporte" style="font-size: 16px; font-weight: bold;">Escribe tu comentario</label>
+          <textarea id="comentario-reporte" class="swal2-textarea" style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #ccc;" placeholder="Escribe aquí la razón del reporte..."></textarea>
+        </div>`,
+      focusConfirm: false,
+      showCancelButton: true,
+      preConfirm: () => {
+        const tipoReporteElement = document.getElementById('tipo-reporte');
+        const comentarioElement = document.getElementById('comentario-reporte');
+  
+        const tipoReporte = tipoReporteElement ? tipoReporteElement.value : null;
+        const comentario = comentarioElement ? comentarioElement.value : null;
+  
+        if (!tipoReporte) {
+          return Swal.showValidationMessage('Debes seleccionar un tipo de reporte');
+        }
+        if (!comentario) {
+          return Swal.showValidationMessage('Debes escribir un comentario');
+        }
+  
+        return { tipoReporte, comentario };
+      }
+    });
+  
+    if (formValues) {
+      const { tipoReporte, comentario } = formValues;
+  
+      try {
+        await AuthToken.post('reporteObra/create', { 
+          fk_obra: obra.pkCod_Producto, 
+          fk_TipoReporte: tipoReporte, 
+          comentario 
+        });
+        MySwal.fire('Reporte enviado', 'Tu reporte ha sido enviado exitosamente', 'success');
+      } catch (error) {
+        console.error('Error al reportar:', error);
+        MySwal.fire('Error', 'Hubo un problema al enviar el reporte', 'error');
+      }
+    }
+  };
+  
+
   const renderCards = () => {
     return listObra.slice(startIndex, endIndex).map((obra, index) => (
       <div className="col" key={index}>
         <div className="card shadow-sm">
           <img
-             src={`data:${obra.TipoImagen};base64,${obra.imagen}`} // Usa el tipo MIME recibido del backend
+            src={`data:${obra.TipoImagen};base64,${obra.imagen}`} // Usa el tipo MIME recibido del backend
             className="bd-placeholder-img card-img-top"
             width="100%"
             height="225"
@@ -62,23 +137,18 @@ function Album() {
           <div className="card-body">
             <h5 className="card-title">{obra.nombreProducto}</h5>
             <p className="card-text">{obra.descripcion}</p>
-            <div className="dropdown">{/* boton*/}
-              <button className="btn btn-light btn-sm dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
-                <i className="bi bi-three-dots-vertical"></i>
+            <li>
+              <button
+                className="btn btn-danger"
+                onClick={() => handleReport(obra)}
+              >
+                <i className="bi bi-exclamation-triangle-fill"></i> Reportar
               </button>
-              <ul className="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                <li>
-                  <Link className="dropdown-item" to={`/ReportForm/${obra.pkCod_Producto}`}
-                  >
-                    <i className="bi bi-exclamation-triangle-fill"></i> Reportar
-                  </Link>
-                </li>
-              </ul>
-              <div className="d-flex justify-content-between align-items-center">
+            </li>
+            <div className="d-flex justify-content-between align-items-center">
               <Link to={`/DetalleObras/${obra.pkCod_Producto}`} className="btn btn-outline-primary mx-2">
                 Ver detalles de la obra
               </Link>
-            </div>
             </div>
           </div>
         </div>
@@ -87,6 +157,7 @@ function Album() {
   };
 
   const totalPages = Math.ceil(listObra.length / itemsPerPage);
+
   return (
     <div className="album py-5 bg-custom-color">
       <div className="container">
@@ -121,40 +192,41 @@ function Album() {
         <br />
         <br />
         <div className="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">{renderCards()}</div>
-      </div>
-      <div className="d-flex justify-content-center mt-3">
-        <nav aria-label="Page navigation example">
-          <ul className="pagination" style={{ margin: '0' }}>
-            <li className={`page-item ${currentPage === 1 && 'disabled'}`}>
-              <button
-                className="page-link"
-                onClick={() => handlePaginationClick(currentPage - 1)}
-                aria-label="Previous"
-              >
-                <span aria-hidden="true">&laquo;</span>
-              </button>
-            </li>
-            {[...Array(totalPages).keys()].map((num) => (
-              <li
-                key={num}
-                className={`page-item ${currentPage === num + 1 && 'active'}`}
-                onClick={() => handlePaginationClick(num + 1)}
-                style={{ margin: '0' }}
-              >
-                <button className="page-link">{num + 1}</button>
+
+        <div className="d-flex justify-content-center mt-3">
+          <nav aria-label="Page navigation example">
+            <ul className="pagination" style={{ margin: '0' }}>
+              <li className={`page-item ${currentPage === 1 && 'disabled'}`}>
+                <button
+                  className="page-link"
+                  onClick={() => handlePaginationClick(currentPage - 1)}
+                  aria-label="Previous"
+                >
+                  <span aria-hidden="true">&laquo;</span>
+                </button>
               </li>
-            ))}
-            <li className={`page-item ${currentPage === totalPages && 'disabled'}`}>
-              <button
-                className="page-link custom-page"
-                onClick={() => handlePaginationClick(currentPage + 1)}
-                aria-label="Next"
-              >
-                <span aria-hidden="true">&raquo;</span>
-              </button>
-            </li>
-          </ul>
-        </nav>
+              {[...Array(totalPages).keys()].map((num) => (
+                <li
+                  key={num}
+                  className={`page-item ${currentPage === num + 1 && 'active'}`}
+                  onClick={() => handlePaginationClick(num + 1)}
+                  style={{ margin: '0' }}
+                >
+                  <button className="page-link">{num + 1}</button>
+                </li>
+              ))}
+              <li className={`page-item ${currentPage === totalPages && 'disabled'}`}>
+                <button
+                  className="page-link custom-page"
+                  onClick={() => handlePaginationClick(currentPage + 1)}
+                  aria-label="Next"
+                >
+                  <span aria-hidden="true">&raquo;</span>
+                </button>
+              </li>
+            </ul>
+          </nav>
+        </div>
       </div>
     </div>
   );

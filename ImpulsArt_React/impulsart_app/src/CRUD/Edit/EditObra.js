@@ -14,6 +14,7 @@ import AuthToken from '../../Auth/AuthToken';
 
 export const EditObra = () => {
     let navigate = useNavigate();
+    const [imageSrc, setImageSrc] = useState('');
     const toast = useRef(null);
     const { pkCod_Producto } = useParams();
 
@@ -36,38 +37,47 @@ export const EditObra = () => {
     const [imagePreview, setImagePreview] = useState(null);
     const [formChanged, setFormChanged] = useState(false);
 
+    const formatCurrency = (amount) => {
+        const formatter = new Intl.NumberFormat('es-CO', {
+          style: 'currency',
+          currency: 'COP',
+          minimumFractionDigits: 0,
+          maximumFractionDigits: 0
+        });
+        return formatter.format(amount);
+      };
+
     useEffect(() => {
-
         // Cargar datos de la obra
-const loadObra = async () => {
-    try {
-        // Solicitar los detalles de la obra usando AuthToken
-        const response = await AuthToken.get(`obra/list/${pkCod_Producto}`);
-        // Extraer los datos de la respuesta correctamente
-        const data = response.data.data;
+        const loadObra = async () => {
+            try {
+                // Solicitar los detalles de la obra usando AuthToken
+                const response = await AuthToken.get(`obra/list/${pkCod_Producto}`);
+                // Extraer los datos de la respuesta correctamente
+                const data = response.data.data;
 
-        // Crear un objeto con los datos cargados
-        const loadedObra = {
-            ...data,
-            tamano: data.alto && data.ancho ? `${data.alto} x ${data.ancho}` : "",
-            categoriaId: data.categoria ? data.categoria.pkCod_Categoria.toString() : "",
-            imagen: data.imagen // Mantener la URL de la imagen existente
+                // Crear un objeto con los datos cargados
+                const loadedObra = {
+                    ...data,
+                    tamano: data.alto && data.ancho ? `${data.alto} x ${data.ancho}` : "",
+                    categoriaId: data.categoria ? data.categoria.pkCod_Categoria.toString() : "",
+                    imagen: data.imagen ? `data:${data.imagenTipo};base64,${data.imagen}` : null // Convertir la imagen en un formato que pueda ser mostrado
+                };
+
+                // Actualizar el estado con los datos cargados
+                setObra(loadedObra);
+                setInitialObra(loadedObra); // Guardar los valores iniciales
+
+                if (data.imagen) {
+                    setImagePreview(`data:${data.imagenTipo};base64,${data.imagen}`);
+                }
+
+            } catch (error) {
+                // Manejo de errores en la carga de la obra
+                console.error('Error al cargar la obra:', error);
+                toast.current.show({ severity: 'error', summary: 'Error', detail: 'No se pudo cargar la obra.' });
+            }
         };
-
-        // Actualizar el estado con los datos cargados
-        setObra(loadedObra);
-        setInitialObra(loadedObra); // Guardar los valores iniciales
-
-        // Configurar la vista previa de la imagen si existe
-        if (data.imagen) {
-            setImagePreview(`http://localhost:8086/api/obra/imagen/${data.imagen}`);
-        }
-    } catch (error) {
-        // Manejo de errores en la carga de la obra
-        console.error('Error al cargar la obra:', error);
-        toast.current.show({ severity: 'error', summary: 'Error', detail: 'No se pudo cargar la obra.' });
-    }
-};
 
         const loadCategorias = async () => {
             try {
@@ -83,6 +93,7 @@ const loadObra = async () => {
             .catch(() => setLoading(false));
     }, [pkCod_Producto]);
 
+
     useEffect(() => {
         setFormChanged(JSON.stringify(obra) !== JSON.stringify(initialObra));
     }, [obra]);
@@ -91,10 +102,18 @@ const loadObra = async () => {
         const { name, value } = e.target;
 
         if (name === 'alto' || name === 'ancho') {
+            // Eliminar caracteres no numéricos
             const rawValue = value.replace(/[^\d]/g, '');
-            const updatedValue = rawValue ? `${rawValue}cm` : ''; // Solo agrega "cm" si hay un número
+            // Convertir el valor a número
+            const numberValue = parseInt(rawValue, 10);
+            // Limitar el valor a 150 si supera el límite
+            const limitedValue = numberValue > 150 ? 150 : numberValue;
+            // Actualizar el valor con la unidad 'cm'
+            const updatedValue = limitedValue ? `${limitedValue}cm` : '';
+
             setObra(prevObra => {
                 const updatedObra = { ...prevObra, [name]: updatedValue };
+                // Actualizar el campo 'tamano'
                 if (updatedObra.alto && updatedObra.ancho) {
                     updatedObra.tamano = `${updatedObra.alto} x ${updatedObra.ancho}`;
                 } else {
@@ -102,9 +121,18 @@ const loadObra = async () => {
                 }
                 return updatedObra;
             });
+        } else if (name === 'costo') {
+            // Actualizar el valor sin formatear
+            const rawValue = value.replace(/[^0-9]/g, ''); // Eliminar todo excepto números
+            setObra(prevObra => ({ ...prevObra, [name]: rawValue }));
         } else {
             setObra(prevObra => ({ ...prevObra, [name]: value }));
         }
+    };
+
+    const isOnlyLettersWithValidSpaces = (str) => {
+        // Permitir solo letras y un solo espacio entre palabras, sin espacios al inicio o al final
+        return /^[A-Za-z]+( [A-Za-z]+)*$/.test(str);
     };
 
     const handleCostoChange = (e) => {
@@ -113,10 +141,27 @@ const loadObra = async () => {
     };
 
     const handlePesoChange = (e) => {
-        let value = e.target.value.replace(/[^\d]/g, '');
-        if (value !== "") {
+        let value = e.target.value.replace(/[^\d]/g, ''); // Elimina caracteres no numéricos
+
+        if (value === "") {
+            setObra({ ...obra, peso: "" }); // Si está vacío, no establecer valor
+            return;
+        }
+
+        let numericValue = Number(value);
+
+        if (numericValue === 0) {
+            // No permitir valor 0
+            toast.current.show({ severity: 'warn', summary: 'Advertencia', detail: 'El peso debe ser mayor que 0.' });
+            return;
+        }
+
+        if (numericValue > 50) {
+            value = "50Kg"; // Limitar a 50Kg si se supera el límite
+        } else {
             value += "Kg";
         }
+
         setObra({ ...obra, peso: value });
     };
 
@@ -126,22 +171,37 @@ const loadObra = async () => {
     };
 
     const handleFileChange = (e) => {
-      const file = e.target.files[0];
-      if (file) {
-          setObra({ ...obra, imagen: file });
-          const reader = new FileReader();
-          reader.onloadend = () => {
-              setImagePreview(reader.result);
-          };
-          reader.readAsDataURL(file);
-      }
-  };
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+
+            reader.onloadend = () => {
+                // Actualizar la vista previa de la imagen
+                setImagePreview(reader.result);
+                // Guardar el archivo en el estado de obra
+                setObra(prevObra => ({ ...prevObra, imagen: file }));
+            };
+
+            // Leer el archivo como URL de datos
+            reader.readAsDataURL(file);
+        }
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
 
         if (!obra.nombreProducto || !obra.costo || !obra.peso || !obra.tamano || !obra.cantidad || !obra.categoriaId || !obra.descripcion || !obra.imagen) {
             toast.current.show({ severity: 'warn', summary: 'Advertencia', detail: 'Todos los campos deben estar completos' });
+            return;
+        }
+
+        if (!isOnlyLettersWithValidSpaces(obra.nombreProducto)) {
+            toast.current.show({ severity: 'warn', summary: 'Advertencia', detail: 'El nombre de la obra solo debe contener letras y un solo espacio entre palabras, sin espacios al inicio o al final', life: 3000 });
+            return;
+        }
+
+        if (!isOnlyLettersWithValidSpaces(obra.descripcion)) {
+            toast.current.show({ severity: 'warn', summary: 'Advertencia', detail: 'La descripcion de la obra solo debe contener letras y un solo espacio entre palabras, sin espacios al inicio o al final', life: 3000 });
             return;
         }
 
@@ -258,7 +318,16 @@ const loadObra = async () => {
                                     <div className="row">
                                         <div className="col-md-6">
                                             <div className="form-floating">
-                                                <input className="form-control" id="floatingCosto" placeholder="Costo" name="costo" value={obra.costo} onChange={handleCostoChange} type="text" />
+                                                <input
+                                                    className="form-control"
+                                                    maxLength="11"
+                                                    id="floatingCosto"
+                                                    placeholder="Costo"
+                                                    name="costo"
+                                                    value={obra.costo ? formatCurrency(obra.costo) : ''}
+                                                    onChange={handleInputChange}
+                                                    type="text"
+                                                />
                                                 <label htmlFor="floatingCosto">Costo</label>
                                             </div>
                                         </div>
@@ -296,7 +365,26 @@ const loadObra = async () => {
                                         </div>
                                         <div className="col-md-6">
                                             <div className="form-floating form-cantidad">
-                                                <input className="form-control" id="floatingCantidad" placeholder="Cantidad" name="cantidad" value={obra.cantidad} onChange={(e) => {const value = e.target.value; if (value === '' || (Number(value) >= 0)) {setObra(prevObra => ({ ...prevObra, cantidad: value })); }}} min="0" type="number" />
+                                                <input
+                                                    className="form-control"
+                                                    id="floatingCantidad"
+                                                    placeholder="Cantidad"
+                                                    name="cantidad"
+                                                    value={obra.cantidad}
+                                                    onChange={(e) => {
+                                                        const value = e.target.value;
+                                                        const numericValue = Number(value);
+
+                                                        // Validar que el valor sea un número válido dentro del rango permitido
+                                                        if (value === '' || (numericValue >= 1 && numericValue <= 20)) {
+                                                            setObra(prevObra => ({ ...prevObra, cantidad: value }));
+                                                        } else {
+                                                            toast.current.show({ severity: 'warn', summary: 'Advertencia', detail: 'La cantidad debe ser mayor que 0 y menor o igual a 20.' });
+                                                            return;
+                                                        }
+                                                    }}
+                                                    type="text" // Cambiado de "number" a "text" para desactivar la validación del navegador
+                                                />
                                                 <label htmlFor="floatingCantidad">Cantidad</label>
                                             </div>
                                         </div>
@@ -336,8 +424,8 @@ const loadObra = async () => {
                                 </div>
                                 <div className="form-group">
                                     <div className="image-upload" onClick={() => document.getElementById('fileInput').click()}>
-                                        {obra.imagen ? (
-                                            <img src={obra.imagen} alt="Previsualización" className="img-fluid preview-image" />
+                                        {imagePreview ? (
+                                            <img src={imagePreview} alt="Previsualización" className="img-fluid preview-image" />
                                         ) : (
                                             <div className="image-placeholder">
                                                 <i className="cross-icon bi bi-plus"></i>
@@ -348,7 +436,7 @@ const loadObra = async () => {
                                     </div>
                                 </div>
                                 <div className="btn-group d-flex justify-content-center">
-                                <button
+                                    <button
                                         className="btn btn-create btn-primary py-2 create-btn"
                                         type="submit"
                                         disabled={!formChanged} // Desactiva el botón si no hay cambios

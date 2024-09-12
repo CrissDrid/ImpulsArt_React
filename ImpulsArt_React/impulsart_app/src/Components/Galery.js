@@ -22,6 +22,7 @@ function Galery() {
     setIdentificacion(identificacion);
   }, []);
 
+  
   // Cargar obras o subastas dependiendo de showSubasta
   useEffect(() => {
     if (identificacion) {
@@ -116,7 +117,7 @@ function Galery() {
     return listObra.map((obra) => (
       <div className="obra-card" key={obra.pkCod_Producto} onClick={() => handleCardClick(obra.pkCod_Producto)}>
         <img
-             src={`data:${obra.TipoImagen};base64,${obra.imagen}`} // Usa el tipo MIME recibido del backend
+          src={`data:${obra.TipoImagen};base64,${obra.imagen}`} // Usa el tipo MIME recibido del backend
           alt={`Imagen: ${obra.nombreProducto}`}
         />
         <div className="obra-info">
