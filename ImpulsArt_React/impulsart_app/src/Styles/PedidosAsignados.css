@@ -1,0 +1,77 @@
+/* Estilos generales de la tabla */
+.custom-datatable {
+    width: 80%;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+
+  .title{
+    display: flex;
+    justify-content: center;
+  }
+
+  .table{
+    display: flex;
+    justify-content: center;
+    align-items: center !important;
+  }
+  
+  .custom-datatable .p-datatable-header {
+    background-color: #f8f9fa;
+    border-bottom: 2px solid #e9ecef;
+    padding: 1rem;
+  }
+  
+  .custom-datatable .p-datatable-thead > tr > th {
+    background-color: #f1f3f5;
+    color: #495057;
+    font-weight: 600;
+    text-transform: uppercase;
+    padding: 1rem;
+  }
+  
+  .custom-datatable .p-datatable-tbody > tr {
+    transition: background-color 0.3s ease;
+  }
+  
+  .custom-datatable .p-datatable-tbody > tr:nth-child(even) {
+    background-color: #f8f9fa;
+  }
+  
+  .custom-datatable .p-datatable-tbody > tr:hover {
+    background-color: #e9ecef;
+  }
+  
+  /* Estilos para las celdas */
+  .custom-datatable .p-datatable-tbody > tr > td {
+    padding: 0.75rem 1rem;
+  }
+  
+  /* Estilos para los tags de estado */
+  .custom-datatable .p-tag {
+    border-radius: 12px;
+    padding: 0.25rem 0.75rem;
+    font-weight: 600;
+  }
+  
+  /* Estilos para el botón de acción */
+  .custom-datatable .p-button.p-button-rounded {
+    width: 2.5rem;
+    height: 2.5rem;
+  }
+  
+  /* Estilos para la fila expandida */
+  .custom-datatable .p-datatable-tbody > tr.p-row-expanded {
+    background-color: #e9ecef;
+  }
+  
+  .custom-datatable .p-row-expanded > td {
+    border-bottom: none !important;
+  }
+  
+  .custom-datatable .p-rowexpansion-content {
+    padding: 1rem;
+    background-color: #fff;
+    border-top: 1px solid #dee2e6;
+  }
