@@ -118,6 +118,19 @@ function CarritoCompras({ onFinalizarCompra }) {
         return elementoCarrito.reduce((total, item) => total + (parseInt(item.obra.costo.replace(/[$,.]/g, '')) * item.cantidad), 0);
     };
 
+    const handleFinalizarCompra = () => {
+        const datosCarrito = {
+            items: elementoCarrito.map(item => ({
+                nombre: item.obra.nombreProducto,
+                cantidad: item.cantidad,
+                precioUnitario: parseInt(item.obra.costo.replace(/[$,.]/g, '')),
+                total: parseInt(item.obra.costo.replace(/[$,.]/g, '')) * item.cantidad
+            })),
+            subtotal: calcularTotal()
+        };
+        onFinalizarCompra(datosCarrito);
+    };
+
     return (
         <>
             <div id="carrito-compras" className='container'>
@@ -186,7 +199,7 @@ function CarritoCompras({ onFinalizarCompra }) {
                                     <span>${calcularTotal()}</span>
                                 </li>
                             </ul>
-                            <button className="btn btn-finalizarCompra mt-3 w-100" onClick={onFinalizarCompra}>Finalizar Compra</button>
+                            <button className="btn btn-finalizarCompra mt-3 w-100" onClick={handleFinalizarCompra}>Finalizar Compra</button>
                         </div>
                     </div>
                 </div>
