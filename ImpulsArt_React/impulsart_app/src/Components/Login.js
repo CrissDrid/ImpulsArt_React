@@ -11,6 +11,7 @@ const Login = () => {
   const navigate = useNavigate();
   const [form, setForm] = useState({ email: '', contrasena: '' });
   const [error, setError] = useState(null);
+  const [errorType, setErrorType] = useState(''); // Agregado para diferenciar el tipo de error
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -33,14 +34,17 @@ const Login = () => {
   
         navigate('/home');
       } else {
+        setErrorType('authError');
         setError(response.data.message || 'Error al iniciar sesión');
       }
     } catch (error) {
       if (error.response && error.response.status === 401) {
+        setErrorType('authError');
         setError('Correo o contraseña incorrectos');
         console.error('Email o Contraseña incorrectos', error.message);
       } else {
         console.error('Error del servidor:', error.response?.data?.message || error.message);
+        setErrorType('serverError');
         setError('Error del servidor: ' + (error.response?.data?.message || error.message));
       }
     }
@@ -48,6 +52,14 @@ const Login = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault(); // Evitar que el formulario se envíe de la manera predeterminada
+
+    // Validar campos vacíos
+    if (!form.email || !form.contrasena) {
+      setErrorType('fieldError');
+      setError('Todos los campos deben estar llenos');
+      return;
+    }
+
     iniciarSesion(); // Llamar a la función de inicio de sesión
   };
 
@@ -60,14 +72,34 @@ const Login = () => {
             <div className="login-image"><img className="logo-login" src={Logo} alt="" /></div>
             <form onSubmit={handleSubmit}>
               <div className="form-floating">
-                <input type="email" className="form-control" id="floatingInput" placeholder="name@example.com" name='email' value={form.email} onChange={handleChange} />
+                <input
+                  type="email"
+                  className="form-control"
+                  id="floatingInput"
+                  placeholder="name@example.com"
+                  name='email'
+                  value={form.email}
+                  onChange={handleChange}
+                />
                 <label htmlFor="floatingInput">Email</label>
               </div>
               <div className="form-floating">
-                <input type="password" className="form-control" id="floatingPassword" placeholder="Password" name='contrasena' value={form.contrasena} onChange={handleChange} />
+                <input
+                  type="password"
+                  className="form-control"
+                  id="floatingPassword"
+                  placeholder="Password"
+                  name='contrasena'
+                  value={form.contrasena}
+                  onChange={handleChange}
+                />
                 <label htmlFor="floatingPassword">Contraseña</label>
               </div>
-              {error && <div className="alert alert-danger">{error}</div>}
+              {error && 
+                <div className={`alert ${errorType === 'fieldError' ? 'alert-warning' : 'alert-danger'}`}>
+                  {error}
+                </div>
+              }
               <button className="btn btn-primary w-100 py-2 iniciar-btn" type="submit">Iniciar Sesión</button>
               <div className="Links">
                 <p><Link className='link-contraseña link-no-underline'>¿Olvidaste tu contraseña?</Link></p>

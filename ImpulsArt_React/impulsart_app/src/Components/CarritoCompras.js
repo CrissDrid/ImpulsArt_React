@@ -114,8 +114,33 @@ function CarritoCompras({ onFinalizarCompra }) {
         }
     };
 
+    const formatearMoneda = (cantidad) => {
+        const formato = new Intl.NumberFormat('es-CO', {
+            style: 'currency',
+            currency: 'COP',
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 0
+        });
+        return formato.format(cantidad);
+    };
+
     const calcularTotal = () => {
-        return elementoCarrito.reduce((total, item) => total + (parseInt(item.obra.costo.replace(/[$,.]/g, '')) * item.cantidad), 0);
+        return elementoCarrito.reduce((total, item) => 
+            total + (parseFloat(item.obra.costo) * item.cantidad), 0
+        );
+    };
+    
+    const handleFinalizarCompra = () => {
+        const datosCarrito = {
+            items: elementoCarrito.map(item => ({
+                nombre: item.obra.nombreProducto,
+                cantidad: item.cantidad,
+                precioUnitario: parseFloat(item.obra.costo),
+                total: parseFloat(item.obra.costo) * item.cantidad
+            })),
+            subtotal: calcularTotal()
+        };
+        onFinalizarCompra(datosCarrito);
     };
 
     return (
@@ -127,7 +152,7 @@ function CarritoCompras({ onFinalizarCompra }) {
                             <div key={item.pkCod_Elemento} className='row border-bottom'>
                                 <div className='col-md-3'>
                                     <div className='img'>
-                                        <img  src={`data:${item.obra.TipoImagen};base64,${item.obra.imagen}`} alt={item.obra.nombreProducto} />
+                                        <img src={`data:${item.obra.TipoImagen};base64,${item.obra.imagen}`} alt={item.obra.nombreProducto} />
                                     </div>
                                 </div>
                                 <div className='col-md-6'>
@@ -138,7 +163,7 @@ function CarritoCompras({ onFinalizarCompra }) {
                                     </div>
                                 </div>
                                 <div className='col-md-2'>
-                                    <h5 className='valorObra d-flex justify-content-end'>{item.obra.costo}</h5>
+                                    <h5 className='valorObra d-flex justify-content-end'>{formatearMoneda(parseFloat(item.obra.costo))}</h5>
                                     <div className='col-md-3 d-flex justify-content-start'>
                                         <div className="d-flex align-items-center inputNumber">
                                             <button 
@@ -178,15 +203,15 @@ function CarritoCompras({ onFinalizarCompra }) {
                                 {elementoCarrito.map(item => (
                                     <li key={item.pkCod_Elemento} className="list-group-item nombrePrecio d-flex justify-content-between align-items-center">
                                         {item.obra.nombreProducto}
-                                        <span>${parseInt(item.obra.costo.replace(/[$,.]/g, '')) * item.cantidad}</span>
+                                        <span>{formatearMoneda(parseFloat(item.obra.costo) * item.cantidad)}</span>
                                     </li>
                                 ))}
                                 <li className="list-group-item total d-flex justify-content-between align-items-center font-weight-bold">
                                     Total
-                                    <span>${calcularTotal()}</span>
+                                    <span>{formatearMoneda(calcularTotal())}</span>
                                 </li>
                             </ul>
-                            <button className="btn btn-finalizarCompra mt-3 w-100" onClick={onFinalizarCompra}>Finalizar Compra</button>
+                            <button className="btn btn-finalizarCompra mt-3 w-100" onClick={handleFinalizarCompra}>Finalizar Compra</button>
                         </div>
                     </div>
                 </div>

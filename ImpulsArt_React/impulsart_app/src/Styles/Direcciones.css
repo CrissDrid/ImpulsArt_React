@@ -151,20 +151,16 @@
   }
   
   .btn-atras {
-    background-color: #8a2be2;
+    background-color: #8D33FF;
     color: white;
     border: none;
-    padding: 10px;
     border-radius: 5px;
     cursor: pointer;
     margin-top: 20px;
     margin-left: 8rem; /* Posiciona el botón al lado izquierdo */
     align-self: flex-start; /* Alinea el botón a la izquierda del contenedor */
   }
-  
-  .btn-atras:hover {
-    background-color: #7a1db9;
-  }
+
   
   
   

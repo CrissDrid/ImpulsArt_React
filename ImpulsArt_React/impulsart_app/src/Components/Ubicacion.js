@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Swal from 'sweetalert2';
 import AuthToken from '../Auth/AuthToken';
 import GetUserInfo from '../Auth/GetUserInfo';
-import '../Styles/Direcciones.css'; // Reutilizando los estilos de Direcciones
+import '../Styles/Direcciones.css';
 
 function Ubicacion({ onAtras, onDireccionSeleccionada }) {
   const [direcciones, setDirecciones] = useState([]);
@@ -43,29 +43,25 @@ function Ubicacion({ onAtras, onDireccionSeleccionada }) {
       title: 'Confirmar Dirección',
       text: `¿Estás seguro que deseas enviar a la dirección: ${direccion.direccion}?`,
       icon: 'warning',
-      showCancelButton: true, // Mostrar botón de cancelar
+      showCancelButton: true,
       cancelButtonColor: '#d33',
       confirmButtonText: 'Aceptar',
       cancelButtonText: 'Cancelar'
     }).then((result) => {
       if (result.isConfirmed) {
-        // Si el usuario confirma, pasamos al siguiente paso (Pago)
-        onDireccionSeleccionada();
+        onDireccionSeleccionada(direccion);
       } else if (result.isDismissed) {
-        // Si el usuario cancela, no hacemos nada.
         console.log('El usuario canceló la selección de dirección.');
       }
     });
   };
 
   return (
-    <>
     <div className="page-container">
       <div className="header-container">
         <h2 className="direcciones-title">Seleccionar Dirección de Envío</h2>
       </div>
 
-      {/* Contenedor principal con borde negro */}
       <div className="direccion-container">
         <div className="row">
           {direcciones.length > 0 ? (
@@ -95,7 +91,6 @@ function Ubicacion({ onAtras, onDireccionSeleccionada }) {
         Atrás
       </button>
     </div>
-  </>
   );
 }
 
