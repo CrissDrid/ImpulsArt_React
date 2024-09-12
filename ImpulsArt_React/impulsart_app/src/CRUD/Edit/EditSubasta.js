@@ -42,20 +42,20 @@ const EditSubasta = () => {
                 const result = await AuthToken.get(`${process.env.REACT_APP_API_BASE_URL}subasta/list/${pkCodSubasta}`);
                 const subastaData = result.data.data[0];
                 console.log('Datos de la subasta:', subastaData); // Depura aquí para verificar los datos
-    
+
                 // Configurar el estado de subasta
                 setSubasta({
                     nombreProducto: subastaData.obras.nombreProducto,
                     peso: subastaData.obras.peso,
-                    tamano: `${subastaData.obras.alto} x ${subastaData.obras.ancho}`,
                     alto: subastaData.obras.alto,
                     ancho: subastaData.obras.ancho,
+                    tamano: `${subastaData.obras.alto} x ${subastaData.obras.ancho}`,
                     categoriaId: subastaData.obras.categoria.pkCod_Categoria,
                     categoriaNombre: subastaData.obras.categoria.nombreCategoria,
                     descripcion: subastaData.obras.descripcion,
                     imagen: subastaData.obras.imagen ? `data:${subastaData.obras.tipoImagen};base64,${subastaData.obras.imagen}` : null
                 });
-    
+
                 // Verificar y mostrar la previsualización de la imagen
                 if (subastaData.obras.imagen) {
                     const base64Image = `data:${subastaData.obras.tipoImagen};base64,${subastaData.obras.imagen}`;
@@ -67,7 +67,7 @@ const EditSubasta = () => {
                 console.error('Error al cargar la subasta:', error);
             }
         };
-    
+
         const loadCategorias = async () => {
             try {
                 const result = await AuthToken.get(`${process.env.REACT_APP_API_BASE_URL}categoria/all`);
@@ -76,7 +76,7 @@ const EditSubasta = () => {
                 console.error('Error al cargar las categorías:', error);
             }
         };
-    
+
         loadSubasta();
         loadCategorias();
     }, [pkCodSubasta]);
@@ -84,11 +84,7 @@ const EditSubasta = () => {
     const handleInputChange = (e) => {
         const { name, value } = e.target;
 
-        if (name === 'precioInicial') {
-            // Formatear el valor del precio inicial como moneda
-            const rawValue = value.replace(/[^0-9]/g, '');
-            setSubasta({ ...subasta, [name]: formatCurrency(rawValue) });
-        } else if (name === 'alto' || name === 'ancho') {
+        if (name === 'alto' || name === 'ancho') {
             // Eliminar caracteres no numéricos
             const rawValue = value.replace(/[^\d]/g, '');
             // Convertir el valor a número y limitarlo a 150
@@ -117,7 +113,7 @@ const EditSubasta = () => {
         const file = e.target.files[0];
         if (file) {
             const reader = new FileReader();
-    
+
             reader.onloadend = () => {
                 // Actualizar la vista previa de la imagen
                 setImagePreview(reader.result);
@@ -126,7 +122,7 @@ const EditSubasta = () => {
 
                 setFormChanged(true);
             };
-    
+
             // Leer el archivo como URL de datos
             reader.readAsDataURL(file);
         }
@@ -156,6 +152,8 @@ const EditSubasta = () => {
         }
 
         setSubasta({ ...subasta, peso: value });
+
+        setFormChanged(true);
     };
 
     const isOnlyLettersWithValidSpaces = (str) => {
