@@ -1,36 +1,45 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { Button } from 'primereact/button';
 import { Tag } from 'primereact/tag';
 import '../Styles/PedidosAsignados.css'; // Asegúrate de crear este archivo con los estilos proporcionados
 import Navbar_init from './Navbar_init';
+import axios from 'axios';
+import AuthToken from '../Auth/AuthToken';
 
 const DashboardDomiciliario = () => {
   const [expandedRows, setExpandedRows] = useState(null);
+  const [data, setData] = useState([]);
 
-  const data = [
-    {
-      referencia: '001',
-      fechaPedido: '2024-09-11',
-      saldoCobrar: 50.00,
-      estado: 'Pendiente',
-      nombreUsuario: 'Juan Pérez',
-      numeroContacto: '123-456-7890',
-      direccionEntrega: 'Calle 123 #45-67',
-      prioridad: 'Alta'
-    },
-    {
-      referencia: '002',
-      fechaPedido: '2024-09-12',
-      saldoCobrar: 75.50,
-      estado: 'En camino',
-      nombreUsuario: 'María Rodríguez',
-      numeroContacto: '098-765-4321',
-      direccionEntrega: 'Avenida Principal 456',
-      prioridad: 'Media'
-    },
-  ];
+  // Obtener los datos cuando el componente se monta
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await AuthToken.get('despacho/all'); // Reemplaza con la URL de tu API
+        const transformedData = response.data.data.map(despacho => ({
+          referencia: despacho.referencia,
+          fechaPedido: despacho.venta.fechaVenta,
+          saldoCobrar: despacho.venta.costoTotal,
+          estado: despacho.estado,
+          nombreUsuario: despacho.usuario[0]?.nombre || 'No disponible',
+          numeroContacto: despacho.usuario[0]?.numCelular || 'No disponible',
+          direccionEntrega: `${despacho.direccion.direccion}, ${despacho.direccion.ciudad}, ${despacho.direccion.departamento}`,
+          prioridad: despacho.venta.carrito.elementoCarrito.length > 0 ? 'Alta' : 'Media' // Ejemplo de lógica para prioridad
+        }));
+        setData(transformedData);
+      } catch (error) {
+        console.error('Error al obtener los datos:', error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  // Función para formatear el saldo en pesos colombianos
+  const formatCurrency = (value) => {
+    return value.toLocaleString('es-CO', { style: 'currency', currency: 'COP' });
+  };
 
   const rowExpansionTemplate = (data) => {
     return (
@@ -71,26 +80,26 @@ const DashboardDomiciliario = () => {
 
   return (
     <>
-    <Navbar_init/>
-    <div className='title'>
+      <Navbar_init />
+      <div className='title'>
         <h1>Pedidos Asignados</h1>
-    </div>
-    <div className="container-fluid mt-4 table">
-      <DataTable 
-        value={data} 
-        expandedRows={expandedRows}
-        onRowToggle={(e) => setExpandedRows(e.data)}
-        rowExpansionTemplate={rowExpansionTemplate}
-        className="custom-datatable p-datatable-sm"
-      >
-        <Column expander style={{ width: '3em' }} />
-        <Column field="referencia" header="Referencia" />
-        <Column field="fechaPedido" header="Fecha Pedido" />
-        <Column field="saldoCobrar" header="Saldo a Cobrar" body={(rowData) => `$${rowData.saldoCobrar.toFixed(2)}`} />
-        <Column field="estado" header="Estado" body={estadoBodyTemplate} />
-        <Column body={actionBodyTemplate} header="Botones" style={{ width: '5em' }} />
-      </DataTable>
-    </div>
+      </div>
+      <div className="container-fluid mt-4 table">
+        <DataTable
+          value={data}
+          expandedRows={expandedRows}
+          onRowToggle={(e) => setExpandedRows(e.data)}
+          rowExpansionTemplate={rowExpansionTemplate}
+          className="custom-datatable p-datatable-sm"
+        >
+          <Column expander style={{ width: '3em' }} />
+          <Column field="referencia" header="Referencia" />
+          <Column field="fechaPedido" header="Fecha Pedido" />
+          <Column field="saldoCobrar" header="Saldo a Cobrar" body={(rowData) => formatCurrency(rowData.saldoCobrar)} />
+          <Column field="estado" header="Estado" body={estadoBodyTemplate} />
+          <Column body={actionBodyTemplate} header="Botones" style={{ width: '5em' }} />
+        </DataTable>
+      </div>
     </>
   );
 };

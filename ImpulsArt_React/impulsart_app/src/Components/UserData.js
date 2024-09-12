@@ -48,11 +48,6 @@ function UserData() {
     setUsuario((prevState) => ({ ...prevState, [key]: value }));
   };
 
-  const isEmailValid = (email) => {
-    const emailRegex = /^[^\s@]+@(hotmail|gmail|yahoo|outlook)\.com$/;
-    return emailRegex.test(email);
-  };
-
   const isOnlyLettersWithValidSpaces = (str) => {
     // Permitir solo letras y un solo espacio entre palabras, sin espacios al inicio o al final
     return /^[A-Za-z]+( [A-Za-z]+)*$/.test(str);
@@ -92,7 +87,7 @@ function UserData() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!usuario.userName || !usuario.nombre || !usuario.apellido || !usuario.fechaNacimiento || !usuario.email || !usuario.numCelular) {
+    if (!usuario.userName || !usuario.nombre || !usuario.apellido || !usuario.fechaNacimiento || !usuario.numCelular) {
       toast.current.show({ severity: 'error', summary: 'Error', detail: 'Todos los campos son obligatorios', life: 3000 });
       return;
   }
@@ -117,11 +112,6 @@ if (!isValidUserName(usuario.userName)) {
     toast.current.show({ severity: 'warn', summary: 'Advertencia', detail: 'El número de documento debe tener 8 o 10 dígitos', life: 3000 });
     return;
 }
-
-  if (!isEmailValid(usuario.email)) {
-      toast.current.show({ severity: 'warn', summary: 'Advertencia', detail: 'Por favor, ingrese un correo electrónico válido', life: 3000 });
-      return;
-  }
 
   if (!isDateOfBirthValid(usuario.fechaNacimiento)) {
       toast.current.show({ severity: 'warn', summary: 'Advertencia', detail: usuario.fechaNacimiento ? 'Debe ser mayor de edad para registrarse' : 'Fecha de nacimiento inválida', life: 3000 });
@@ -220,10 +210,6 @@ if (!isValidUserName(usuario.userName)) {
         <div className="form-floating">
           <input type="text" className="form-control" id="floatingUserName" maxLength="30" value={usuario.userName || ''} onChange={handleInputChange} required />
           <label htmlFor="floatingUserName">User Name</label>
-        </div>
-        <div className="form-floating">
-          <input type="email" className="form-control" id="floatingEmail" maxLength="150" value={usuario.email || ''} onChange={handleInputChange} required />
-          <label htmlFor="floatingEmail">Email</label>
         </div>
         <button className={`btn w-100 py-2 guardar-btn ${hasChanges ? 'btn-primary' : 'btn-secondary'} ${!hasChanges ? 'btn-disabled' : ''}`} type="submit" disabled={!hasChanges}>
           Guardar
