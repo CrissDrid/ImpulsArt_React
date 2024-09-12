@@ -12,6 +12,7 @@ import Direcciones from './Direcciones';
 import AuthToken from '../Auth/AuthToken';
 // Asegúrate de obtener datos del usuario
 import GetUserInfo from '../Auth/GetUserInfo';
+
 function Profile() {
   const [usuario, setUsuario] = useState(null);
   const [identificacion, setIdentificacion] = useState('');
@@ -49,8 +50,33 @@ function Profile() {
   }, [usuario]);
 
   useEffect(() => {
-    localStorage.setItem('activeTab', activeTab);
-  }, [activeTab]);
+    // Guardar el estado en el historial
+    const handleTabChange = (tab) => {
+      setActiveTab(tab);
+      window.history.pushState({ tab }, '', `#${tab}`);
+    };
+
+    // Manejar el retroceso del navegador
+    const onPopState = (event) => {
+      const state = event.state;
+      if (state && state.tab) {
+        setActiveTab(state.tab);
+      } else {
+        setActiveTab('datosPersonales'); // Página predeterminada
+      }
+    };
+
+    window.addEventListener('popstate', onPopState);
+
+    return () => {
+      window.removeEventListener('popstate', onPopState);
+    };
+  }, []);
+
+  const handleTabChange = (tab) => {
+    setActiveTab(tab);
+    window.history.pushState({ tab }, '', `#${tab}`);
+  };
 
   const handleInputChange = (e) => {
     const { id, value } = e.target;
@@ -104,18 +130,17 @@ function Profile() {
         <div className="user-nav">
           <h3>Mis Datos</h3>
           <ul>
-            <li><i className="bi bi-heart-fill fs-4"></i><a href="#datos" onClick={() => setActiveTab('datosPersonales')}>Datos Personales</a></li>
-            <li><i className="bi bi-palette-fill fs-4"></i><a href="#galeria" onClick={() => setActiveTab('miGaleria')}>Mi Galería</a></li>
-            <li><i className="bi bi-house-fill fs-4"></i><a href="#Direcciones" onClick={() => setActiveTab('direcciones')}>Mis Direcciones</a></li>
-            <li><i className="bi bi-shield-lock-fill fs-4"></i><a href="#clave" onClick={() => setActiveTab('cambiarContrasena')}>Cambiar Contraseña</a></li>
+            <li><i className="bi bi-heart-fill fs-4"></i><a href="#datos" onClick={(e) => { e.preventDefault(); handleTabChange('datosPersonales'); }}>Datos Personales</a></li>
+            <li><i className="bi bi-palette-fill fs-4"></i><a href="#galeria" onClick={(e) => { e.preventDefault(); handleTabChange('miGaleria'); }}>Mi Galería</a></li>
+            <li><i className="bi bi-house-fill fs-4"></i><a href="#Direcciones" onClick={(e) => { e.preventDefault(); handleTabChange('direcciones'); }}>Mis Direcciones</a></li>
+            <li><i className="bi bi-shield-lock-fill fs-4"></i><a href="#clave" onClick={(e) => { e.preventDefault(); handleTabChange('cambiarContrasena'); }}>Cambiar Contraseña</a></li>
             <li><i className="bi bi-cart-fill fs-4"></i><a href="#">Historial de Compras</a></li>
           </ul>
         </div>
         {activeTab === 'datosPersonales' && <UserData />}
         {activeTab === 'cambiarContrasena' && <ChangePWD />}
-        {activeTab === 'miGaleria' && <Galery/>}
+        {activeTab === 'miGaleria' && <Galery />}
         {activeTab === 'direcciones' && <Direcciones />}
-
       </div>
       <Footer />
     </div>
