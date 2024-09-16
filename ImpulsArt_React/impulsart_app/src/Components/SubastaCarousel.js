@@ -38,7 +38,7 @@ function SubastaCarousel() {
   };
 
   const subastaTemplate = (subasta) => {
-    const obra = subasta.obras;
+    const obra = subasta;
 
     return (
       <div className="obra-card">
@@ -70,14 +70,20 @@ function SubastaCarousel() {
               tooltip="Participar en subasta"
               tooltipOptions={{ position: 'top' }}
             />
-            <Link to={`/DetallesSubasta/${subasta.pkCodSubasta}`}>
-              <Button
-                icon="pi pi-eye"
-                className="p-button-rounded p-button-primary action-button"
-                tooltip="Ver detalles"
-                tooltipOptions={{ position: 'top' }}
-              />
-            </Link>
+            {obra.subastas.length > 0 ? (
+              obra.subastas.map((subasta, index) => (
+                <Link key={index} to={`/DetallesSubasta/${subasta.pkCodSubasta}`}>
+                  <Button
+                    icon="pi pi-eye"
+                    className="p-button-rounded p-button-primary action-button"
+                    tooltip={`Ver detalles de la subasta ${index + 1}`}
+                    tooltipOptions={{ position: 'top' }}
+                  />
+                </Link>
+              ))
+            ) : (
+              <p>No hay subastas disponibles para esta obra.</p>
+            )}
           </div>
         </div>
       </div>
