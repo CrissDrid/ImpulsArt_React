@@ -6,6 +6,7 @@ import { Toast } from 'primereact/toast';
 import '../Styles/DetallesObra.css';
 import Navbar_init from './Navbar_init';
 import Footer from './Footer';
+import ObraCarousel from './ObraCarousel'; // Importamos el componente ObraCarousel
 
 // Autenticacion de apis
 import AuthToken from '../Auth/AuthToken';
@@ -32,6 +33,7 @@ function DetallesObra() {
   });
   const [cantidadCompra, setCantidadCompra] = useState(1);
   const [rol, setRol] = useState([]);
+  const [todasLasObras, setTodasLasObras] = useState([]); // Nuevo estado para todas las obras
 
   useEffect(() => {
     const fetchData = async () => {
@@ -92,8 +94,18 @@ function DetallesObra() {
       }
     };
 
+    const loadTodasLasObras = async () => {
+      try {
+        const result = await AuthToken.get(`${process.env.REACT_APP_API_BASE_URL}obra/all`);
+        setTodasLasObras(result.data.data);
+      } catch (error) {
+        console.error('Error al cargar todas las obras:', error);
+      }
+    };
+
     loadObra();
     loadCarritoId();
+    loadTodasLasObras();
   }, [identificacion, pkCod_Producto]);
 
   const handleRatingChange = (e) => {
@@ -250,6 +262,16 @@ function DetallesObra() {
                 {rol.includes('ASESOR') ? 'Borrar' : 'Reportar'}
               </button>
             </div>
+          </div>
+        </div>
+        
+        {/* Añadimos el carrusel de obras al final */}
+        <div className="row mt-5">
+          <div className="col-12">
+            <ObraCarousel 
+              obras={todasLasObras.filter(o => o.pkCod_Producto !== pkCod_Producto)} 
+              handleReport={handleReportOrDelete}
+            />
           </div>
         </div>
       </div>
