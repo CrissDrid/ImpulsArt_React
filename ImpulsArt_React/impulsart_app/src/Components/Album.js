@@ -11,14 +11,15 @@ import AuthToken from '../Auth/AuthToken';
 import GetUserInfo from '../Auth/GetUserInfo';
 // Importar el nuevo archivo CSS
 import '../Styles/Album.css';
-// Importar los componentes ObraCarousel y SubastaCarousel
+// Importar los componentes AllCarousel, ObraCarousel y SubastaCarousel
+import AllCarousel from './AllCarousel';
 import ObraCarousel from './ObraCarousel';
 import SubastaCarousel from './SubastaCarousel';
 
 const MySwal = withReactContent(Swal);
 
 function Album() {
-  const [listObra, setListObra] = useState([]);
+  const [listObra, setListObra] = useState([]); // Estado para las obras
   const [listSubasta, setListSubasta] = useState([]); // Estado para las subastas
   const [tipoReporte, setTipoReporte] = useState([]);
   const [categoria, setCategoria] = useState('');
@@ -155,7 +156,7 @@ function Album() {
   return (
     <div className="album">
       <div className="container">
-      <div className="search-container">
+        <div className="search-container">
           <select
             value={categoria}
             onChange={(e) => setCategoria(e.target.value)}
@@ -176,7 +177,11 @@ function Album() {
             onChange={(e) => setNombreProducto(e.target.value)}
           />
         </div>
+        {/* Mostrar AllCarousel primero */}
+        <AllCarousel handleReport={handleReport} />
+        {/* Luego mostrar ObraCarousel con la lista de obras obtenidas */}
         <ObraCarousel obras={listObra} handleReport={handleReport} />
+        {/* Luego mostrar SubastaCarousel */}
         <SubastaCarousel subastas={listSubasta} handleReport={handleReport} />
       </div>
     </div>

@@ -2,9 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { Carousel } from 'primereact/carousel';
 import { Button } from 'primereact/button';
 import { Link } from 'react-router-dom';
+import { Tag } from 'primereact/tag';
 import AuthToken from '../Auth/AuthToken';
 
-function SubastaCarousel() {
+function SubastaCarousel({ handleReport }) {
   const [listSubasta, setListSubasta] = useState([]);
 
   useEffect(() => {
@@ -25,16 +26,11 @@ function SubastaCarousel() {
     AuthToken.get(`${process.env.REACT_APP_API_BASE_URL}obra/obrasEnSubasta`)
       .then((response) => {
         console.log(response.data.data);
-        setListSubasta(normalizeData(response.data.data)); // Corregido aquí
+        setListSubasta(normalizeData(response.data.data));
       })
       .catch((e) => {
         console.log(e);
       });
-  };
-
-  const handleReport = (subasta) => {
-    // Implementar la lógica de reporte aquí
-    console.log('Reportar subasta:', subasta);
   };
 
   const subastaTemplate = (subasta) => {
@@ -55,28 +51,24 @@ function SubastaCarousel() {
           <Button
             icon="pi pi-exclamation-triangle"
             className="p-button-rounded p-button-warning p-button-text report-button"
-            onClick={() => handleReport(subasta)}
+            onClick={() => handleReport(obra)}
           />
         </div>
         <div className="obra-details">
           <h5 className="obra-title">{obra ? obra.nombreProducto : 'Producto no disponible'}</h5>
-          <p className="obra-price">
-            Categoría: {obra && obra.categoria ? obra.categoria.nombreCategoria : 'Sin categoría'}
-          </p>
+          <Tag 
+            value={obra.categoria ? obra.categoria.nombreCategoria : 'Sin categoría'} 
+            className="obra-category-tag"
+            severity="info"
+          />
           <div className="obra-actions">
-            <Button
-              icon="pi pi-gavel"
-              className="p-button-rounded p-button-secondary p-button-text action-button"
-              tooltip="Participar en subasta"
-              tooltipOptions={{ position: 'top' }}
-            />
             {obra.subastas.length > 0 ? (
               obra.subastas.map((subasta, index) => (
                 <Link key={index} to={`/DetallesSubasta/${subasta.pkCodSubasta}`}>
                   <Button
                     icon="pi pi-eye"
                     className="p-button-rounded p-button-primary action-button"
-                    tooltip={`Ver detalles de la subasta ${index + 1}`}
+                    tooltip="Ver detalles"
                     tooltipOptions={{ position: 'top' }}
                   />
                 </Link>

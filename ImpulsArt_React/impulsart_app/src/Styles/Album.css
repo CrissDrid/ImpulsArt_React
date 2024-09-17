@@ -1,30 +1,48 @@
-/* Album.css */
-
 .album {
-    background-color: #f8f9fa;
-    padding-top: 3rem;
-    padding-bottom: 3rem;
-  }
-  
-  .obra-card {
-    width: 100%;
-    max-width: 250px; /* Reduced max-width to fit 4 cards */
-    margin: 10px auto; /* Changed to auto for horizontal centering */
-    border-radius: 8px;
-    overflow: hidden;
-    background-color: #fff;
-    box-shadow: 0 .125rem .25rem rgba(0,0,0,.075);
-  }
-  
-  .obra-image-container {
-    position: relative;
-    background-color: #f0f0f0;
-    padding: 20px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 180px; /* Slightly reduced height */
-  }
+  background-color: #f8f9fa28;
+  padding-top: 3rem;
+  padding-bottom: 3rem;
+  border-radius: 1rem;
+}
+
+.obra-card-link {
+  text-decoration: none; /* Quitar el subrayado */
+  color: inherit; /* Mantener el color original del texto */
+}
+
+.obra-card-link:hover {
+  text-decoration: none; /* Asegurarse que tampoco haya subrayado en hover */
+}
+
+/* Forzar eliminación del margin-top en todos los tags */
+.obra-category-tag{
+  margin-top: 0 !important; /* Eliminar cualquier margen superior */
+}
+
+.obra-type-tag {
+  margin-bottom: 0.5rem;
+  margin-right: 0.5rem;
+}
+
+.obra-card {
+  width: 100%;
+  max-width: 450px ; /* Increased from 350px to 450px */
+  margin: 10px auto;
+  border-radius: 8px;
+  overflow: hidden;
+  background-color: #fff;
+  box-shadow: 0 .125rem .25rem rgba(0,0,0,.075);
+}
+
+.obra-image-container {
+  position: relative;
+  background-color: #f0f0f0;
+  padding: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 220px; /* Increased from 180px to 220px to maintain aspect ratio */
+}
 
 .obra-image {
   max-width: 100%;
@@ -42,28 +60,36 @@
 }
 
 .obra-details {
-  padding: 15px;
+  padding: 20px; /* Increased from 15px to 20px for better spacing */
 }
 
 .obra-title {
-  margin: 0 0 10px 0;
-  font-size: 18px;
+  margin: 0 0 15px 0; /* Increased bottom margin */
+  font-size: 20px; /* Increased from 18px to 20px */
 }
 
 .obra-price {
-  margin: 0 0 15px 0;
+  margin: 0 0 20px 0; /* Increased bottom margin */
   color: #666;
+  font-size: 16px; /* Added font size */
+}
+
+.obra-category {
+  margin: 0 0 20px 0; /* Added margin for category */
+  color: #888;
+  font-size: 14px; /* Added font size */
 }
 
 .obra-actions {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end; /* Alinea el contenido al final del contenedor */
   align-items: center;
 }
 
 .action-button {
-  width: 40px;
-  height: 40px;
+  width: 45px; /* Tamaño del botón */
+  height: 45px; /* Tamaño del botón */
+  margin-left: 1rem !important;
 }
 
 .search-container {
@@ -80,7 +106,19 @@
   flex: 2;
 }
 
-  
-  .p-carousel-indicators.p-reset {
-    display: none;
-  }
+.p-carousel-indicators.p-reset {
+  display: none;
+}
+
+/* New styles to adjust the carousel for wider cards */
+.custom-carousel .p-carousel-container {
+  padding: 0 20px; /* Add some padding to the sides of the carousel */
+}
+
+.custom-carousel .p-carousel-items-container {
+  margin: 0 -10px; /* Negative margin to counteract the item padding */
+}
+
+.custom-carousel .p-carousel-item {
+  padding: 0 10px; /* Add padding to carousel items for spacing between cards */
+}

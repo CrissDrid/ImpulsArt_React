@@ -115,7 +115,7 @@ function Galery() {
 
   const renderObraCards = () => {
     return listObra.map((obra) => (
-      <div className="obra-card" key={obra.pkCod_Producto} onClick={() => handleCardClick(obra.pkCod_Producto)}>
+      <div className="obras-card" key={obra.pkCod_Producto} onClick={() => handleCardClick(obra.pkCod_Producto)}>
         <img
           src={`data:${obra.TipoImagen};base64,${obra.imagen}`} // Usa el tipo MIME recibido del backend
           alt={`Imagen: ${obra.nombreProducto}`}
@@ -129,19 +129,24 @@ function Galery() {
   };
 
   const renderSubastaCards = () => {
-    return listSubasta.map((subasta) => (
-      <div className="obra-card" key={subasta.obras.id} onClick={() => handleCardClick(subasta.obras.id, subasta.pkCodSubasta)}>
-        <img
-           src={`data:${subasta.obras.TipoImagen};base64,${subasta.obras.imagen}`} // Usa el tipo MIME recibido del backend
-          alt={`Imagen: ${subasta.obras.nombreProducto}`}
-        />
-        <div className="obra-info">
-          <h5>{subasta.obras.nombreProducto}</h5>
-          <p>Categoría: {subasta.obras.categoria.nombreCategoria}</p>
-        </div>
-      </div>
-    ));
-  };
+    return listSubasta.map((obra) => {
+        // Acceder a la primera subasta en la lista de subastas
+        const subasta = obra.subastas?.[0] || {}; // Usa un objeto vacío si `subastas` está vacío
+
+        return (
+            <div className="obras-card" key={subasta.pkCodSubasta} onClick={() => handleCardClick(subasta.pkCodSubasta, subasta.pkCodSubasta)}>
+                <img
+                    src={`data:${obra.tipoImagen};base64,${obra.imagen}`} // Usa el tipo MIME recibido del backend
+                    alt={`Imagen: ${obra.nombreProducto}`}
+                />
+                <div className="obra-info">
+                    <h5>{obra.nombreProducto}</h5>
+                    <p>Categoría: {obra.categoria?.nombreCategoria}</p>
+                </div>
+            </div>
+        );
+    });
+};
 
   const handleSubirObraClick = () => {
     Swal.fire({
