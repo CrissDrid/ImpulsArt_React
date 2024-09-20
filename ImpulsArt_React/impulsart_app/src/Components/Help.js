@@ -6,18 +6,25 @@ import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 
 function Help() {
     const [searchTerm, setSearchTerm] = useState("");
+    const [openIndex, setOpenIndex] = useState(null);
 
     const tutorials = [
-        { id: "One", title: "¿Cómo puedo Iniciar sesion?", video: "https://www.youtube.com/embed/GhiHU7aefwo?si=8J1SK_kdjPhNUXtx" },
-        { id: "Two", title: "¿Cómo puedo vender mi arte en ImpulsArt?", video: "https://www.youtube.com/embed/GhiHU7aefwo?si=8J1SK_kdjPhNUXtx" },
-        { id: "Three", title: "¿Qué sucede si el arte que compré llega dañado?", video: "https://www.youtube.com/embed/GhiHU7aefwo?si=8J1SK_kdjPhNUXtx" },
-        { id: "Four", title: "¿Cómo puedo estar seguro de que las obras de arte en ImpulsArt son auténticas?", video: "https://www.youtube.com/embed/GhiHU7aefwo?si=8J1SK_kdjPhNUXtx" },
-        { id: "Five", title: "¿Cuánto tiempo se tarda en recibir mi obra de arte después de realizar la compra?", video: "https://www.youtube.com/embed/GhiHU7aefwo?si=8J1SK_kdjPhNUXtx" }
+        { id: "One", title: "¿Cómo puedo reportar una obra arte en ImpulsArt?", video: "https://www.youtube.com/embed/pcgwRhHx3YE" },
+        { id: "Two", title: "¿Qué sucede si el arte que compré llega dañado?", video: "https://www.youtube.com/embed/Cz5RCCc3EZY" },
+        { id: "Three", title: "¿Cómo puedo enviar PQRS?", video: "https://www.youtube.com/embed/Cz5RCCc3EZY" },
+        { id: "Four", title: "¿Cómo puedo enviar agregar direcciones?", video: "https://www.youtube.com/embed/L4XR18JDYSk" },
+        { id: "Five", title: "¿Cómo puedo subir obras?", video: "https://www.youtube.com/embed/BBZxN2oigfc" },
+        { id: "Six", title: "¿Cómo puedo iniciar una subasta?", video: "https://www.youtube.com/embed/5F9naRxccXc" },
+        { id: "Seven", title: "¿Como puedo comprar una obra en venta?", video: "https://www.youtube.com/embed/-oC5-ocznxE" },
     ];
 
     const filteredTutorials = tutorials.filter(tutorial =>
         tutorial.title.toLowerCase().includes(searchTerm.toLowerCase())
     );
+
+    const toggleAccordion = (index) => {
+        setOpenIndex(openIndex === index ? null : index);
+    };
 
     return (
         <div style={{ marginTop: '0px', paddingTop: '0px' }}>
@@ -37,16 +44,37 @@ function Help() {
 
                     {/* Renderizar acordeones filtrados */}
                     {filteredTutorials.map((tutorial, index) => (
-                        <div key={tutorial.id} className="accordion-item">
+                        <div key={tutorial.id} className="accordion-item" style={{ overflow: 'hidden' }}>
                             <h2 className="accordion-header" id={`heading${tutorial.id}`} style={{ fontSize: '16px', margin: '0' }}>
-                                <button className="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target={`#collapse${tutorial.id}`} aria-expanded={index === 0} aria-controls={`collapse${tutorial.id}`}>
+                                <button
+                                    className="accordion-button"
+                                    type="button"
+                                    onClick={() => toggleAccordion(index)}
+                                    aria-expanded={openIndex === index}
+                                    aria-controls={`collapse${tutorial.id}`}
+                                >
                                     {tutorial.title}
                                 </button>
                             </h2>
-                            <div id={`collapse${tutorial.id}`} className="accordion-collapse collapse" aria-labelledby={`heading${tutorial.id}`} data-bs-parent="#accordionExample">
+                            <div
+                                id={`collapse${tutorial.id}`}
+                                className={`accordion-collapse collapse ${openIndex === index ? 'show' : ''}`}
+                                aria-labelledby={`heading${tutorial.id}`}
+                                data-bs-parent="#accordionExample"
+                                style={{
+                                    transition: 'height 0.35s ease',
+                                }}
+                            >
                                 <div className="accordion-body">
                                     <div style={{ display: 'flex', justifyContent: 'center' }}>
-                                        <iframe width="700" height="400" src={tutorial.video} title="YouTube video player" frameBorder="0" allowFullScreen></iframe>
+                                        <iframe
+                                            width="700"
+                                            height="400"
+                                            src={tutorial.video}
+                                            title="YouTube video player"
+                                            frameBorder="0"
+                                            allowFullScreen
+                                        ></iframe>
                                     </div>
                                 </div>
                             </div>
@@ -60,4 +88,3 @@ function Help() {
 }
 
 export default Help;
-
