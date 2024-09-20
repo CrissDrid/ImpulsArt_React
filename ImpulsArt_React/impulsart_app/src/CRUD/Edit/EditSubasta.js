@@ -41,39 +41,34 @@ const EditSubasta = () => {
             try {
                 console.log(`Loading subasta with id: ${pkCodSubasta}`);
                 const result = await AuthToken.get(`${process.env.REACT_APP_API_BASE_URL}subasta/list/${pkCodSubasta}`);
-                const subastaData = result.data.data[0]; // Asegúrate de usar el primer elemento del array
-    
-                console.log('Subasta data:', subastaData);
-    
-                if (subastaData) {
-                    const obra = subastaData; // Aquí se asume que `subastaData` es el objeto de la obra
-    
-                    setSubasta({
-                        nombreProducto: obra.nombreProducto || '',
-                        peso: obra.peso || '',
-                        tamano: obra.tamano || '',
-                        alto: obra.alto || '',
-                        ancho: obra.ancho || '',
-                        categoriaId: obra.categoria ? obra.categoria.pkCod_Categoria : '',
-                        categoriaNombre: obra.categoria ? obra.categoria.nombreCategoria : '',
-                        descripcion: obra.descripcion || '',
-                        imagen: obra.imagen ? `data:${obra.tipoImagen};base64,${obra.imagen}` : ''
-                    });
-    
-                    if (obra.imagen) {
-                        const base64Image = `data:${obra.tipoImagen};base64,${obra.imagen}`;
-                        setImagePreview(base64Image);
-                    } else {
-                        setImagePreview(null);
-                    }
+                const subastaData = result.data.data[0];
+                console.log('Datos de la subasta:', subastaData); // Depura aquí para verificar los datos
+
+                // Configurar el estado de subasta
+                setSubasta({
+                    nombreProducto: subastaData.obras.nombreProducto,
+                    peso: subastaData.obras.peso,
+                    alto: subastaData.obras.alto,
+                    ancho: subastaData.obras.ancho,
+                    tamano: `${subastaData.obras.alto} x ${subastaData.obras.ancho}`,
+                    categoriaId: subastaData.obras.categoria.pkCod_Categoria,
+                    categoriaNombre: subastaData.obras.categoria.nombreCategoria,
+                    descripcion: subastaData.obras.descripcion,
+                    imagen: subastaData.obras.imagen ? `data:${subastaData.obras.tipoImagen};base64,${subastaData.obras.imagen}` : null
+                });
+
+                // Verificar y mostrar la previsualización de la imagen
+                if (subastaData.obras.imagen) {
+                    const base64Image = `data:${subastaData.obras.tipoImagen};base64,${subastaData.obras.imagen}`;
+                    setImagePreview(base64Image);
                 } else {
-                    console.error('La subasta no contiene datos o la estructura de datos es incorrecta');
+                    setImagePreview(null);
                 }
             } catch (error) {
                 console.error('Error al cargar la subasta:', error);
             }
         };
-    
+
         const loadCategorias = async () => {
             try {
                 console.log('Loading categories');
@@ -84,23 +79,15 @@ const EditSubasta = () => {
                 console.error('Error al cargar las categorías:', error);
             }
         };
-    
-        if (pkCodSubasta) {
-            loadSubasta();
-            loadCategorias();
-        } else {
-            console.error('pkCodSubasta no es válido:', pkCodSubasta);
-        }
+
+        loadSubasta();
+        loadCategorias();
     }, [pkCodSubasta]);
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
 
-        if (name === 'precioInicial') {
-            // Formatear el valor del precio inicial como moneda
-            const rawValue = value.replace(/[^0-9]/g, '');
-            setSubasta({ ...subasta, [name]: formatCurrency(rawValue) });
-        } else if (name === 'alto' || name === 'ancho') {
+        if (name === 'alto' || name === 'ancho') {
             // Eliminar caracteres no numéricos
             const rawValue = value.replace(/[^\d]/g, '');
             // Convertir el valor a número y limitarlo a 150
@@ -129,7 +116,7 @@ const EditSubasta = () => {
         const file = e.target.files[0];
         if (file) {
             const reader = new FileReader();
-    
+
             reader.onloadend = () => {
                 // Actualizar la vista previa de la imagen
                 setImagePreview(reader.result);
@@ -138,7 +125,7 @@ const EditSubasta = () => {
 
                 setFormChanged(true);
             };
-    
+
             // Leer el archivo como URL de datos
             reader.readAsDataURL(file);
         }
@@ -168,6 +155,8 @@ const EditSubasta = () => {
         }
 
         setSubasta({ ...subasta, peso: value });
+
+        setFormChanged(true);
     };
 
     const isOnlyLettersWithValidSpaces = (str) => {

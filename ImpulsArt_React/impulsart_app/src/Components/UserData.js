@@ -92,6 +92,7 @@ function UserData() {
     e.preventDefault();
 
     if (!usuario.userName || !usuario.nombre || !usuario.apellido || !usuario.fechaNacimiento || !usuario.numCelular) {
+    if (!usuario.userName || !usuario.nombre || !usuario.apellido || !usuario.fechaNacimiento || !usuario.numCelular) {
       toast.current.show({ severity: 'error', summary: 'Error', detail: 'Todos los campos son obligatorios', life: 3000 });
       return;
     }
