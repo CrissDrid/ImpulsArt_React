@@ -7,10 +7,11 @@ import Swal from 'sweetalert2';
 import withReactContent from 'sweetalert2-react-content';
 import AuthToken from '../Auth/AuthToken';
 import GetUserInfo from '../Auth/GetUserInfo';
+import { Link } from 'react-router-dom';
 
 const MySwal = withReactContent(Swal);
 
-export default function DashboardAsesor() {
+export default function Dashboard() {
     const [activeTable, setActiveTable] = useState('subastas');
     const [subastas, setSubastas] = useState([]);
     const [ventas, setVentas] = useState([]);
@@ -19,16 +20,19 @@ export default function DashboardAsesor() {
     const [reportes, setReportes] = useState([]);
     const [usuarios, setUsuarios] = useState([]);
     const [identificacion, setIdentificacion] = useState(null);
+    const [rol, setRol] = useState([]);
+    const [selectedRole, setSelectedRole] = useState(null); // Agregado
     const [estadisticas, setEstadisticas] = useState({
         ventas: 0,
         subastas: 0,
         despachos: 0,
         pqrs: 0,
-        usuarios: 0
+        usuarios: 0,
+        reportes: 0
     });
 
     useEffect(() => {
-        axios.get('http://localhost:8086/api/estadisticas/obtener')
+        AuthToken.get('estadisticas/obtener')
             .then(response => {
                 setEstadisticas(response.data);
             })
@@ -50,6 +54,21 @@ export default function DashboardAsesor() {
     }, []);
 
     useEffect(() => {
+        const fetchRoles = async () => {
+            try {
+                const response = await AuthToken.get('rol/all');
+                console.log('Roles:', response.data); // Verifica que los roles están siendo recibidos
+                setRol(response.data);
+            } catch (error) {
+                console.error('Error al obtener roles:', error);
+            }
+        };
+        fetchRoles();
+    }, []);
+    
+    
+
+    useEffect(() => {
         if (identificacion) {
             getData();
         }
@@ -60,8 +79,11 @@ export default function DashboardAsesor() {
             let response;
             switch (activeTable) {
                 case 'subastas':
-                    response = await AuthToken.get(`subasta/subastaYobras`);
-                    setSubastas(response.data.data);
+                    response = await AuthToken.get(`obra/obrasEnSubasta`);
+                    const products = response.data.data;
+                    // Flatten subastas array from each product
+                    const allSubastas = products.flatMap(product => product.subastas);
+                    setSubastas(allSubastas);
                     break;
                 case 'ventas':
                     response = await AuthToken.get(`venta/all`);
@@ -95,6 +117,71 @@ export default function DashboardAsesor() {
         setActiveTable(table);
     };
 
+    const openEditModal = (usuario) => {
+        MySwal.fire({
+            title: 'Editar Usuario',
+            html: getEditUserHtml(usuario.rol ? usuario.rol.pkCod_Rol : null),
+            focusConfirm: false,
+            showCancelButton: true,
+            confirmButtonText: 'Guardar',
+            preConfirm: () => {
+                const selectedRole = document.getElementById('floatingRolId').value;
+                if (!selectedRole) {
+                    Swal.showValidationMessage('Por favor, selecciona un rol');
+                    return false;
+                }
+                return {
+                    rol: { pkCod_Rol: selectedRole }
+                };
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const updatedUsuario = {
+                    ...usuario,
+                    rol: result.value.rol,
+                };
+                updateUser(updatedUsuario);
+            }
+        });
+    };
+    
+    
+
+    const getEditUserHtml = (currentRole) => {
+        if (!Array.isArray(rol) || rol.length === 0) {
+            return `<div>No se pudieron cargar los roles.</div>`;
+        }
+        return `
+            <div class="form-floating">
+                <select
+                    class="form-control"
+                    id="floatingRolId"
+                    name="RolId"
+                    value="${currentRole || ''}"
+                >
+                    <option value="">Seleccione un rol</option>
+                    ${rol.map(r => `
+                    <option value="${r.pkCod_rol}" ${r.pkCod_rol === currentRole ? 'selected' : ''}>
+                        ${r.nombre}
+                    </option>
+                    `).join('')}
+                </select>
+                <label for="floatingRolId">Rol</label>
+            </div>
+        `;
+    };
+    
+
+
+    const updateUser = async (user) => {
+        try {
+            await AuthToken.put(`usuario/${user.id}`, user); // Ajusta el endpoint según sea necesario
+            Swal.fire('Usuario actualizado', '', 'success');
+        } catch (error) {
+            Swal.fire('Error', 'No se pudo actualizar el usuario', 'error');
+        }
+    };
+
     const renderTable = () => {
         switch (activeTable) {
             case 'subastas':
@@ -102,10 +189,10 @@ export default function DashboardAsesor() {
                     <>
                     <h1>Subastas</h1>
                     <DataTable value={subastas} stripedRows tableStyle={{ minWidth: '50rem' }}>
-                        <Column field="estado_subasta" header="Estado" />
-                        <Column field="fecha_finalizacion" header="Fecha Finalizacion" />
-                        <Column field="fecha_inicio" header="Fecha de inicio" />
-                        <Column field="precio_inicial" header="Precio Inicial" />
+                        <Column field="estadoSubasta" header="Estado" />
+                        <Column field="fechaFinalizacion" header="Fecha Finalización" />
+                        <Column field="fechaInicio" header="Fecha de Inicio" />
+                        <Column field="precioInicial" header="Precio Inicial"/>
                     </DataTable>
                     </>
                 );
@@ -114,9 +201,8 @@ export default function DashboardAsesor() {
                     <>
                     <h1>Ventas</h1>
                     <DataTable value={ventas} stripedRows tableStyle={{ minWidth: '50rem' }}>
-                        <Column field="cantidad" header="Cantidad" />
-                        <Column field="fecha_venta" header="Fecha de la Venta" />
-                        <Column field="total_pago" header="Total de la Venta" />
+                        <Column field="FechaVenta" header="Fecha de la Venta" />
+                        <Column field="costoTotal" header="Total de la Venta" />
                     </DataTable>
                     </>
                 );
@@ -125,8 +211,7 @@ export default function DashboardAsesor() {
                     <>
                     <h1>Despachos</h1>
                     <DataTable value={despachos} stripedRows tableStyle={{ minWidth: '50rem' }}>
-                        <Column field="fecha_entrega" header="Fecha de entrega" />
-                        <Column field="fecha_venta" header="Fecha de Venta" />
+                        <Column field="FechaEntrega" header="Fecha de entrega" />
                         <Column field="estado" header="Estado" />
                     </DataTable>
                     </>
@@ -138,7 +223,7 @@ export default function DashboardAsesor() {
                     <DataTable value={pqrs} stripedRows tableStyle={{ minWidth: '50rem' }}>
                         <Column field="descripcion" header="Descripcion" />
                         <Column field="estado" header="Estado" />
-                        <Column field="fechapqrs" header="Fecha PQRS" />
+                        <Column field="fechaPQRS" header="Fecha PQRS" />
                     </DataTable>
                     </>
                 );
@@ -146,13 +231,25 @@ export default function DashboardAsesor() {
                 return (
                     <>
                     <h1>Usuarios</h1>
+                    <Link to="/CreateUsuario" className='btn btn-primary'>Crear usuario</Link>
                     <DataTable value={usuarios} stripedRows tableStyle={{ minWidth: '50rem' }}>
                         <Column field="nombre" header="Nombre" />
                         <Column field="apellido" header="Apellido" />
                         <Column field="email" header="Email" />
                         <Column field="fechaNacimiento" header="Fecha de Nacimiento" />
-                        <Column field="num_celular" header="Numero" />
-                        <Column field="tipo_usuario" header="Tipo de usuario" />
+                        <Column field="numCelular" header="Numero" />
+                        <Column field="rol.nombre" header="Tipo de usuario" />
+                        <Column
+                            header="Acciones"
+                            body={(rowData) => (
+                                <button
+                                    className="btn btn-primary"
+                                    onClick={() => openEditModal(rowData)}
+                                >
+                                    Editar
+                                </button>
+                            )}
+                        />
                     </DataTable>
                     </>
                 );
@@ -162,7 +259,7 @@ export default function DashboardAsesor() {
                     <h1>Reportes</h1>
                     <DataTable value={reportes} stripedRows tableStyle={{ minWidth: '50rem' }}>
                         <Column field="comentario" header="Comentario" />
-                        <Column field="fecha_reporte" header="Fecha del Reporte" />
+                        <Column field="fechaReporte" header="Fecha del Reporte" />
                     </DataTable>
                     </>
                 );
@@ -184,7 +281,7 @@ export default function DashboardAsesor() {
                         <div className="card-body">
                             <i className="bi bi-gem card-icon"></i> {/* Icono para Subastas */}
                             <h5 className="card-title">Subastas</h5>
-                            <h6 className="card-subtitle mb-2 text-muted" style={{ fontSize: '1.6rem' }}>{estadisticas.subastas}</h6>
+                            <h6 className="card-subtitle mb-2 text-muted" style={{ fontSize: '1.6em' }}>{estadisticas.subastas}</h6>
                         </div>
                     </div>
                 </div>
@@ -195,9 +292,9 @@ export default function DashboardAsesor() {
                         style={{ cursor: 'pointer' }}
                     >
                         <div className="card-body">
-                            <i className="bi bi-cash card-icon"></i> {/* Icono para Ventas */}
+                            <i className="bi bi-cart-check card-icon"></i> {/* Icono para Ventas */}
                             <h5 className="card-title">Ventas</h5>
-                            <h6 className="card-subtitle mb-2 text-muted" style={{ fontSize: '1.6rem' }}>{estadisticas.ventas}</h6>
+                            <h6 className="card-subtitle mb-2 text-muted" style={{ fontSize: '1.6em' }}>{estadisticas.ventas}</h6>
                         </div>
                     </div>
                 </div>
@@ -210,7 +307,7 @@ export default function DashboardAsesor() {
                         <div className="card-body">
                             <i className="bi bi-truck card-icon"></i> {/* Icono para Despachos */}
                             <h5 className="card-title">Despachos</h5>
-                            <h6 className="card-subtitle mb-2 text-muted" style={{ fontSize: '1.6rem' }}>{estadisticas.despachos}</h6>
+                            <h6 className="card-subtitle mb-2 text-muted" style={{ fontSize: '1.6em' }}>{estadisticas.despachos}</h6>
                         </div>
                     </div>
                 </div>
@@ -221,9 +318,9 @@ export default function DashboardAsesor() {
                         style={{ cursor: 'pointer' }}
                     >
                         <div className="card-body">
-                            <i className="bi bi-question-circle card-icon"></i> {/* Icono para PQRS */}
+                            <i className="bi bi-flag card-icon"></i> {/* Icono para PQRS */}
                             <h5 className="card-title">PQRS</h5>
-                            <h6 className="card-subtitle mb-2 text-muted" style={{ fontSize: '1.6rem' }}>{estadisticas.pqrs}</h6>
+                            <h6 className="card-subtitle mb-2 text-muted" style={{ fontSize: '1.6em' }}>{estadisticas.pqrs}</h6>
                         </div>
                     </div>
                 </div>
@@ -236,7 +333,7 @@ export default function DashboardAsesor() {
                         <div className="card-body">
                             <i className="bi bi-person card-icon"></i> {/* Icono para Usuarios */}
                             <h5 className="card-title">Usuarios</h5>
-                            <h6 className="card-subtitle mb-2 text-muted" style={{ fontSize: '1.6rem' }}>{estadisticas.usuarios}</h6>
+                            <h6 className="card-subtitle mb-2 text-muted" style={{ fontSize: '1.6em' }}>{estadisticas.usuarios}</h6>
                         </div>
                     </div>
                 </div>
@@ -247,14 +344,16 @@ export default function DashboardAsesor() {
                         style={{ cursor: 'pointer' }}
                     >
                         <div className="card-body">
-                            <i className="bi bi-file-earmark-text card-icon"></i> {/* Icono para Reportes */}
+                            <i className="bi bi-file-text card-icon"></i> {/* Icono para Reportes */}
                             <h5 className="card-title">Reportes</h5>
-                            <h6 className="card-subtitle mb-2 text-muted" style={{ fontSize: '1.6rem' }}>{estadisticas.reportes}</h6>
+                            <h6 className="card-subtitle mb-2 text-muted" style={{ fontSize: '1.6em' }}>{estadisticas.reportes}</h6>
                         </div>
                     </div>
                 </div>
             </div>
-            {renderTable()}
+            <div className="table-container">
+                {renderTable()}
+            </div>
             <style jsx>{`
                 .card {
                     border-radius: 0.25rem;
