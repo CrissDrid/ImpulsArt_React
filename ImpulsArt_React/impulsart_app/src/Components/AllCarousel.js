@@ -53,6 +53,17 @@ function AllCarousel({ handleReport }) {
             severity="info"
             style={{ marginTop: '0.5rem' }}
           />
+          <div className="obra-price-info" style={{ marginTop: '0.5rem' }}>
+            {isSubasta ? (
+              <span className="obra-minimum-bid">
+                ${parseInt(obra.subastas[0].precioInicial).toLocaleString()}
+              </span>
+            ) : (
+              <span className="obra-price">
+                ${parseInt(obra.costo).toLocaleString()}
+              </span>
+            )}
+          </div>
           <div className="obra-actions">
             {isSubasta ? (
               <>
@@ -92,7 +103,14 @@ function AllCarousel({ handleReport }) {
         className="custom-carousel"
         circular
         itemTemplate={obraTemplate}
-        header={<h5 className="text-center mb-4 d-flex justify-content-start">Recomendaciones</h5>}
+        header={
+          <div className="d-flex justify-content-between align-items-center mb-4">
+            <h5 className="mb-0">Recomendaciones</h5>
+            <Link to="../SeccionAll" className="ver-todo-link" style={{ marginRight: '50px' }}>
+              Ver Todo
+            </Link>
+          </div>
+        }
       />
     </div>
   );

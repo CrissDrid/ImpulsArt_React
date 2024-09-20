@@ -21,6 +21,8 @@ import NoAccess from './no_access';
 import ProtectedRoute from './ProtectedRoute'; // Importar ProtectedRoute
 import Profile from './Profile';
 import SeccionSubasta from './SeccionSubasta';
+import SeccionObras from './SeccionObras';
+import SeccionAll from './SeccionAll'
 import DetallesSubasta from './DetallesSubasta';
 import DetalleObras from './DetalleObras';
 import Simulacion from './Simulacion';
@@ -36,6 +38,8 @@ import DashboardDomiciliario from './DashboardDomiciliario';
 import EstadoEntrega from './EstadoEntrega';
 import ObraCarousel from './ObraCarousel';
 import AllCarousel from './AllCarousel'
+import Search from './Search';
+import SeccionSearch from './SeccionSearch';
 
 function AppRoutes() { // Cambia el nombre de la función a AppRoutes
   return (
@@ -52,6 +56,8 @@ function AppRoutes() { // Cambia el nombre de la función a AppRoutes
         <Route path='/changePWD' element={<ChangePWD/>}/>
         <Route path='/galery' element={<Galery/>}/>
         <Route path='/SeccionSubasta' element={<SeccionSubasta />}/>
+        <Route path='/SeccionObras' element={<SeccionObras />}/>
+        <Route path='/SeccionAll' element={<SeccionAll/>}/>
         <Route path='/DetallesSubasta/:pkCodSubasta' element={<DetallesSubasta />}/>
         <Route path='/Carrito' element={<CarritoCompras/>}/>
         <Route path='/pasarela' element={<PasarelaPagos/>}/>
@@ -65,6 +71,8 @@ function AppRoutes() { // Cambia el nombre de la función a AppRoutes
         <Route path='/EstadoEntrega' element={<EstadoEntrega />}/>
         <Route path='/ObraCarousel' element={<ObraCarousel/>}/>
         <Route path='/AllCarousel' element={<AllCarousel/>}/>
+        <Route path='/Search' element={<Search/>}/>
+        <Route path="/SeccionSearch/:searchQuery" element={<SeccionSearch />} />
 
 
         <Route path="/DetalleObras/:pkCod_Producto" element={<DetalleObras />} />

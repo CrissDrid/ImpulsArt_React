@@ -61,6 +61,11 @@ function SubastaCarousel({ handleReport }) {
             className="obra-category-tag"
             severity="info"
           />
+          {obra.subastas && obra.subastas.length > 0 && (
+            <div className="obra-minimum-bid">
+              ${parseInt(obra.subastas[0].precioInicial).toLocaleString()}
+            </div>
+          )}
           <div className="obra-actions">
             {obra.subastas.length > 0 ? (
               obra.subastas.map((subasta, index) => (
@@ -91,7 +96,14 @@ function SubastaCarousel({ handleReport }) {
         className="custom-carousel"
         circular
         itemTemplate={subastaTemplate}
-        header={<h5 className="text-center mb-4 d-flex justify-content-start">Subastas</h5>}
+        header={
+          <div className="d-flex justify-content-between align-items-center mb-4">
+            <h5 className="mb-0">Obras en Subasta</h5>
+            <Link to="../SeccionSubasta" className="ver-todo-link" style={{ marginRight: '50px' }}>
+              Ver Todo
+            </Link>
+          </div>
+        }
       />
     </div>
   );

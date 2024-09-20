@@ -1,0 +1,163 @@
+/* Estilos generales de las tarjetas */
+.obra-card {
+  width: 100%;
+  max-width: 450px;
+  margin: 10px auto;
+  border-radius: 8px;
+  overflow: hidden;
+  background-color: #fff;
+  box-shadow: 0 .125rem .25rem rgba(0,0,0,.075);
+  transition: all 0.3s ease-in-out;
+}
+
+.obra-card:hover {
+  transform: scale(1.02);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.obra-image-container {
+  position: relative;
+  background-color: #f0f0f0;
+  padding: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 220px;
+}
+
+.obra-image {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.report-button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 30px;
+  height: 30px;
+  background-color: rgba(255, 255, 255, 0.7);
+}
+
+.obra-details {
+  padding: 20px;
+}
+
+.obra-title {
+  margin: 0 0 15px 0;
+  font-size: 20px;
+}
+
+.obra-category-tag {
+  margin-top: 0 !important;
+  margin-bottom: 15px;
+  max-width: 55px;  /* Limitar el ancho del tag */
+  max-height: 20px;
+}
+
+.obra-type-tag{
+  margin-top: 0 !important;
+  margin-bottom: 15px;
+  max-width: 55px;  /* Limitar el ancho del tag */
+  max-height: 20px;
+}
+
+.obra-actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.action-button {
+  width: 45px;
+  height: 45px;
+  margin-left: 1rem !important;
+}
+
+/* Estilos para la vista de lista */
+.auction-list-view {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.obra-card-list .obra-title {
+  font-size: 1.8rem;
+}
+
+.obra-card-list {
+  display: flex;
+  max-width: 100%;
+  margin: 0;
+}
+
+.obra-card-list .obra-image-container {
+  width: 30%;
+  height: 200px;
+}
+
+.obra-card-list .obra-details {
+  width: 70%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.obra-card-list .obra-title {
+  margin-bottom: 10px;
+}
+
+.obra-card-list .obra-actions {
+  margin-top: -3.1rem;
+}
+
+.p-dataview-layout-options {
+  display: flex;
+  overflow: hidden;
+  border-radius: 5px;
+  background-color: white;
+}
+
+.p-dataview-layout-options .p-button {
+  background-color: transparent;
+  border: 1.5px solid #8D33FF; /* Borde morado */
+  color: black;
+  padding: 8px 12px;
+  transition: all 0.3s ease;
+  border-radius: 0;
+  box-shadow: none; /* Elimina el box-shadow */
+}
+
+.p-dataview-layout-options .p-button:hover {
+  background-color: #f3e8ff; /* Color de fondo suave al hacer hover */
+  border-color: #7a1db9; /* Cambiar el color del borde al hacer hover */
+}
+
+.p-dataview-layout-options .p-button.p-highlight {
+  background-color: #8D33FF;
+  color: white;
+  border-color: #7a1db9; /* Borde morado más oscuro cuando está activo */
+}
+
+.p-dataview-layout-options .p-button.p-highlight:hover {
+  background-color: #7a1db9;
+}
+
+.p-dataview-layout-options .p-button .p-button-icon {
+  font-size: 1.2rem;
+}
+
+/* Estilos para redondear solo las esquinas externas */
+.p-dataview-layout-options .p-button:first-child {
+  border-top-left-radius: 5px;
+  border-bottom-left-radius: 5px;
+}
+
+.p-dataview-layout-options .p-button:last-child {
+  border-top-right-radius: 5px;
+  border-bottom-right-radius: 5px;
+}
+
+
+

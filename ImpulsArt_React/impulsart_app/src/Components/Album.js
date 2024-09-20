@@ -22,8 +22,6 @@ function Album() {
   const [listObra, setListObra] = useState([]); // Estado para las obras
   const [listSubasta, setListSubasta] = useState([]); // Estado para las subastas
   const [tipoReporte, setTipoReporte] = useState([]);
-  const [categoria, setCategoria] = useState('');
-  const [nombreProducto, setNombreProducto] = useState('');
   const [userRole, setUserRole] = useState('');
 
   useEffect(() => {
@@ -72,7 +70,7 @@ function Album() {
 
   const getSubasta = async () => {
     try {
-      const response = await AuthToken.get('subasta/all'); // Asume que la API es 'subasta/all'
+      const response = await AuthToken.get('subasta/all');
       setListSubasta(normalizeData(response.data));
     } catch (error) {
       console.error('Error en getSubasta:', error);
@@ -137,7 +135,7 @@ function Album() {
 
       if (formValues) {
         const { tipoReporte, comentario } = formValues;
-    
+
         try {
           await AuthToken.post('reporteObra/create', { 
             fk_obra: obra.pkCod_Producto, 
@@ -156,27 +154,6 @@ function Album() {
   return (
     <div className="album">
       <div className="container">
-        <div className="search-container">
-          <select
-            value={categoria}
-            onChange={(e) => setCategoria(e.target.value)}
-            className="form-select search-select"
-          >
-            <option value="">Selecciona la categoría de su obra</option>
-            <option value="Pintura">Pintura</option>
-            <option value="Dibujo">Dibujo</option>
-            <option value="Maqueta">Maqueta</option>
-            <option value="Ceramica">Ceramica</option>
-          </select>
-          <input
-            className="form-control search-input"
-            type="search"
-            placeholder="Buscar por nombre de producto"
-            aria-label="Buscar"
-            value={nombreProducto}
-            onChange={(e) => setNombreProducto(e.target.value)}
-          />
-        </div>
         {/* Mostrar AllCarousel primero */}
         <AllCarousel handleReport={handleReport} />
         {/* Luego mostrar ObraCarousel con la lista de obras obtenidas */}

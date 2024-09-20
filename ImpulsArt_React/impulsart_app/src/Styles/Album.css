@@ -3,6 +3,7 @@
   padding-top: 3rem;
   padding-bottom: 3rem;
   border-radius: 1rem;
+  margin-top: -4rem;
 }
 
 .obra-card-link {
@@ -32,6 +33,12 @@
   overflow: hidden;
   background-color: #fff;
   box-shadow: 0 .125rem .25rem rgba(0,0,0,.075);
+  transition: all 0.3s ease-in-out;
+}
+
+.obra-card:hover{
+  transform: scale(1.05);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .obra-image-container {
@@ -66,12 +73,6 @@
 .obra-title {
   margin: 0 0 15px 0; /* Increased bottom margin */
   font-size: 20px; /* Increased from 18px to 20px */
-}
-
-.obra-price {
-  margin: 0 0 20px 0; /* Increased bottom margin */
-  color: #666;
-  font-size: 16px; /* Added font size */
 }
 
 .obra-category {
@@ -110,6 +111,14 @@
   display: none;
 }
 
+.custom-carousel{
+  margin-top: 1.5rem;
+}
+
+.custom-carousel .p-carousel-header{
+  margin-bottom: -1.5rem;
+}
+
 /* New styles to adjust the carousel for wider cards */
 .custom-carousel .p-carousel-container {
   padding: 0 20px; /* Add some padding to the sides of the carousel */
@@ -121,4 +130,13 @@
 
 .custom-carousel .p-carousel-item {
   padding: 0 10px; /* Add padding to carousel items for spacing between cards */
+}
+
+.ver-todo-link {
+  color: #8D33FF !important;
+  font-weight: bold;
+}
+
+.ver-todo-link:hover {
+  color: #7a1db9 !important;
 }
