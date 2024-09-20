@@ -82,14 +82,6 @@ export default function Dashboard() {
                     const allSubastas = products.flatMap(product => product.subastas);
                     setSubastas(allSubastas);
                     break;
-                case 'ventas':
-                    response = await AuthToken.get(`venta/all`);
-                    setVentas(response.data.data);
-                    break;
-                case 'despachos':
-                    response = await AuthToken.get(`despacho/all`);
-                    setDespachos(response.data.data);
-                    break;
                 case 'pqrs':
                     response = await AuthToken.get(`pqrs/all`);
                     setPqrs(response.data.data);
@@ -97,10 +89,6 @@ export default function Dashboard() {
                 case 'usuarios':
                     response = await AuthToken.get(`usuario/all`);
                     setUsuarios(response.data.data);
-                    break;
-                case 'reportes':
-                    response = await AuthToken.get(`reporteObra/all`);
-                    setReportes(response.data.data);
                     break;
                 default:
                     break;
@@ -206,26 +194,6 @@ export default function Dashboard() {
                     </DataTable>
                     </>
                 );
-            case 'ventas':
-                return (
-                    <>
-                    <h1>Ventas</h1>
-                    <DataTable value={ventas} stripedRows tableStyle={{ minWidth: '50rem' }}>
-                        <Column field="FechaVenta" header="Fecha de la Venta" />
-                        <Column field="costoTotal" header="Total de la Venta" />
-                    </DataTable>
-                    </>
-                );
-            case 'despachos':
-                return (
-                    <>
-                    <h1>Despachos</h1>
-                    <DataTable value={despachos} stripedRows tableStyle={{ minWidth: '50rem' }}>
-                        <Column field="FechaEntrega" header="Fecha de entrega" />
-                        <Column field="estado" header="Estado" />
-                    </DataTable>
-                    </>
-                );
             case 'pqrs':
                 return (
                     <>
@@ -262,16 +230,6 @@ export default function Dashboard() {
                     </DataTable>
                     </>
                 );
-            case 'reportes':
-                return (
-                    <>
-                    <h1>Reportes</h1>
-                    <DataTable value={reportes} stripedRows tableStyle={{ minWidth: '50rem' }}>
-                        <Column field="comentario" header="Comentario" />
-                        <Column field="fechaReporte" header="Fecha del Reporte" />
-                    </DataTable>
-                    </>
-                );
             default:
                 return null;
         }
@@ -291,32 +249,6 @@ export default function Dashboard() {
                             <i className="bi bi-gem card-icon"></i> {/* Icono para Subastas */}
                             <h5 className="card-title">Subastas</h5>
                             <h6 className="card-subtitle mb-2 text-muted" style={{ fontSize: '1.6em' }}>{estadisticas.subastas}</h6>
-                        </div>
-                    </div>
-                </div>
-                <div className="col-12 col-md-4 mb-2">
-                    <div
-                        className={`card ${activeTable === 'ventas' ? 'p-button-primary' : 'p-button-outlined'} cursor-pointer`}
-                        onClick={() => handleTableClick('ventas')}
-                        style={{ cursor: 'pointer' }}
-                    >
-                        <div className="card-body">
-                            <i className="bi bi-cart-check card-icon"></i> {/* Icono para Ventas */}
-                            <h5 className="card-title">Ventas</h5>
-                            <h6 className="card-subtitle mb-2 text-muted" style={{ fontSize: '1.6em' }}>{estadisticas.ventas}</h6>
-                        </div>
-                    </div>
-                </div>
-                <div className="col-12 col-md-4 mb-2">
-                    <div
-                        className={`card ${activeTable === 'despachos' ? 'p-button-primary' : 'p-button-outlined'} cursor-pointer`}
-                        onClick={() => handleTableClick('despachos')}
-                        style={{ cursor: 'pointer' }}
-                    >
-                        <div className="card-body">
-                            <i className="bi bi-truck card-icon"></i> {/* Icono para Despachos */}
-                            <h5 className="card-title">Despachos</h5>
-                            <h6 className="card-subtitle mb-2 text-muted" style={{ fontSize: '1.6em' }}>{estadisticas.despachos}</h6>
                         </div>
                     </div>
                 </div>
@@ -343,19 +275,6 @@ export default function Dashboard() {
                             <i className="bi bi-person card-icon"></i> {/* Icono para Usuarios */}
                             <h5 className="card-title">Usuarios</h5>
                             <h6 className="card-subtitle mb-2 text-muted" style={{ fontSize: '1.6em' }}>{estadisticas.usuarios}</h6>
-                        </div>
-                    </div>
-                </div>
-                <div className="col-12 col-md-4 mb-2">
-                    <div
-                        className={`card ${activeTable === 'reportes' ? 'p-button-primary' : 'p-button-outlined'} cursor-pointer`}
-                        onClick={() => handleTableClick('reportes')}
-                        style={{ cursor: 'pointer' }}
-                    >
-                        <div className="card-body">
-                            <i className="bi bi-file-text card-icon"></i> {/* Icono para Reportes */}
-                            <h5 className="card-title">Reportes</h5>
-                            <h6 className="card-subtitle mb-2 text-muted" style={{ fontSize: '1.6em' }}>{estadisticas.reportes}</h6>
                         </div>
                     </div>
                 </div>

@@ -1,14 +1,52 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Navbar_init from './Navbar_init';
 import Footer from './Footer';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 
+// Autenticación de token
+import AuthToken from '../Auth/AuthToken';
+// Obtener datos del usuario
+import GetUserInfo from '../Auth/GetUserInfo';
+
 function Help() {
     const [searchTerm, setSearchTerm] = useState("");
     const [openIndex, setOpenIndex] = useState(null);
+    const [rol, setRol] = useState([]);
+    const [usuario, setUsuario] = useState({});
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-    const tutorials = [
+    useEffect(() => {
+        const checkAuthentication = async () => {
+          const token = localStorage.getItem('authToken');
+    
+          if (token) {
+            setIsAuthenticated(true);
+            try {
+              const { rol, identificacion } = await GetUserInfo();
+              setRol(rol || []);
+    
+              // Llama a la API solo si tienes la identificación
+              if (identificacion) {
+                const result = await AuthToken.get(`usuario/list/${identificacion}`);
+                setUsuario(result.data.data);
+              }
+    
+              // Mueve el log aquí
+              console.log('Authenticated:', true, 'Roles:', rol);
+            } catch (error) {
+              console.error('Error al cargar los datos del usuario:', error);
+            }
+          } else {
+            setIsAuthenticated(false);
+            console.log('Authenticated:', false, 'Roles:', []);
+          }
+        };
+      
+        checkAuthentication();
+      }, []);
+
+      const tutorials = [
         { id: "One", title: "¿Cómo puedo reportar una obra arte en ImpulsArt?", video: "https://www.youtube.com/embed/pcgwRhHx3YE" },
         { id: "Two", title: "¿Qué sucede si el arte que compré llega dañado?", video: "https://www.youtube.com/embed/Cz5RCCc3EZY" },
         { id: "Three", title: "¿Cómo puedo enviar PQRS?", video: "https://www.youtube.com/embed/Cz5RCCc3EZY" },
@@ -16,7 +54,21 @@ function Help() {
         { id: "Five", title: "¿Cómo puedo subir obras?", video: "https://www.youtube.com/embed/BBZxN2oigfc" },
         { id: "Six", title: "¿Cómo puedo iniciar una subasta?", video: "https://www.youtube.com/embed/5F9naRxccXc" },
         { id: "Seven", title: "¿Como puedo comprar una obra en venta?", video: "https://www.youtube.com/embed/-oC5-ocznxE" },
+        { id: "Eight", title: "¿Como actualizar mis datos personales?", video: "https://www.youtube.com/embed/jeLuG2VpUbs?si=d-3uYbKoc_6KYEF_" },
     ];
+    
+    if (isAuthenticated && rol.includes('ASESOR')) {
+        tutorials.push(
+            { id: "Nine", title: "¿Como atender reportes en ImpulsArt?", video: "https://www.youtube.com/embed/Vl2Y7QpznCY?si=Vp0p8SRsU_QzF4cx" },
+            { id: "Ten", title: "¿Como atender pqrs como asesor?", video: "https://www.youtube.com/embed/4v7IOw9a2iE?si=wiAfOAcDXOMSZQkB" },
+        );
+    }
+
+    if (isAuthenticated && rol.includes('DOMICILIARIO')) {
+        tutorials.push(
+            { id: "Eleven", title: "Como atender los despachos como domiciliario en ImpulsArt", video: "https://www.youtube.com/embed/SEF5cv--uhI?si=YCKNN3TsfDqQ8Yyz" }
+        );
+    }
 
     const filteredTutorials = tutorials.filter(tutorial =>
         tutorial.title.toLowerCase().includes(searchTerm.toLowerCase())
