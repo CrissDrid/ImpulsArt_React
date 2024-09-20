@@ -153,7 +153,7 @@ function Navbar_init({ onSupportClick, onAboutClick }) {
 
             {isAuthenticated && rol.includes('DOMICILIARIO') && (
               <li className="nav-item">
-                <Link to='/DashboardDomiciliario' className="nav-link active" aria-current="page">PQRS y reportes</Link>
+                <Link to='/DashboardDomiciliario' className="nav-link active" aria-current="page">Despachos</Link>
               </li>
             )}
 
