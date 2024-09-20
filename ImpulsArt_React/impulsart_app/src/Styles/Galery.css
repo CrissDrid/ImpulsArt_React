@@ -45,7 +45,7 @@
     transform: scale(1.2);
   }
   
-  .obra-card {
+  .obras-card {
     width: 12rem; /* Ajustado para ser más grande */
     border: 1px solid #ddd;
     border-radius: 8px;
@@ -54,12 +54,12 @@
     cursor: pointer;
   }
   
-  .obra-card:hover {
+  .obras-card:hover {
     transform: scale(1.05);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   }
   
-  .obra-card img {
+  .obras-card img {
     width: 100%;
     height: 150px; /* Ajustado para ser más alto */
     object-fit: cover;

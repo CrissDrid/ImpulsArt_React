@@ -14,12 +14,6 @@
     border-radius: 5px;
 }
 
-.d-flex {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 0.5rem;
-}
-
 .btn-comprar {
     background-color: #8D33FF;
     color: white;

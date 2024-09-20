@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import AuthToken from '../Auth/AuthToken';
 import GetUserInfo from '../Auth/GetUserInfo';
@@ -7,6 +8,7 @@ import '../Styles/Direcciones.css';
 function Ubicacion({ onAtras, onDireccionSeleccionada }) {
   const [direcciones, setDirecciones] = useState([]);
   const [identificacion, setIdentificacion] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchUserInfo = async () => {
@@ -56,6 +58,10 @@ function Ubicacion({ onAtras, onDireccionSeleccionada }) {
     });
   };
 
+  const handleNavigateToProfile = () => {
+    navigate('/profile', { state: { activeTab: 'direcciones' } });
+  };
+
   return (
     <div className="page-container">
       <div className="header-container">
@@ -82,7 +88,12 @@ function Ubicacion({ onAtras, onDireccionSeleccionada }) {
             ))
           ) : (
             <div className="col-md-12">
-              <p>No tienes direcciones registradas.</p>
+              <p>
+                No tienes direcciones registradas.{' '}
+                <a href="#" onClick={handleNavigateToProfile} className="link-agregar-direccion">
+                  Agregar Dirección Aquí
+                </a>
+              </p>
             </div>
           )}
         </div>

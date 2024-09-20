@@ -10,6 +10,8 @@ import 'bootstrap-icons/font/bootstrap-icons.css';
 import AuthToken from '../Auth/AuthToken';
 // Obtener datos del usuario
 import GetUserInfo from '../Auth/GetUserInfo';
+import Search from './Search';
+// import SearchComponent from './SearchComponent';  // Uncomment when ready to use
 
 function Navbar_init({ onSupportClick, onAboutClick }) {
   const [showAboutButton, setShowAboutButton] = useState(false);
@@ -61,7 +63,7 @@ function Navbar_init({ onSupportClick, onAboutClick }) {
   useEffect(() => {
     // Show the "Nosotros" button only on the landing page
     setShowAboutButton(location.pathname === '/');
-  }, [location]); // location ahora está definido correctamente
+  }, [location]);
 
   // Nueva función para manejar el soporte
   const handleSupportClick = () => {
@@ -71,7 +73,6 @@ function Navbar_init({ onSupportClick, onAboutClick }) {
       navigate('/Help'); // Si no está en la página de inicio, redirige a /Help
     }
   };
-
 
   return (
     <nav className="navbar navbar-expand-lg">
@@ -105,44 +106,13 @@ function Navbar_init({ onSupportClick, onAboutClick }) {
         </Sidebar>
       )}
 
-      <style jsx>{`
-        .p-sidebar {
-          width: 250px;
-        }
-        .sidebar-content {
-          display: flex;
-          flex-direction: column;
-          align-items: flex-start;
-          padding: 1rem;
-        }
-        .header {
-          margin-bottom: 1rem;
-          color: black;
-          font-size: 1.5rem;
-        }
-        .dropdown-container {
-          position: relative;
-          display: inline-block;
-        }
-        .dropdown-menu {
-          position: absolute;
-          right: 0;
-          min-width: 150px;
-        }
-        .custom-sidebar-toggle {
-          z-index: 1050;
-        }
-        .pi {
-          font-size: 1.5rem;
-        }
-      `}</style>
-
       <div className="container-fluid">
         <Link to='/Home'><img className='nav-logo' src={Logo} alt="Logo" /></Link>
         <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarTogglerDemo02" aria-controls="navbarTogglerDemo02" aria-expanded="false" aria-label="Toggle navigation">
           <span className="navbar-toggler-icon"></span>
         </button>
         <div className="collapse navbar-collapse" id="navbarTogglerDemo02">
+          <Search/>
           <ul className="navbar-nav mb-2 mb-lg-0 ms-auto">
             <li className="nav-item">
               <Link to="/Home" style={{ textDecoration: 'none' }}>
@@ -171,19 +141,7 @@ function Navbar_init({ onSupportClick, onAboutClick }) {
                 <Link to='/DashboardAsesor' className="nav-link active" aria-current="page">PQRS y reportes</Link>
               </li>
             )}
-
-            {isAuthenticated && rol.includes('DOMICILIARIO') && (
-              <li className="nav-item">
-                <Link to='/DashboardDomiciliario' className="nav-link active" aria-current="page">Despacho</Link>
-              </li>
-            )}
-
-            {isAuthenticated && (
-              <li className="nav-item">
-                <Link to='/SeccionSubasta' className="nav-link active" aria-current="page">Seccion Subasta</Link>
-              </li>
-            )}
-
+            
             {isAuthenticated && (
               <li className="nav-item">
                 <div className="dropdown">
@@ -222,10 +180,40 @@ function Navbar_init({ onSupportClick, onAboutClick }) {
           </ul>
         </div>
       </div>
+
+      <style jsx>{`
+        .p-sidebar {
+          width: 250px;
+        }
+        .sidebar-content {
+          display: flex;
+          flex-direction: column;
+          align-items: flex-start;
+          padding: 1rem;
+        }
+        .header {
+          margin-bottom: 1rem;
+          color: black;
+          font-size: 1.5rem;
+        }
+        .dropdown-container {
+          position: relative;
+          display: inline-block;
+        }
+        .dropdown-menu {
+          position: absolute;
+          right: 0;
+          min-width: 150px;
+        }
+        .custom-sidebar-toggle {
+          z-index: 1050;
+        }
+        .pi {
+          font-size: 1.5rem;
+        }
+      `}</style>
     </nav>
   );
 }
 
 export default Navbar_init;
-
-

@@ -6,10 +6,13 @@ import { Toast } from 'primereact/toast';
 import '../Styles/DetallesObra.css';
 import Navbar_init from './Navbar_init';
 import Footer from './Footer';
-
-// Autenticacion de apis
+import ObraCarousel from './ObraCarousel';
 import AuthToken from '../Auth/AuthToken';
 import GetUserInfo from '../Auth/GetUserInfo';
+import Swal from 'sweetalert2';
+import withReactContent from 'sweetalert2-react-content';
+
+const MySwal = withReactContent(Swal);
 
 function DetallesObra() {
   const toast = useRef(null);
@@ -32,6 +35,8 @@ function DetallesObra() {
   });
   const [cantidadCompra, setCantidadCompra] = useState(1);
   const [rol, setRol] = useState([]);
+  const [todasLasObras, setTodasLasObras] = useState([]);
+  const [tipoReporte, setTipoReporte] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -92,8 +97,28 @@ function DetallesObra() {
       }
     };
 
+    const loadTodasLasObras = async () => {
+      try {
+        const result = await AuthToken.get(`${process.env.REACT_APP_API_BASE_URL}obra/all`);
+        setTodasLasObras(result.data.data);
+      } catch (error) {
+        console.error('Error al cargar todas las obras:', error);
+      }
+    };
+
+    const loadTipoReporte = async () => {
+      try {
+        const result = await AuthToken.get('tipoReporte/all');
+        setTipoReporte(result.data.data);
+      } catch (error) {
+        console.error('Error al cargar los tipos de PQRS:', error);
+      }
+    };
+
     loadObra();
     loadCarritoId();
+    loadTodasLasObras();
+    loadTipoReporte();
   }, [identificacion, pkCod_Producto]);
 
   const handleRatingChange = (e) => {
@@ -165,8 +190,54 @@ function DetallesObra() {
         toast.current.show({ severity: 'error', summary: 'Error', detail: 'No se pudo eliminar la obra', life: 3000 });
       }
     } else {
-      // Aquí deberías implementar la lógica para mostrar el modal de reporte
-      console.log('Mostrar modal de reporte');
+      const { value: formValues } = await MySwal.fire({
+        title: 'Reportar Obra',
+        html: `
+          <div style="display: flex; flex-direction: column; gap: 15px; align-items: center;">
+            <label for="tipo-reporte" style="font-size: 16px; font-weight: bold;">Selecciona el tipo de reporte</label>
+            <select id="tipo-reporte" class="swal2-select" style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #ccc;">
+              <option value="">Selecciona el tipo de reporte</option>
+              ${tipoReporte.map(tipo => `<option value="${tipo.pkCod_TipoReporte}">${tipo.nombre}</option>`).join('')}
+            </select>
+
+            <label for="comentario-reporte" style="font-size: 16px; font-weight: bold;">Escribe tu comentario</label>
+            <textarea id="comentario-reporte" class="swal2-textarea" style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #ccc;" placeholder="Escribe aquí la razón del reporte..."></textarea>
+          </div>`,
+        focusConfirm: false,
+        showCancelButton: true,
+        preConfirm: () => {
+          const tipoReporteElement = document.getElementById('tipo-reporte');
+          const comentarioElement = document.getElementById('comentario-reporte');
+
+          const tipoReporte = tipoReporteElement ? tipoReporteElement.value : null;
+          const comentario = comentarioElement ? comentarioElement.value : null;
+
+          if (!tipoReporte) {
+            return Swal.showValidationMessage('Debes seleccionar un tipo de reporte');
+          }
+          if (!comentario) {
+            return Swal.showValidationMessage('Debes escribir un comentario');
+          }
+
+          return { tipoReporte, comentario };
+        }
+      });
+
+      if (formValues) {
+        const { tipoReporte, comentario } = formValues;
+    
+        try {
+          await AuthToken.post('reporteObra/create', { 
+            fk_obra: pkCod_Producto,
+            fk_TipoReporte: tipoReporte, 
+            comentario 
+          });
+          toast.current.show({ severity: 'success', summary: 'Éxito', detail: 'Reporte enviado correctamente', life: 3000 });
+        } catch (error) {
+          console.error('Error al reportar:', error);
+          toast.current.show({ severity: 'error', summary: 'Error', detail: 'Hubo un problema al enviar el reporte', life: 3000 });
+        }
+      }
     }
   };
 
@@ -244,12 +315,21 @@ function DetallesObra() {
                 </button>
               )}
               <button 
-                className={`btn ${rol.includes('ASESOR') ? 'btn-danger' : 'btn-warning'} ${rol.includes('ASESOR') ? 'w-100' : 'w-25'} py-2`}
+                className={`btn ${rol.includes('ASESOR') ? 'btn-danger' : 'btn-warning report-button-circle'} py-2`}
                 type="button" 
                 onClick={handleReportOrDelete}>
-                {rol.includes('ASESOR') ? 'Borrar' : 'Reportar'}
+                {rol.includes('ASESOR') ? 'Borrar' : <i className="pi pi-exclamation-triangle"></i>}
               </button>
             </div>
+          </div>
+        </div>
+        
+        <div className="row mt-5">
+          <div className="col-12">
+            <ObraCarousel 
+              obras={todasLasObras.filter(o => o.pkCod_Producto !== pkCod_Producto)} 
+              handleReport={handleReportOrDelete}
+            />
           </div>
         </div>
       </div>

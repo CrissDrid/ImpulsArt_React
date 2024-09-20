@@ -53,21 +53,21 @@ function DetallesSubasta() {
         console.log('Datos de subasta:', subastaData);
 
         setSubasta({
-          nombreProducto: subastaData.obras.nombreProducto,
-          costo: subastaData.obras.costo,
-          peso: subastaData.obras.peso,
-          tamano: subastaData.obras.tamano,
-          cantidad: subastaData.obras.cantidad,
-          categoriaId: subastaData.obras.categoria.pkCod_Categoria,
-          categoriaNombre: subastaData.obras.categoria.nombreCategoria,
-          descripcion: subastaData.obras.descripcion,
-          estadoSubasta: subastaData.estadoSubasta,
-          precioInicial: subastaData.precioInicial,
-          fechaInicio: subastaData.fechaInicio,
-          fechaFinalizacion: subastaData.fechaFinalizacion,
-          imagen: subastaData.obras.imagen,
-          TipoImagen: subastaData.obras.TipoImagen,
-          imagenPreview: subastaData.obras.imagen,
+          nombreProducto: subastaData.nombreProducto,
+          costo: subastaData.costo,
+          peso: subastaData.peso,
+          tamano: subastaData.tamano,
+          cantidad: subastaData.cantidad,
+          categoriaId: subastaData.categoria.pkCod_Categoria,
+          categoriaNombre: subastaData.categoria.nombreCategoria,
+          descripcion: subastaData.descripcion,
+          estadoSubasta: subastaData.subastas[0].estadoSubasta,
+          precioInicial: subastaData.subastas[0].precioInicial,
+          fechaInicio: subastaData.subastas[0].fechaInicio,
+          fechaFinalizacion: subastaData.subastas[0].fechaFinalizacion,
+          imagen: subastaData.imagen,
+          tipoImagen: subastaData.tipoImagen,
+          imagenPreview: subastaData.imagen,
           rating: subastaData.rating || 0
         });
       } catch (error) {
