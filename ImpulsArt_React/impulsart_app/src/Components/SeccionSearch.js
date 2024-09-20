@@ -119,7 +119,7 @@ export default function SeccionSearch() {
 
   const fetchSearchResults = async () => {
     try {
-      const response = await axios.get(`http://localhost:8086/api/obra/buscar?query=${encodeURIComponent(searchQuery)}`);
+      const response = await AuthToken.get(`obra/buscar?query=${encodeURIComponent(searchQuery)}`);
       if (response.data.status === 'success') {
         setObras(response.data.data);
       }

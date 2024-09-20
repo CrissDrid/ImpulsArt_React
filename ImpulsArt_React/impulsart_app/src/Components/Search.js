@@ -3,6 +3,7 @@ import { PrimeIcons } from 'primereact/api';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import '../Styles/Navbar.css';
+import AuthToken from '../Auth/AuthToken';
 
 function SearchComponent() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -40,7 +41,7 @@ function SearchComponent() {
   const fetchSuggestions = async (query) => {
     setIsLoading(true);
     try {
-      const response = await axios.get(`http://localhost:8086/api/obra/autocomplete?query=${query}`);
+      const response = await AuthToken.get(`obra/autocomplete?query=${query}`);
       const uniqueSuggestions = getUniqueSuggestions(response.data.data);
       setSuggestions(uniqueSuggestions);
       setShowSuggestions(true);

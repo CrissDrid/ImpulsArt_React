@@ -131,7 +131,7 @@ useEffect(() => {
 
 const fetchRandomObras = async () => {
   try {
-    const response = await axios.get('http://localhost:8086/api/obra/random?limit=20');
+    const response = await AuthToken.get('obra/random?limit=20');
     if (response.data.status === 'success') {
       setObras(response.data.data);
       setFilteredObras(response.data.data);

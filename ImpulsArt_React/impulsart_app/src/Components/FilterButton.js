@@ -3,6 +3,7 @@ import { Button } from 'primereact/button';
 import { Dialog } from 'primereact/dialog';
 import { Dropdown } from 'primereact/dropdown';
 import axios from 'axios';
+import AuthToken from '../Auth/AuthToken';
 
 const FilterButton = ({ onApplyFilters }) => {
   const [visible, setVisible] = useState(false);
@@ -20,7 +21,7 @@ const FilterButton = ({ onApplyFilters }) => {
 
   const fetchCategories = async () => {
     try {
-      const response = await axios.get('http://localhost:8086/api/categoria/all');
+      const response = await AuthToken.get('categoria/all');
       if (response.data.status === 'success') {
         const formattedCategories = response.data.data.map(category => ({
           label: category.nombreCategoria,

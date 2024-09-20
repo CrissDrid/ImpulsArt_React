@@ -4,6 +4,7 @@ import { Button } from 'primereact/button';
 import { Tag } from 'primereact/tag';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
+import AuthToken from '../Auth/AuthToken';
 
 function AllCarousel({ handleReport }) {
   const [obras, setObras] = useState([]);
@@ -11,7 +12,7 @@ function AllCarousel({ handleReport }) {
   useEffect(() => {
     const fetchRandomObras = async () => {
       try {
-        const response = await axios.get('http://localhost:8086/api/obra/random?limit=20');
+        const response = await AuthToken.get('obra/random?limit=20');
         if (response.data.status === 'success') {
           setObras(response.data.data);
         }
