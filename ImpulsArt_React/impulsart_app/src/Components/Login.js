@@ -102,7 +102,6 @@ const Login = () => {
               }
               <button className="btn btn-primary w-100 py-2 iniciar-btn" type="submit">Iniciar Sesión</button>
               <div className="Links">
-                <p><Link className='link-contraseña link-no-underline'>¿Olvidaste tu contraseña?</Link></p>
                 <p>¿Todavía no tienes una cuenta?<Link className='link-no-underline link-cuenta' to="/register"> Crear cuenta nueva</Link></p>
               </div>
             </form>
