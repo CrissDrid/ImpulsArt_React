@@ -70,6 +70,12 @@ function Help() {
         );
     }
 
+    if (isAuthenticated && rol.includes('ADMIN')) {
+        tutorials.push(
+            { id: "Eleven", title: "Como asignar roles como ADMINISTRADOR en ImpulsArt", video: "https://www.youtube.com/embed/aHt-hi9idFw?si=DROhSeLGa3LNiULW" }
+        );
+    }
+
     const filteredTutorials = tutorials.filter(tutorial =>
         tutorial.title.toLowerCase().includes(searchTerm.toLowerCase())
     );
