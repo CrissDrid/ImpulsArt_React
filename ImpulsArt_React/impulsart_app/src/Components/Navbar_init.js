@@ -27,23 +27,30 @@ function Navbar_init({ onSupportClick, onAboutClick }) {
   useEffect(() => {
     const checkAuthentication = async () => {
       const token = localStorage.getItem('authToken');
+      
       if (token) {
         setIsAuthenticated(true);
         try {
           const { rol, identificacion } = await GetUserInfo();
           setRol(rol || []);
+          
+          // Llama a la API solo si tienes la identificación
           if (identificacion) {
             const result = await AuthToken.get(`usuario/list/${identificacion}`);
             setUsuario(result.data.data);
           }
+          
+          // Mueve el log aquí
+          console.log('Authenticated:', true, 'Roles:', rol);
         } catch (error) {
           console.error('Error al cargar los datos del usuario:', error);
         }
       } else {
         setIsAuthenticated(false);
+        console.log('Authenticated:', false, 'Roles:', []);
       }
     };
-
+  
     checkAuthentication();
   }, []);
 
@@ -112,7 +119,9 @@ function Navbar_init({ onSupportClick, onAboutClick }) {
           <span className="navbar-toggler-icon"></span>
         </button>
         <div className="collapse navbar-collapse" id="navbarTogglerDemo02">
-          <Search/>
+          {isAuthenticated && rol.includes('USER') && (
+              <Search />
+            )}
           <ul className="navbar-nav mb-2 mb-lg-0 ms-auto">
             <li className="nav-item">
               <Link to="/Home" style={{ textDecoration: 'none' }}>

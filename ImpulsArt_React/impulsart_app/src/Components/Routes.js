@@ -73,8 +73,6 @@ function AppRoutes() { // Cambia el nombre de la función a AppRoutes
         <Route path='/AllCarousel' element={<AllCarousel/>}/>
         <Route path='/Search' element={<Search/>}/>
         <Route path="/SeccionSearch/:searchQuery" element={<SeccionSearch />} />
-
-
         <Route path="/DetalleObras/:pkCod_Producto" element={<DetalleObras />} />
         
         {/*CRUD USUARIOS*/}
