@@ -18,14 +18,15 @@ function UserData() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Obtener datos del usuario
         const { identificacion } = await GetUserInfo();
         setIdentificacion(identificacion);
 
-        // Cargar datos relacionados con el usuario
         if (identificacion) {
           const response = await AuthToken.get(`/usuario/list/${identificacion}`);
-          setUsuario(response.data.data);
+          const userData = response.data.data;
+
+          setUsuario(userData);
+          localStorage.setItem('user', JSON.stringify(userData)); // Asegúrate de guardar los datos
         }
       } catch (error) {
         console.error('Error al cargar los datos del usuario:', error);
@@ -35,24 +36,27 @@ function UserData() {
     fetchData();
   }, []);
 
-  useEffect(() => {
-    const originalData = JSON.parse(localStorage.getItem('user'));
-    if (usuario && originalData) {
-      setHasChanges(JSON.stringify(usuario) !== JSON.stringify(originalData));
-    }
-  }, [usuario]);
-
   const handleInputChange = (e) => {
     const { id, value } = e.target;
     const key = id.replace('floating', '').charAt(0).toLowerCase() + id.replace('floating', '').slice(1);
-    setUsuario((prevState) => ({ ...prevState, [key]: value }));
+
+    // Actualiza el estado del usuario
+    setUsuario((prevState) => {
+      const updatedUser = { ...prevState, [key]: value };
+      return updatedUser; // Devuelve el usuario actualizado
+    });
+
+    // Compara con los datos originales para verificar si hay cambios
+    const originalData = JSON.parse(localStorage.getItem('user'));
+    const hasChanges = Object.keys(originalData).some(k => originalData[k] !== value);
+    setHasChanges(hasChanges);
   };
 
   const isOnlyLettersWithValidSpaces = (str) => {
     // Permitir solo letras y un solo espacio entre palabras, sin espacios al inicio o al final
     return /^[A-Za-z]+( [A-Za-z]+)*$/.test(str);
   };
-  
+
   const isValidUserName = (str) => {
     // No permitir espacios en el nombre de usuario
     return /^[A-Za-z0-9_]+$/.test(str);
@@ -65,22 +69,22 @@ function UserData() {
   const isDateOfBirthValid = (date) => {
     const today = new Date();
     const dob = new Date(date);
-    
+
     if (dob > today) {
       return { isValid: false, message: "La fecha de nacimiento no puede ser una fecha futura" };
     }
-    
+
     let age = today.getFullYear() - dob.getFullYear();
     const monthDiff = today.getMonth() - dob.getMonth();
-    
+
     if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dob.getDate())) {
       age--;
     }
-    
+
     if (age < 18) {
       return { isValid: false, message: "Debe ser mayor de edad para registrarse" };
     }
-    
+
     return { isValid: true, message: "" };
   };
 
@@ -90,38 +94,38 @@ function UserData() {
     if (!usuario.userName || !usuario.nombre || !usuario.apellido || !usuario.fechaNacimiento || !usuario.numCelular) {
       toast.current.show({ severity: 'error', summary: 'Error', detail: 'Todos los campos son obligatorios', life: 3000 });
       return;
-  }
+    }
 
-  if (!isOnlyLettersWithValidSpaces(usuario.nombre)) {
+    if (!isOnlyLettersWithValidSpaces(usuario.nombre)) {
       toast.current.show({ severity: 'warn', summary: 'Advertencia', detail: 'El nombre solo debe contener letras y un solo espacio entre palabras, sin espacios al inicio o al final', life: 3000 });
       return;
-  }
+    }
 
-  if (!isOnlyLettersWithValidSpaces(usuario.apellido)) {
+    if (!isOnlyLettersWithValidSpaces(usuario.apellido)) {
       toast.current.show({ severity: 'warn', summary: 'Advertencia', detail: 'El apellido solo debe contener letras y no puede tener un espacio al inicio', life: 3000 });
       return;
-  }
+    }
 
-  // Validar nombre de usuario
-if (!isValidUserName(usuario.userName)) {
-  toast.current.show({ severity: 'warn', summary: 'Advertencia', detail: 'El nombre de usuario no debe contener espacios y solo debe contener letras', life: 3000 });
-  return;
-}
+    // Validar nombre de usuario
+    if (!isValidUserName(usuario.userName)) {
+      toast.current.show({ severity: 'warn', summary: 'Advertencia', detail: 'El nombre de usuario no debe contener espacios y solo debe contener letras', life: 3000 });
+      return;
+    }
 
-  if (!isIdentificationValid(identificacion)) {
-    toast.current.show({ severity: 'warn', summary: 'Advertencia', detail: 'El número de documento debe tener 8 o 10 dígitos', life: 3000 });
-    return;
-}
+    if (!isIdentificationValid(identificacion)) {
+      toast.current.show({ severity: 'warn', summary: 'Advertencia', detail: 'El número de documento debe tener 8 o 10 dígitos', life: 3000 });
+      return;
+    }
 
-  if (!isDateOfBirthValid(usuario.fechaNacimiento)) {
+    if (!isDateOfBirthValid(usuario.fechaNacimiento)) {
       toast.current.show({ severity: 'warn', summary: 'Advertencia', detail: usuario.fechaNacimiento ? 'Debe ser mayor de edad para registrarse' : 'Fecha de nacimiento inválida', life: 3000 });
       return;
-  }
+    }
 
-  if (!isPhoneValid(usuario.numCelular)) {
+    if (!isPhoneValid(usuario.numCelular)) {
       toast.current.show({ severity: 'warn', summary: 'Advertencia', detail: 'Número de celular inválido. Debe contener 10 dígitos y comenzar con 3', life: 3000 });
       return;
-  }
+    }
 
     Swal.fire({
       title: '¿Estás seguro de hacer esos cambios?',

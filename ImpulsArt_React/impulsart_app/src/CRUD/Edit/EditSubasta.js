@@ -67,7 +67,7 @@ const EditSubasta = () => {
                         setImagePreview(null);
                     }
                 } else {
-                    console.error('La subasta no contiene datos o la estructura de datos es incorrecta');
+                    setImagePreview(null);
                 }
             } catch (error) {
                 console.error('Error al cargar la subasta:', error);

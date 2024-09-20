@@ -12,6 +12,7 @@ import Navbar_init from './Navbar_init';
 import Footer from './Footer';
 import Swal from 'sweetalert2';
 import withReactContent from 'sweetalert2-react-content';
+import FilterButton from './FilterButton';
 
 const MySwal = withReactContent(Swal);
 
@@ -43,9 +44,9 @@ const ObraCard = ({ obra, handleReport, handleAddToCart, layout }) => (
         className="obra-category-tag"
         severity="info"
       />
-      <p className="obra-price"><span className="obra-price">
-                ${parseInt(obra.costo).toLocaleString()}
-              </span></p>
+      <p className="obra-price">
+        <span className="obra-price">${parseInt(obra.costo).toLocaleString()}</span>
+      </p>
       <div className="obra-actions">
         <Button
           icon="pi pi-shopping-cart"
@@ -90,8 +91,9 @@ const ListView = ({ obras, handleReport, handleAddToCart }) => (
   </div>
 );
 
-export default function ObrasEnVentaDisplay() {
+export default function SeccionObras() {
   const [obras, setObras] = useState([]);
+  const [filteredObras, setFilteredObras] = useState([]);
   const [layout, setLayout] = useState('grid');
   const [first, setFirst] = useState(0);
   const [rows, setRows] = useState(12);
@@ -120,8 +122,9 @@ export default function ObrasEnVentaDisplay() {
   const getObrasEnVenta = () => {
     AuthToken.get(`${process.env.REACT_APP_API_BASE_URL}obra/obrasEnVenta`)
       .then((response) => {
-        console.log(response.data.data);
-        setObras(normalizeData(response.data.data));
+        const normalizedObras = normalizeData(response.data.data);
+        setObras(normalizedObras);
+        setFilteredObras(normalizedObras);
       })
       .catch((e) => {
         console.log(e);
@@ -268,7 +271,28 @@ export default function ObrasEnVentaDisplay() {
     setRows(event.rows);
   };
 
-  const paginatedObras = obras.slice(first, first + rows);
+  const handleApplyFilters = (filters) => {
+    let filtered = [...obras];
+
+    if (filters.category) {
+      filtered = filtered.filter(obra => 
+        obra.categoria && obra.categoria.nombreCategoria === filters.category
+      );
+    }
+
+    if (filters.priceOrder) {
+      filtered.sort((a, b) => {
+        const priceA = a.costo;
+        const priceB = b.costo;
+        return filters.priceOrder === 'asc' ? priceA - priceB : priceB - priceA;
+      });
+    }
+
+    setFilteredObras(filtered);
+    setFirst(0);
+  };
+
+  const paginatedObras = filteredObras.slice(first, first + rows);
 
   return (
     <>
@@ -277,11 +301,14 @@ export default function ObrasEnVentaDisplay() {
         <Toast ref={toast} />
         <div className="d-flex justify-content-between align-items-center mb-3">
           <h5 className="mb-0">Obras en Venta</h5>
-          <DataViewLayoutOptions 
-            layout={layout} 
-            onChange={(e) => setLayout(e.value)} 
-            className="p-dataview-layout-options"
-          />
+          <div className="d-flex align-items-center">
+            <FilterButton onApplyFilters={handleApplyFilters} showTypeFilter={false} />
+            <DataViewLayoutOptions 
+              layout={layout} 
+              onChange={(e) => setLayout(e.value)} 
+              className="p-dataview-layout-options ml-2"
+            />
+          </div>
         </div>
         {layout === 'grid' ? 
           <GridView obras={paginatedObras} handleReport={handleReport} handleAddToCart={handleAddToCart} /> : 
@@ -290,7 +317,7 @@ export default function ObrasEnVentaDisplay() {
         <Paginator 
           first={first} 
           rows={rows} 
-          totalRecords={obras.length} 
+          totalRecords={filteredObras.length} 
           onPageChange={onPageChange}
           className="justify-content-center"
         />

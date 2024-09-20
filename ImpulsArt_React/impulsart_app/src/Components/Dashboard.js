@@ -241,7 +241,6 @@ export default function Dashboard() {
                 return (
                     <>
                     <h1>Usuarios</h1>
-                    <Link to="/CreateUsuario" className='btn btn-primary'>Crear usuario</Link>
                     <DataTable value={usuarios} stripedRows tableStyle={{ minWidth: '50rem' }}>
                         <Column field="nombre" header="Nombre" />
                         <Column field="apellido" header="Apellido" />

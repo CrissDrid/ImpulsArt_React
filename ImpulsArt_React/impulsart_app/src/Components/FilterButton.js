@@ -2,10 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { Button } from 'primereact/button';
 import { Dialog } from 'primereact/dialog';
 import { Dropdown } from 'primereact/dropdown';
-import axios from 'axios';
+import '../Styles/Filter.css'
 import AuthToken from '../Auth/AuthToken';
 
-const FilterButton = ({ onApplyFilters }) => {
+const FilterButton = ({ onApplyFilters, showTypeFilter = true }) => {
   const [visible, setVisible] = useState(false);
   const [filters, setFilters] = useState({
     category: null,
@@ -25,7 +25,7 @@ const FilterButton = ({ onApplyFilters }) => {
       if (response.data.status === 'success') {
         const formattedCategories = response.data.data.map(category => ({
           label: category.nombreCategoria,
-          value: category.nombreCategoria  // Cambiamos esto para usar nombreCategoria como valor
+          value: category.nombreCategoria
         }));
         setCategories(formattedCategories);
       }
@@ -72,8 +72,8 @@ const FilterButton = ({ onApplyFilters }) => {
 
   return (
     <>
-      <Button icon="pi pi-filter" onClick={() => setVisible(true)} className="p-button-rounded p-button-info" />
-      <Dialog header="Filtros" visible={visible} style={{ width: '30rem' }} footer={footer} onHide={() => setVisible(false)}>
+      <Button icon="pi pi-filter" onClick={() => setVisible(true)} className="p-button-rounded p-button-info custom-filter-button"/>
+      <Dialog header="Filtros" visible={visible} style={{ width: '30rem' }} footer={footer} onHide={() => setVisible(false)} draggable={false}>
         <div className="p-fluid">
           <div className="p-field">
             <label htmlFor="category">Categoría</label>
@@ -85,7 +85,7 @@ const FilterButton = ({ onApplyFilters }) => {
               placeholder="Selecciona una categoría"
             />
           </div>
-          
+
           <div className="p-field">
             <label htmlFor="priceOrder">Orden de precio</label>
             <Dropdown
@@ -96,17 +96,19 @@ const FilterButton = ({ onApplyFilters }) => {
               placeholder="Selecciona el orden de precio"
             />
           </div>
-          
-          <div className="p-field">
-            <label htmlFor="type">Tipo</label>
-            <Dropdown
-              id="type"
-              value={filters.type}
-              options={types}
-              onChange={(e) => setFilters({...filters, type: e.value})}
-              placeholder="Selecciona un tipo"
-            />
-          </div>
+
+          {showTypeFilter && (
+            <div className="p-field">
+              <label htmlFor="type">Tipo</label>
+              <Dropdown
+                id="type"
+                value={filters.type}
+                options={types}
+                onChange={(e) => setFilters({...filters, type: e.value})}
+                placeholder="Selecciona un tipo"
+              />
+            </div>
+          )}
         </div>
       </Dialog>
     </>

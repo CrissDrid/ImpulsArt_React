@@ -251,16 +251,6 @@ function DetallesObra() {
             <div className="image-container">
               <img src={`data:${obra.TipoImagen};base64,${obra.imagen}`} alt={obra.nombreProducto} className="product-image" />
             </div>
-            <div className="rating-container mt-2">
-              <Rating 
-                value={obra.rating} 
-                onChange={handleRatingChange} 
-                cancel={false} 
-                stars={5}
-                onIcon="bi bi-star-fill"
-                offIcon="bi bi-star"
-              />
-            </div>
           </div>
           <div className="col-md-6">
             <div className='row'>
