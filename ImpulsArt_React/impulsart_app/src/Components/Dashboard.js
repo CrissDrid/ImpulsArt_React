@@ -53,21 +53,18 @@ export default function Dashboard() {
         fetchUserInfo();
     }, []);
 
-    useEffect(() => {
         const fetchRoles = async () => {
             try {
                 const response = await AuthToken.get('rol/all');
                 console.log('Roles:', response.data); // Verifica que los roles están siendo recibidos
                 setRol(response.data);
+                return response;  // Asegúrate de devolver la respuesta
             } catch (error) {
                 console.error('Error al obtener roles:', error);
+                throw error;  // Lanza el error si ocurre
             }
         };
-        fetchRoles();
-    }, []);
     
-    
-
     useEffect(() => {
         if (identificacion) {
             getData();
@@ -117,37 +114,7 @@ export default function Dashboard() {
         setActiveTable(table);
     };
 
-    const openEditModal = (usuario) => {
-        MySwal.fire({
-            title: 'Editar Usuario',
-            html: getEditUserHtml(usuario.rol ? usuario.rol.pkCod_Rol : null),
-            focusConfirm: false,
-            showCancelButton: true,
-            confirmButtonText: 'Guardar',
-            preConfirm: () => {
-                const selectedRole = document.getElementById('floatingRolId').value;
-                if (!selectedRole) {
-                    Swal.showValidationMessage('Por favor, selecciona un rol');
-                    return false;
-                }
-                return {
-                    rol: { pkCod_Rol: selectedRole }
-                };
-            }
-        }).then((result) => {
-            if (result.isConfirmed) {
-                const updatedUsuario = {
-                    ...usuario,
-                    rol: result.value.rol,
-                };
-                updateUser(updatedUsuario);
-            }
-        });
-    };
-    
-    
-
-    const getEditUserHtml = (currentRole) => {
+    const getEditUserHtml = (currentRole, rol) => {
         if (!Array.isArray(rol) || rol.length === 0) {
             return `<div>No se pudieron cargar los roles.</div>`;
         }
@@ -156,12 +123,12 @@ export default function Dashboard() {
                 <select
                     class="form-control"
                     id="floatingRolId"
-                    name="RolId"
+                    name="rolId"
                     value="${currentRole || ''}"
                 >
                     <option value="">Seleccione un rol</option>
                     ${rol.map(r => `
-                    <option value="${r.pkCod_rol}" ${r.pkCod_rol === currentRole ? 'selected' : ''}>
+                    <option value="${r.pkCod_Rol}" ${r.pkCod_Rol == currentRole ? 'selected' : ''}>
                         ${r.nombre}
                     </option>
                     `).join('')}
@@ -171,14 +138,57 @@ export default function Dashboard() {
         `;
     };
     
-
-
-    const updateUser = async (user) => {
+    const openEditModal = async (usuarios) => {
         try {
-            await AuthToken.put(`usuario/${user.id}`, user); // Ajusta el endpoint según sea necesario
+            const response = await fetchRoles();  // Asegúrate de que fetchRoles esté funcionando correctamente
+            const roles = response.data.data;  // Verifica que response.data tenga el formato correcto
+    
+            console.log('Roles obtenidos:', roles);  // Imprime los roles para depurar
+    
+            if (!roles || roles.length === 0) {
+                throw new Error('No se encontraron roles');
+            }
+    
+            MySwal.fire({
+                title: 'Editar Usuario',
+                html: getEditUserHtml(usuarios.rol ? usuarios.rol.pkCod_Rol : null, roles),  // Aquí pasa los roles al HTML
+                focusConfirm: false,
+                showCancelButton: true,
+                confirmButtonText: 'Guardar',
+                preConfirm: () => {
+                    const selectedRole = document.getElementById('floatingRolId').value;
+                    if (!selectedRole) {
+                        Swal.showValidationMessage('Por favor, selecciona un rol');
+                        return false;
+                    }
+                    return {
+                        rol: { pkCod_Rol: selectedRole }
+                    };
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const updatedUsuario = {
+                        ...usuarios,
+                        rol: result.value.rol,
+                    };
+                    updateUser(updatedUsuario);
+                }
+            });
+        } catch (error) {
+            console.error('Error al obtener los roles:', error);
+            Swal.fire('Error', 'No se pudieron cargar los roles.', 'error');
+        }
+    };
+    
+    const updateUser = async (usuarios) => {
+        try {
+            const response = await AuthToken.put(`usuario/updateRol/${usuarios.identificacion}`, {
+                rolId: usuarios.rol.pkCod_Rol
+            });
             Swal.fire('Usuario actualizado', '', 'success');
         } catch (error) {
             Swal.fire('Error', 'No se pudo actualizar el usuario', 'error');
+            console.error('Error en la actualización:', error);
         }
     };
 
