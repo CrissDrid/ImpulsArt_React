@@ -1,111 +1,121 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { DataViewLayoutOptions } from 'primereact/dataview';
 import { Paginator } from 'primereact/paginator';
 import { Button } from 'primereact/button';
 import { Tag } from 'primereact/tag';
 import { Link } from 'react-router-dom';
+import { Toast } from 'primereact/toast';
+import axios from 'axios';
 import AuthToken from '../Auth/AuthToken';
+import GetUserInfo from '../Auth/GetUserInfo';
 import '../Styles/SeccionSubasta.css';
-import Navbar_init from './Navbar_init'
-import Footer from './Footer'
+import Navbar_init from './Navbar_init';
+import Footer from './Footer';
 import Swal from 'sweetalert2';
 import withReactContent from 'sweetalert2-react-content';
-import GetUserInfo from '../Auth/GetUserInfo';
+import FilterButton from './FilterButton';
 
 const MySwal = withReactContent(Swal);
 
-const AuctionCard = ({ auction, handleReport, layout }) => (
-  <div className={`obra-card ${layout === 'list' ? 'obra-card-list' : ''}`}>
-    <div className="obra-image-container">
-      <img
-        src={`data:${auction.TipoImagen};base64,${auction.imagen}`}
-        className="obra-image"
-        alt={`Imagen de la subasta: ${auction.nombreProducto}`}
-      />
-      <Button
-        icon="pi pi-exclamation-triangle"
-        className="p-button-rounded p-button-warning p-button-text report-button"
-        onClick={() => handleReport(auction)}
-      />
-    </div>
-    <div className="obra-details">
-      <h5 className="obra-title">{auction.nombreProducto}</h5>
-      {layout === 'list' && (
-        <p className="obra-description">{auction.descripcion}</p>
-      )}
-      <div className="obra-info-row">
-        <Tag 
-          value={auction.categoria ? auction.categoria.nombreCategoria : 'Sin categoría'} 
-          className="obra-category-tag"
-          severity="info"
+const ObraCard = ({ obra, handleReport, layout }) => {
+  return (
+    <div className={`obra-card ${layout === 'list' ? 'obra-card-list' : ''}`}>
+      <div className="obra-image-container">
+        <img
+          src={`data:${obra.tipoImagen};base64,${obra.imagen}`}
+          className="obra-image"
+          alt={`Imagen de la obra: ${obra.nombreProducto}`}
         />
-        {auction.subastas && auction.subastas.length > 0 && (
-          <div className="obra-minimum-bid">
-            ${parseInt(auction.subastas[0].precioInicial).toLocaleString()}
-          </div>
-        )}
+        <Button
+          icon="pi pi-exclamation-triangle"
+          className="p-button-rounded p-button-warning p-button-text report-button"
+          onClick={() => handleReport(obra)}
+        />
       </div>
-      <div className="obra-actions">
-        {auction.subastas && auction.subastas.length > 0 ? (
-          auction.subastas.map((subasta, index) => (
+      <div className="obra-details">
+        <h5 className="obra-title">{obra.nombreProducto}</h5>
+        {layout === 'list' && (
+          <p className="obra-description">{obra.descripcion}</p>
+        )}
+        <div className="obra-tags-container">
+          <Tag
+            value="Subasta"
+            severity="warning"
+            className="obra-type-tag"
+          />
+          <Tag
+            value={obra.categoria ? obra.categoria.nombreCategoria : 'Sin categoría'}
+            className="obra-category-tag"
+            severity="info"
+          />
+        </div>
+        <div className="obra-info-row">
+          <div className="obra-minimum-bid">
+            ${parseInt(obra.subastas[0].precioInicial).toLocaleString()}
+          </div>
+        </div>
+        <div className="obra-actions">
+          {obra.subastas.map((subasta, index) => (
             <Link key={index} to={`/DetallesSubasta/${subasta.pkCodSubasta}`}>
               <Button
                 icon="pi pi-eye"
                 className="p-button-rounded p-button-primary action-button"
-                tooltip="Ver detalles"
+                tooltip="Ver detalles de subasta"
                 tooltipOptions={{ position: 'top' }}
               />
             </Link>
-          ))
-        ) : (
-          <p>No hay subastas disponibles para esta obra.</p>
-        )}
+          ))}
+        </div>
       </div>
     </div>
-  </div>
-);
+  );
+};
 
-
-const GridView = ({ auctions, handleReport }) => (
+const GridView = ({ obras, handleReport }) => (
   <div className="row">
-    {auctions.map(auction => (
-      <div key={auction.pkCodSubasta} className="col-12 col-sm-6 col-md-4 col-lg-3 mb-4">
-        <AuctionCard auction={auction} handleReport={handleReport} layout="grid" />
+    {obras.map(obra => (
+      <div key={obra.pkCod_Producto} className="col-12 col-sm-6 col-md-4 col-lg-3 mb-4">
+        <ObraCard obra={obra} handleReport={handleReport} layout="grid" />
       </div>
     ))}
   </div>
 );
 
-const ListView = ({ auctions, handleReport }) => (
-  <div className="auction-list-view">
-    {auctions.map(auction => (
-      <div key={auction.pkCodSubasta} className="mb-3">
-        <AuctionCard auction={auction} handleReport={handleReport} layout="list" />
+const ListView = ({ obras, handleReport }) => (
+  <div className="obra-list-view">
+    {obras.map(obra => (
+      <div key={obra.pkCod_Producto} className="mb-3">
+        <ObraCard obra={obra} handleReport={handleReport} layout="list" />
       </div>
     ))}
   </div>
 );
 
-export default function AuctionDisplay() {
-  const [auctions, setAuctions] = useState([]);
+export default function SeccionSubasta() {
+  const [obras, setObras] = useState([]);
+  const [filteredObras, setFilteredObras] = useState([]);
   const [layout, setLayout] = useState('grid');
   const [first, setFirst] = useState(0);
   const [rows, setRows] = useState(12);
   const [tipoReporte, setTipoReporte] = useState([]);
   const [userRole, setUserRole] = useState('');
+  const toast = useRef(null);
 
   useEffect(() => {
-    getAuctions();
+    fetchSubastas();
     loadTipoReporte();
     loadUserRole();
   }, []);
 
-  const loadUserRole = async () => {
+  const fetchSubastas = async () => {
     try {
-      const { rol } = await GetUserInfo();
-      setUserRole(rol);
+      const response = await axios.get('http://localhost:8086/api/obra/obrasEnSubasta');
+      if (response.data.status === 'success') {
+        setObras(response.data.data);
+        setFilteredObras(response.data.data);
+      }
     } catch (error) {
-      console.error('Error al cargar el rol del usuario:', error);
+      console.error('Error fetching subastas:', error);
     }
   };
 
@@ -118,30 +128,13 @@ export default function AuctionDisplay() {
     }
   };
 
-  const normalizeData = (data) => {
-    if (Array.isArray(data)) {
-      return data;
-    } else if (data && data.data && Array.isArray(data.data)) {
-      return data.data;
-    } else {
-      return [];
+  const loadUserRole = async () => {
+    try {
+      const { rol } = await GetUserInfo();
+      setUserRole(rol);
+    } catch (error) {
+      console.error('Error al cargar el rol del usuario:', error);
     }
-  };
-
-  const getAuctions = () => {
-    AuthToken.get(`${process.env.REACT_APP_API_BASE_URL}obra/obrasEnSubasta`)
-      .then((response) => {
-        console.log(response.data.data);
-        setAuctions(normalizeData(response.data.data));
-      })
-      .catch((e) => {
-        console.log(e);
-      });
-  };
-
-  const onPageChange = (event) => {
-    setFirst(event.first);
-    setRows(event.rows);
   };
 
   const handleReport = async (obra) => {
@@ -160,7 +153,7 @@ export default function AuctionDisplay() {
         try {
           await AuthToken.delete(`obra/delete/${obra.pkCod_Producto}`);
           MySwal.fire('Borrado!', 'La obra ha sido eliminada.', 'success');
-          getAuctions();
+          fetchSubastas();
         } catch (error) {
           console.error('Error al borrar la obra:', error);
           MySwal.fire('Error', 'Hubo un problema al borrar la obra', 'error');
@@ -218,33 +211,63 @@ export default function AuctionDisplay() {
     }
   };
 
-  const paginatedAuctions = auctions.slice(first, first + rows);
+  const onPageChange = (event) => {
+    setFirst(event.first);
+    setRows(event.rows);
+  };
+
+  const handleApplyFilters = (filters) => {
+    let filtered = [...obras];
+
+    if (filters.category) {
+      filtered = filtered.filter(obra => 
+        obra.categoria && obra.categoria.nombreCategoria === filters.category
+      );
+    }
+
+    if (filters.priceOrder) {
+      filtered.sort((a, b) => {
+        const priceA = a.subastas[0].precioInicial;
+        const priceB = b.subastas[0].precioInicial;
+        return filters.priceOrder === 'asc' ? priceA - priceB : priceB - priceA;
+      });
+    }
+
+    setFilteredObras(filtered);
+    setFirst(0);
+  };
+
+  const paginatedObras = filteredObras.slice(first, first + rows);
 
   return (
     <>
-    <Navbar_init/>
-    <div className="container mt-5">
-      <div className="d-flex justify-content-between align-items-center mb-3">
-        <h5 className="mb-0">Obras en Subasta</h5>
-        <DataViewLayoutOptions 
-  layout={layout} 
-  onChange={(e) => setLayout(e.value)} 
-  className="p-dataview-layout-options"
-/>
+      <Navbar_init/>
+      <div className="container mt-5">
+        <Toast ref={toast} />
+        <div className="d-flex justify-content-between align-items-center mb-3">
+          <h5 className="mb-0">Subastas Activas</h5>
+          <div className="d-flex align-items-center">
+            <FilterButton onApplyFilters={handleApplyFilters} showTypeFilter={false} />
+            <DataViewLayoutOptions 
+              layout={layout} 
+              onChange={(e) => setLayout(e.value)} 
+              className="p-dataview-layout-options ml-2"
+            />
+          </div>
+        </div>
+        {layout === 'grid' ? 
+          <GridView obras={paginatedObras} handleReport={handleReport} /> : 
+          <ListView obras={paginatedObras} handleReport={handleReport} />
+        }
+        <Paginator 
+          first={first} 
+          rows={rows} 
+          totalRecords={filteredObras.length} 
+          onPageChange={onPageChange}
+          className="justify-content-center"
+        />
       </div>
-      {layout === 'grid' ? 
-        <GridView auctions={paginatedAuctions} handleReport={handleReport} /> : 
-        <ListView auctions={paginatedAuctions} handleReport={handleReport} />
-      }
-      <Paginator 
-        first={first} 
-        rows={rows} 
-        totalRecords={auctions.length} 
-        onPageChange={onPageChange}
-        className="justify-content-center"
-      />
-    </div>
-    <Footer/>
+      <Footer/>
     </>
   );
 }

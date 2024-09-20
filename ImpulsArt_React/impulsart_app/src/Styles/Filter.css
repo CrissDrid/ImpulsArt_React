@@ -1,0 +1,45 @@
+.custom-filter-button {
+    background-color: transparent;
+    border: 1.5px solid #8D33FF;
+    color: black;
+    padding: 8px 12px;
+    transition: all 0.3s ease;
+    border-radius: 0;
+    box-shadow: none;
+    margin-right: 1rem !important;
+}
+
+.custom-filter-button:hover {
+    background-color:#8D33FF;
+    color: white;
+}
+
+.custom-filter-button .pi-filter {
+    margin-top: 5px !important;
+    margin-right: 0.1px;
+}
+
+.p-dialog .p-button {
+    background-color: #8D33FF;
+    border: 1.5px solid #8D33FF;
+    color: white;
+    padding: 8px 12px;
+    transition: all 0.3s ease;
+    border-radius: 4px;
+    box-shadow: none;
+    font-weight: bold;
+}
+
+.p-dialog .p-button:hover {
+    background-color: #7a1db9;
+    color: white;
+}
+
+.p-button-secondary {
+    margin-left: 0.5rem;
+}
+
+/* Aplica un tamaño de fuente más pequeño a los items del dropdown */
+.p-dropdown-item {
+    font-size: 1.1rem; /* Ajusta el tamaño de la fuente según tu preferencia */
+}

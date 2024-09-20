@@ -13,6 +13,7 @@ import Navbar_init from './Navbar_init';
 import Footer from './Footer';
 import Swal from 'sweetalert2';
 import withReactContent from 'sweetalert2-react-content';
+import FilterButton from './FilterButton';
 
 const MySwal = withReactContent(Swal);
 
@@ -50,6 +51,17 @@ const ObraCard = ({ obra, handleReport, layout }) => {
             severity="info"
           />
         </div>
+        <div className="obra-info-row">
+          {isSubasta ? (
+            <div className="obra-minimum-bid">
+              ${parseInt(obra.subastas[0].precioInicial).toLocaleString()}
+            </div>
+          ) : (
+            <div className="obra-price">
+              ${parseInt(obra.costo).toLocaleString()}
+            </div>
+          )}
+        </div>
         <div className="obra-actions">
           {isSubasta ? (
             <>
@@ -80,7 +92,6 @@ const ObraCard = ({ obra, handleReport, layout }) => {
   );
 };
 
-
 const GridView = ({ obras, handleReport }) => (
   <div className="row">
     {obras.map(obra => (
@@ -103,6 +114,7 @@ const ListView = ({ obras, handleReport }) => (
 
 export default function SeccionSearch() {
   const [obras, setObras] = useState([]);
+  const [filteredObras, setFilteredObras] = useState([]);
   const [layout, setLayout] = useState('grid');
   const [first, setFirst] = useState(0);
   const [rows, setRows] = useState(12);
@@ -122,6 +134,7 @@ export default function SeccionSearch() {
       const response = await axios.get(`http://localhost:8086/api/obra/buscar?query=${encodeURIComponent(searchQuery)}`);
       if (response.data.status === 'success') {
         setObras(response.data.data);
+        setFilteredObras(response.data.data);
       }
     } catch (error) {
       console.error('Error fetching search results:', error);
@@ -225,7 +238,38 @@ export default function SeccionSearch() {
     setRows(event.rows);
   };
 
-  const paginatedObras = obras.slice(first, first + rows);
+  const handleApplyFilters = (filters) => {
+    console.log('Aplicando filtros:', filters);
+    
+    let filtered = [...obras];
+  
+    if (filters.category) {
+      filtered = filtered.filter(obra => 
+        obra.categoria && obra.categoria.nombreCategoria === filters.category
+      );
+    }
+  
+    if (filters.type) {
+      filtered = filtered.filter(obra => 
+        (filters.type === 'subasta' && obra.subastas && obra.subastas.length > 0) ||
+        (filters.type === 'obra' && (!obra.subastas || obra.subastas.length === 0))
+      );
+    }
+  
+    if (filters.priceOrder) {
+      filtered.sort((a, b) => {
+        const priceA = a.subastas && a.subastas.length > 0 ? a.subastas[0].precioInicial : a.costo;
+        const priceB = b.subastas && b.subastas.length > 0 ? b.subastas[0].precioInicial : b.costo;
+        return filters.priceOrder === 'asc' ? priceA - priceB : priceB - priceA;
+      });
+    }
+  
+    console.log('Obras filtradas final:', filtered);
+    setFilteredObras(filtered);
+    setFirst(0);
+  };
+
+  const paginatedObras = filteredObras.slice(first, first + rows);
 
   return (
     <>
@@ -234,13 +278,16 @@ export default function SeccionSearch() {
         <Toast ref={toast} />
         <div className="d-flex justify-content-between align-items-center mb-3">
           <h5 className="mb-0">Resultados de búsqueda para: {searchQuery}</h5>
-          <DataViewLayoutOptions 
-            layout={layout} 
-            onChange={(e) => setLayout(e.value)} 
-            className="p-dataview-layout-options"
-          />
+          <div className="d-flex align-items-center">
+            <FilterButton onApplyFilters={handleApplyFilters} />
+            <DataViewLayoutOptions 
+              layout={layout} 
+              onChange={(e) => setLayout(e.value)} 
+              className="p-dataview-layout-options ml-2"
+            />
+          </div>
         </div>
-        {obras.length > 0 ? (
+        {filteredObras.length > 0 ? (
           <>
             {layout === 'grid' ? 
               <GridView obras={paginatedObras} handleReport={handleReport} /> : 
@@ -249,7 +296,7 @@ export default function SeccionSearch() {
             <Paginator 
               first={first} 
               rows={rows} 
-              totalRecords={obras.length} 
+              totalRecords={filteredObras.length} 
               onPageChange={onPageChange}
               className="justify-content-center"
             />

@@ -12,7 +12,6 @@ import ListSubasta from '../CRUD/List/ListSubasta';
 import FormSubasta from '../CRUD/Create/FormSubasta';
 import EditSubasta from '../CRUD/Edit/EditSubasta';
 import UserData from './UserData';
-import ChangePWD from './ChangePWD';
 import Galery from './Galery';
 import ListUsuario from '../CRUD/List/ListUsuario';
 import CreateUsuario from '../CRUD/Create/FormUsuario';
@@ -53,7 +52,6 @@ function AppRoutes() { // Cambia el nombre de la función a AppRoutes
         <Route path='/ContactUs' element={<ContactUs/>}/>
         <Route path='/profile' element={<Profile/>}/>
         <Route path='/userdata' element={<UserData/>}/>
-        <Route path='/changePWD' element={<ChangePWD/>}/>
         <Route path='/galery' element={<Galery/>}/>
         <Route path='/SeccionSubasta' element={<SeccionSubasta />}/>
         <Route path='/SeccionObras' element={<SeccionObras />}/>

@@ -5,7 +5,6 @@ import Footer from './Footer';
 import { FaUser } from 'react-icons/fa';
 import '../Styles/Profile.css';
 import UserData from './UserData';
-import ChangePWD from './ChangePWD';
 import Galery from './Galery';
 import Direcciones from './Direcciones';
 
@@ -82,12 +81,9 @@ function Profile() {
             <li><i className="bi bi-heart-fill fs-4"></i><a href="#datos" onClick={(e) => { e.preventDefault(); handleTabChange('datosPersonales'); }}>Datos Personales</a></li>
             <li><i className="bi bi-palette-fill fs-4"></i><a href="#galeria" onClick={(e) => { e.preventDefault(); handleTabChange('miGaleria'); }}>Mi Galería</a></li>
             <li><i className="bi bi-house-fill fs-4"></i><a href="#Direcciones" onClick={(e) => { e.preventDefault(); handleTabChange('direcciones'); }}>Mis Direcciones</a></li>
-            <li><i className="bi bi-shield-lock-fill fs-4"></i><a href="#clave" onClick={(e) => { e.preventDefault(); handleTabChange('cambiarContrasena'); }}>Cambiar Contraseña</a></li>
-            <li><i className="bi bi-cart-fill fs-4"></i><a href="#">Historial de Compras</a></li>
           </ul>
         </div>
         {activeTab === 'datosPersonales' && <UserData />}
-        {activeTab === 'cambiarContrasena' && <ChangePWD />}
         {activeTab === 'miGaleria' && <Galery />}
         {activeTab === 'direcciones' && <Direcciones />}
       </div>

@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import About from './AboutUs';
 import Spot from '../Resources/Spot.svg';
 import Palette from '../Resources/Paintpalette.svg';
@@ -18,6 +19,8 @@ function LandingPage() {
     'Decora tu hogar con piezas que reflejen tu estilo y personalidad.'
   ];
   const intervaloTiempo = 5000;
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     const intervalo = setInterval(() => {
@@ -49,6 +52,10 @@ function LandingPage() {
     aboutRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
   };
 
+  const handleRegister = () => {
+    navigate('/register');
+  };
+
   return (
     <div className='home-container'>
       <Navbar_init onSupportClick={handleScrollToSupport} onAboutClick={handleScrollToAbout} />
@@ -61,8 +68,7 @@ function LandingPage() {
           <h1 className='primary-heading'>EL MUNDO DEL ARTE A UN CLICK DE DISTANCIA</h1>
           <p className='primary-text'>{frases[fraseActual]}</p>
           <div className="mb-3 d-flex email">
-            <input type="email" className="form-control mr-2 email-box" id="exampleFormControlInput1" placeholder="name@example.com"/>
-            <button type="button" className="btn btn-primary register-btn">Registrarte</button>
+            <button type="button" className="btn btn-primary register-btn" style={{ marginLeft: '1.7rem', marginTop: '0.5rem' }} onClick={handleRegister}>Registrarte</button>
           </div>
         </div>
       </div>
