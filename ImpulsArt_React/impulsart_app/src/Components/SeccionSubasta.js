@@ -1,22 +1,122 @@
-import axios from 'axios';
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { DataViewLayoutOptions } from 'primereact/dataview';
+import { Paginator } from 'primereact/paginator';
+import { Button } from 'primereact/button';
+import { Tag } from 'primereact/tag';
 import { Link } from 'react-router-dom';
-import Navbar_init from './Navbar_init';
-import Footer from './Footer';
+import AuthToken from '../Auth/AuthToken';
+import '../Styles/SeccionSubasta.css';
+import Navbar_init from './Navbar_init'
+import Footer from './Footer'
+import Swal from 'sweetalert2';
+import withReactContent from 'sweetalert2-react-content';
+import GetUserInfo from '../Auth/GetUserInfo';
 
-//Autenticacion de apis
-import AuthToken from '../Auth/AuthToken'; 
+const MySwal = withReactContent(Swal);
 
-function SeccionSubasta() {
-  const [listSubasta, setListSubasta] = useState([]);
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 6;
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = currentPage * itemsPerPage;
+const AuctionCard = ({ auction, handleReport, layout }) => (
+  <div className={`obra-card ${layout === 'list' ? 'obra-card-list' : ''}`}>
+    <div className="obra-image-container">
+      <img
+        src={`data:${auction.TipoImagen};base64,${auction.imagen}`}
+        className="obra-image"
+        alt={`Imagen de la subasta: ${auction.nombreProducto}`}
+      />
+      <Button
+        icon="pi pi-exclamation-triangle"
+        className="p-button-rounded p-button-warning p-button-text report-button"
+        onClick={() => handleReport(auction)}
+      />
+    </div>
+    <div className="obra-details">
+      <h5 className="obra-title">{auction.nombreProducto}</h5>
+      {layout === 'list' && (
+        <p className="obra-description">{auction.descripcion}</p>
+      )}
+      <div className="obra-info-row">
+        <Tag 
+          value={auction.categoria ? auction.categoria.nombreCategoria : 'Sin categoría'} 
+          className="obra-category-tag"
+          severity="info"
+        />
+        {auction.subastas && auction.subastas.length > 0 && (
+          <div className="obra-minimum-bid">
+            ${parseInt(auction.subastas[0].precioInicial).toLocaleString()}
+          </div>
+        )}
+      </div>
+      <div className="obra-actions">
+        {auction.subastas && auction.subastas.length > 0 ? (
+          auction.subastas.map((subasta, index) => (
+            <Link key={index} to={`/DetallesSubasta/${subasta.pkCodSubasta}`}>
+              <Button
+                icon="pi pi-eye"
+                className="p-button-rounded p-button-primary action-button"
+                tooltip="Ver detalles"
+                tooltipOptions={{ position: 'top' }}
+              />
+            </Link>
+          ))
+        ) : (
+          <p>No hay subastas disponibles para esta obra.</p>
+        )}
+      </div>
+    </div>
+  </div>
+);
+
+
+const GridView = ({ auctions, handleReport }) => (
+  <div className="row">
+    {auctions.map(auction => (
+      <div key={auction.pkCodSubasta} className="col-12 col-sm-6 col-md-4 col-lg-3 mb-4">
+        <AuctionCard auction={auction} handleReport={handleReport} layout="grid" />
+      </div>
+    ))}
+  </div>
+);
+
+const ListView = ({ auctions, handleReport }) => (
+  <div className="auction-list-view">
+    {auctions.map(auction => (
+      <div key={auction.pkCodSubasta} className="mb-3">
+        <AuctionCard auction={auction} handleReport={handleReport} layout="list" />
+      </div>
+    ))}
+  </div>
+);
+
+export default function AuctionDisplay() {
+  const [auctions, setAuctions] = useState([]);
+  const [layout, setLayout] = useState('grid');
+  const [first, setFirst] = useState(0);
+  const [rows, setRows] = useState(12);
+  const [tipoReporte, setTipoReporte] = useState([]);
+  const [userRole, setUserRole] = useState('');
 
   useEffect(() => {
-    getSubasta(); // Llama a la función para obtener las subastas al cargar el componente
-  }, [currentPage]); // Dependencia en currentPage para manejar la paginación
+    getAuctions();
+    loadTipoReporte();
+    loadUserRole();
+  }, []);
+
+  const loadUserRole = async () => {
+    try {
+      const { rol } = await GetUserInfo();
+      setUserRole(rol);
+    } catch (error) {
+      console.error('Error al cargar el rol del usuario:', error);
+    }
+  };
+
+  const loadTipoReporte = async () => {
+    try {
+      const result = await AuthToken.get('tipoReporte/all');
+      setTipoReporte(result.data.data);
+    } catch (error) {
+      console.error('Error al cargar los tipos de PQRS:', error);
+    }
+  };
 
   const normalizeData = (data) => {
     if (Array.isArray(data)) {
@@ -28,92 +128,123 @@ function SeccionSubasta() {
     }
   };
 
-  const getSubasta = () => {
-    AuthToken.get(`${process.env.REACT_APP_API_BASE_URL}subasta/subastaYobras`)
+  const getAuctions = () => {
+    AuthToken.get(`${process.env.REACT_APP_API_BASE_URL}obra/obrasEnSubasta`)
       .then((response) => {
-        console.log(response.data.data); // Verificar la estructura de los datos
-        setListSubasta(normalizeData(response.data.data));
+        console.log(response.data.data);
+        setAuctions(normalizeData(response.data.data));
       })
       .catch((e) => {
         console.log(e);
       });
   };
 
-  const handlePaginationClick = (pageNumber) => {
-    setCurrentPage(pageNumber);
+  const onPageChange = (event) => {
+    setFirst(event.first);
+    setRows(event.rows);
   };
 
-  const renderCards = () => {
-    return listSubasta.slice(startIndex, endIndex).map((subasta, index) => (
-      <div className="col" key={index}>
-        <div className="card shadow-sm">
-          <img
-            src={`data:${subasta.obras.TipoImagen};base64,${subasta.obras.imagen}`} // Usa el tipo MIME recibido del backend
-            className="bd-placeholder-img card-img-top"
-            width="100%"
-            height="225"
-            alt={`Imagen: ${subasta.obras.nombreProducto}`} // Ajusta el acceso a `nombreProducto` según tu estructura
-          />
-          <div className="card-body">
-            <h5 className="card-title">{subasta.obras.nombreProducto}</h5>
-            <p className="card-text"> Categoria: {subasta.obras.categoria.nombreCategoria}</p>
-            <div className="d-flex justify-content-between align-items-center">
-            <Link to={`/DetallesSubasta/${subasta.pkCodSubasta}`} className="btn btn-outline-primary mx-2">Ver obra en subasta</Link>
-            </div>
-          </div>
-        </div>
-      </div>
-    ));
+  const handleReport = async (obra) => {
+    if (userRole.includes('ASESOR')) {
+      const result = await MySwal.fire({
+        title: '¿Estás seguro?',
+        text: 'No podrás revertir esta acción!',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Sí, bórralo!'
+      });
+
+      if (result.isConfirmed) {
+        try {
+          await AuthToken.delete(`obra/delete/${obra.pkCod_Producto}`);
+          MySwal.fire('Borrado!', 'La obra ha sido eliminada.', 'success');
+          getAuctions();
+        } catch (error) {
+          console.error('Error al borrar la obra:', error);
+          MySwal.fire('Error', 'Hubo un problema al borrar la obra', 'error');
+        }
+      }
+    } else {
+      const { value: formValues } = await MySwal.fire({
+        title: 'Reportar Obra',
+        html: `
+          <div style="display: flex; flex-direction: column; gap: 15px; align-items: center;">
+            <label for="tipo-reporte" style="font-size: 16px; font-weight: bold;">Selecciona el tipo de reporte</label>
+            <select id="tipo-reporte" class="swal2-select" style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #ccc;">
+              <option value="">Selecciona el tipo de reporte</option>
+              ${tipoReporte.map(tipo => `<option value="${tipo.pkCod_TipoReporte}">${tipo.nombre}</option>`).join('')}
+            </select>
+
+            <label for="comentario-reporte" style="font-size: 16px; font-weight: bold;">Escribe tu comentario</label>
+            <textarea id="comentario-reporte" class="swal2-textarea" style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #ccc;" placeholder="Escribe aquí la razón del reporte..."></textarea>
+          </div>`,
+        focusConfirm: false,
+        showCancelButton: true,
+        preConfirm: () => {
+          const tipoReporteElement = document.getElementById('tipo-reporte');
+          const comentarioElement = document.getElementById('comentario-reporte');
+
+          const tipoReporte = tipoReporteElement ? tipoReporteElement.value : null;
+          const comentario = comentarioElement ? comentarioElement.value : null;
+
+          if (!tipoReporte) {
+            return Swal.showValidationMessage('Debes seleccionar un tipo de reporte');
+          }
+          if (!comentario) {
+            return Swal.showValidationMessage('Debes escribir un comentario');
+          }
+
+          return { tipoReporte, comentario };
+        }
+      });
+
+      if (formValues) {
+        const { tipoReporte, comentario } = formValues;
+    
+        try {
+          await AuthToken.post('reporteObra/create', { 
+            fk_obra: obra.pkCod_Producto, 
+            fk_TipoReporte: tipoReporte, 
+            comentario 
+          });
+          MySwal.fire('Reporte enviado', 'Tu reporte ha sido enviado exitosamente', 'success');
+        } catch (error) {
+          console.error('Error al reportar:', error);
+          MySwal.fire('Error', 'Hubo un problema al enviar el reporte', 'error');
+        }
+      }
+    }
   };
 
-  const totalPages = Math.ceil(listSubasta.length / itemsPerPage);
+  const paginatedAuctions = auctions.slice(first, first + rows);
+
   return (
     <>
     <Navbar_init/>
-    <div className="album py-5 bg-custom-color">
-      <div className="container">
-        <div className="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
-          {renderCards()}
-        </div>
-        <div className="d-flex justify-content-center mt-3">
-          <nav aria-label="Page navigation example">
-            <ul className="pagination" style={{ margin: '0' }}>
-              <li className={`page-item ${currentPage === 1 && 'disabled'}`}>
-                <button
-                  className="page-link"
-                  onClick={() => handlePaginationClick(currentPage - 1)}
-                  aria-label="Previous"
-                >
-                  <span aria-hidden="true">&laquo;</span>
-                </button>
-              </li>
-              {[...Array(totalPages).keys()].map((num) => (
-                <li
-                  key={num}
-                  className={`page-item ${currentPage === num + 1 && 'active'}`}
-                  onClick={() => handlePaginationClick(num + 1)}
-                  style={{ margin: '0' }}
-                >
-                  <button className="page-link">{num + 1}</button>
-                </li>
-              ))}
-              <li className={`page-item ${currentPage === totalPages && 'disabled'}`}>
-                <button
-                  className="page-link custom-page"
-                  onClick={() => handlePaginationClick(currentPage + 1)}
-                  aria-label="Next"
-                >
-                  <span aria-hidden="true">&raquo;</span>
-                </button>
-              </li>
-            </ul>
-          </nav>
-        </div>
+    <div className="container mt-5">
+      <div className="d-flex justify-content-between align-items-center mb-3">
+        <h5 className="mb-0">Obras en Subasta</h5>
+        <DataViewLayoutOptions 
+  layout={layout} 
+  onChange={(e) => setLayout(e.value)} 
+  className="p-dataview-layout-options"
+/>
       </div>
+      {layout === 'grid' ? 
+        <GridView auctions={paginatedAuctions} handleReport={handleReport} /> : 
+        <ListView auctions={paginatedAuctions} handleReport={handleReport} />
+      }
+      <Paginator 
+        first={first} 
+        rows={rows} 
+        totalRecords={auctions.length} 
+        onPageChange={onPageChange}
+        className="justify-content-center"
+      />
     </div>
     <Footer/>
     </>
   );
 }
-
-export default SeccionSubasta;

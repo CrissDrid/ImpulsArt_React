@@ -1,0 +1,110 @@
+.search-container {
+  position: relative;
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.search-form {
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.input-container {
+  position: relative;
+  flex-grow: 1;
+  display: flex;
+  align-items: center; /* Alinea el botón verticalmente con el campo de búsqueda */
+}
+
+.search-input {
+  width: 100%; /* Ocupa el 100% del contenedor */
+  padding: 10px 40px 10px 15px;
+  margin-left: 3rem;
+  margin-top: 1rem;
+  border: 1px solid #dfe1e5;
+  border-radius: 8px;
+  font-size: 16px;
+  outline: none;
+  transition: border-color 0.15s; /* Añadido border-color para suavizar el cambio */
+}
+
+.search-input:hover {
+  border-color: #8D33FF; /* Color del borde en hover */
+}
+
+.search-input:focus {
+  border-color: #8D33FF; /* Color del borde en foco */
+}
+
+.search-button {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  margin-top: 0.5rem;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: #8D33FF;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px; /* Tamaño del ícono */
+}
+
+.search-button i {
+  font-size: 18px; /* Ajusta el tamaño del ícono */
+}
+
+.suggestions-list {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 34.5rem; /* Ajusta el ancho para que coincida con el ancho del input */
+  background-color: white;
+  border: 1px solid #8D33FF !important;
+  border-top: none;
+  border-radius: 0 0 8px 8px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  margin-top: -6px !important;
+  margin-left: 3rem !important;
+  z-index: 1000;
+}
+
+.suggestions-list li {
+  font-size: 1.2rem;
+  padding: 10px 15px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.suggestions-list li:hover {
+  background-color: #f1f3f4;
+}
+
+.loading {
+  text-align: center;
+  padding: 10px;
+  color: #666;
+}
+
+.search-results {
+  margin-top: 20px;
+}
+
+.search-results ul {
+  list-style: none;
+  padding: 0;
+}
+
+.search-results li {
+  margin-bottom: 15px;
+  padding: 10px;
+  border: 1px solid #dfe1e5;
+  border-radius: 8px;
+}

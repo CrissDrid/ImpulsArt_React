@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import Navbar_init from './Navbar_init';
 import Footer from './Footer';
 import { FaUser } from 'react-icons/fa';
@@ -17,10 +18,8 @@ function Profile() {
   const [usuario, setUsuario] = useState(null);
   const [identificacion, setIdentificacion] = useState('');
   const [hasChanges, setHasChanges] = useState(false);
-  const [activeTab, setActiveTab] = useState(() => {
-    const storedTab = localStorage.getItem('activeTab');
-    return storedTab || 'datosPersonales';
-  });
+  const [activeTab, setActiveTab] = useState('datosPersonales');
+  const location = useLocation();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -50,64 +49,14 @@ function Profile() {
   }, [usuario]);
 
   useEffect(() => {
-    // Guardar el estado en el historial
-    const handleTabChange = (tab) => {
-      setActiveTab(tab);
-      window.history.pushState({ tab }, '', `#${tab}`);
-    };
-
-    // Manejar el retroceso del navegador
-    const onPopState = (event) => {
-      const state = event.state;
-      if (state && state.tab) {
-        setActiveTab(state.tab);
-      } else {
-        setActiveTab('datosPersonales'); // Página predeterminada
-      }
-    };
-
-    window.addEventListener('popstate', onPopState);
-
-    return () => {
-      window.removeEventListener('popstate', onPopState);
-    };
-  }, []);
+    // Verificar si hay un estado pasado desde la navegación
+    if (location.state && location.state.activeTab) {
+      setActiveTab(location.state.activeTab);
+    }
+  }, [location]);
 
   const handleTabChange = (tab) => {
     setActiveTab(tab);
-    window.history.pushState({ tab }, '', `#${tab}`);
-  };
-
-  const handleInputChange = (e) => {
-    const { id, value } = e.target;
-    const key = id.replace('floating', '').charAt(0).toLowerCase() + id.replace('floating', '').slice(1);
-    setUsuario(prevState => ({
-      ...prevState,
-      [key]: value
-    }));
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      const response = await AuthToken(`usuario/update/${identificacion}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(usuario),
-      });
-      const result = await response.json();
-      if (response.ok) {
-        console.log('Datos actualizados:', result);
-        localStorage.setItem('user', JSON.stringify(usuario));
-        setHasChanges(false);
-      } else {
-        console.error('Error al actualizar:', result);
-      }
-    } catch (error) {
-      console.error('Error de red:', error);
-    }
   };
 
   if (!usuario) {

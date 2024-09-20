@@ -102,12 +102,14 @@ function ObraEnVentaCarousel({ handleReport }) {
         </div>
         <div className="obra-details">
           <h5 className="obra-title">{obra.nombreProducto || 'Producto no disponible'}</h5>
-          <p className="obra-price">${Number(obra.costo).toFixed(2)}</p>
           <Tag 
             value={obra.categoria ? obra.categoria.nombreCategoria : 'Sin categoría'} 
             className="obra-category-tag"
             severity="info"
           />
+          <p className="obra-price"><span className="obra-price">
+                ${parseInt(obra.costo).toLocaleString()}
+              </span></p>
           <div className="obra-actions">
             <Button
               icon="pi pi-shopping-cart"
@@ -143,7 +145,14 @@ function ObraEnVentaCarousel({ handleReport }) {
         className="custom-carousel"
         circular
         itemTemplate={obraTemplate}
-        header={<h5 className="text-center mb-4 d-flex justify-content-start">Obras en Venta</h5>}
+        header={
+          <div className="d-flex justify-content-between align-items-center mb-4">
+            <h5 className="mb-0">Obras en Venta</h5>
+            <Link to="../SeccionObras" className="ver-todo-link" style={{ marginRight: '50px' }}>
+              Ver Todo
+            </Link>
+          </div>
+        }
       />
     </div>
   );

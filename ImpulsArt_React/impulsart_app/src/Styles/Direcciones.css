@@ -161,6 +161,14 @@
     align-self: flex-start; /* Alinea el botón a la izquierda del contenedor */
   }
 
+  .link-agregar-direccion {
+    color: #8D33FF !important;
+  }
+  
+  .link-agregar-direccion:hover {
+    color: #7a1db9 !important;
+  }
+
   
   
   
